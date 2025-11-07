@@ -8,7 +8,6 @@
   <script src="https://kit.fontawesome.com/1c020da525.js" crossorigin="anonymous"></script>
 
   <style>
-    /* 🔹 Styling same as before */
     body {
       margin: 0;
       font-family: 'Poppins', sans-serif;
@@ -16,68 +15,201 @@
       color: #fff;
       overflow-x: hidden;
     }
+
     header {
-      display: flex; align-items: center; justify-content: center;
-      position: relative; padding: 1rem 2rem;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      background: rgba(0,0,0,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(0, 0, 0, 0.6);
       backdrop-filter: blur(12px);
     }
-    .back-arrow { position:absolute; left:20px; font-size:1.6rem; color:#fff; cursor:pointer; transition:transform .3s; }
-    .back-arrow:hover { transform:translateX(-5px); }
-    header h1 { font-size:1.6rem; text-align:center; letter-spacing:1px; }
+
+    .back-arrow {
+      position: absolute;
+      left: 20px;
+      font-size: 1.6rem;
+      color: #fff;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .back-arrow:hover {
+      transform: translateX(-5px);
+    }
 
     .pdf-container {
-      margin:2rem auto 1rem; width:90%; max-width:900px;
-      background:rgba(255,255,255,0.05); border-radius:15px; padding:1rem;
-      box-shadow:0 0 30px rgba(255,0,0,0.12);
+      margin: 2rem auto 1rem;
+      width: 90%;
+      max-width: 900px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 1rem;
+      box-shadow: 0 0 30px rgba(255, 0, 0, 0.12);
     }
-    iframe { width:100%; height:500px; border:none; border-radius:10px; }
+
+    iframe {
+      width: 100%;
+      height: 500px;
+      border: none;
+      border-radius: 10px;
+    }
 
     .bookmark-btn {
-      width:100%; background:linear-gradient(90deg,#ff4b2b,#ff416c);
-      color:#fff; border:none; padding:0.8rem; font-size:1rem;
-      border-radius:8px; cursor:pointer; margin-top:0.8rem;
-      transition:all .3s ease; box-sizing:border-box;
+      width: 100%;
+      background: linear-gradient(90deg, #ff4b2b, #ff416c);
+      color: #fff;
+      border: none;
+      padding: 0.8rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 0.8rem;
+      transition: all 0.3s ease;
     }
-    .bookmark-btn:hover { transform:scale(1.02); }
+
+    .bookmark-btn:hover {
+      transform: scale(1.02);
+    }
 
     .book-meta {
-      width:90%; max-width:900px; margin:1.5rem auto;
-      background:rgba(255,255,255,0.03); padding:1.5rem;
-      border-radius:12px; text-align:center;
+      width: 90%;
+      max-width: 900px;
+      margin: 1.5rem auto;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 1.5rem;
+      border-radius: 12px;
+      text-align: center;
     }
 
+    /* 🔹 Suggestions */
     .suggestions {
-      margin:2.5rem auto 1.5rem; width:90%; max-width:1100px;
+      margin: 2.5rem auto 1.5rem;
+      width: 90%;
+      max-width: 1100px;
     }
-    .suggestion-grid {
-      display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap:1rem;
-    }
-    .suggestion-card {
-      background:rgba(255,255,255,0.03); border-radius:10px;
-      text-align:center; padding:0.5rem; transition:transform .35s;
-      cursor:pointer;
-    }
-    .suggestion-card img { width:100%; height:170px; object-fit:cover; border-radius:8px; }
-    .suggestion-card:hover { transform:scale(1.05); }
 
-    /* Comments */
+    .suggestion-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+    }
+
+    .suggestion-card {
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 10px;
+      text-align: center;
+      padding: 0.5rem;
+      transition: transform 0.35s;
+      cursor: pointer;
+    }
+
+    .suggestion-card img {
+      width: 100%;
+      height: 170px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .suggestion-card:hover {
+      transform: scale(1.05);
+    }
+
+    /* 🔹 Comment Section */
     .comments-wrapper {
-      width:90%; max-width:900px; margin:1.5rem auto 3rem;
-      background:rgba(255,255,255,0.03); border-radius:12px; padding:1rem;
+      width: 90%;
+      max-width: 900px;
+      margin: 2rem auto 3rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 1.5rem;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
     }
-    .comment-form textarea, .comment-form input {
-      width:100%; padding:10px; border-radius:8px; border:none;
-      background:#0f0f0f; color:#fff; margin-top:8px;
+
+    .comments-wrapper h3 {
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
     }
-    .comment-form button {
-      margin-top:8px; padding:8px 16px; background:#e50914; border:none;
-      color:white; border-radius:8px; cursor:pointer;
+
+    .comment-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
+
+    .comment-inputs input,
+    .comment-inputs textarea {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 10px;
+      color: #fff;
+      resize: none;
+      font-size: 0.95rem;
+    }
+
+    .comment-inputs button {
+      align-self: flex-end;
+      background: linear-gradient(90deg, #e50914, #ff416c);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      color: #fff;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .comment-inputs button:hover {
+      transform: scale(1.05);
+    }
+
+    .comments-list {
+      margin-top: 1rem;
+      max-height: 350px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #ff416c transparent;
+    }
+
     .comment-card {
-      background:rgba(0,0,0,0.4); padding:10px; border-radius:8px; margin-bottom:10px;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .comment-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .comment-name {
+      font-weight: 600;
+      color: #ffd;
+    }
+
+    .reply-btn {
+      background: transparent;
+      border: none;
+      color: #9ca3af;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .reply-box {
+      margin-top: 10px;
+      margin-left: 15px;
+      border-left: 2px solid #ff416c;
+      padding-left: 10px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
@@ -89,12 +221,7 @@
   </header>
 
   <div class="pdf-container">
-    <iframe id="bookPdf" title="Book PDF"></iframe>
-  </div>
-
-  <div style="width:90%;max-width:900px;margin:0.8rem auto;">
-    <button class="bookmark-btn" id="fullscreenBtn"> <i class="fa-solid fa-expand"></i> Fullscreen</button>
-    <button class="bookmark-btn" id="bookmarkBtn"><i class="fa-solid fa-bookmark"></i> Add to Bookmarks</button>
+    <iframe id="bookPdf"></iframe>
   </div>
 
   <section class="book-meta">
@@ -104,104 +231,146 @@
   </section>
 
   <div class="comments-wrapper">
-    <h3>Comments</h3>
-    <div class="comment-form">
-      <input type="text" id="commentName" placeholder="Your name" />
-      <textarea id="commentText" placeholder="Write a comment..."></textarea>
-      <button id="postCommentBtn">Post</button>
+    <h3>💬 Comments</h3>
+    <div class="comment-inputs">
+      <input type="text" id="commentName" placeholder="Enter your name..." />
+      <textarea id="commentText" placeholder="Write your comment..."></textarea>
+      <button id="postCommentBtn">Post Comment</button>
     </div>
-    <div id="commentsList">Loading comments...</div>
+    <div class="comments-list" id="commentsList">
+      <p>Loading comments...</p>
+    </div>
   </div>
 
   <section class="suggestions">
-    <h3>Similar Books You May Like</h3>
+    <h3>📚 Similar Books You May Like</h3>
     <div class="suggestion-grid" id="suggestionGrid"></div>
   </section>
 
-<script>
-const BACKEND_BASE = "https://notorabackend-c2yq.onrender.com";
+  <script>
+    const BACKEND_BASE = "https://notoraadminbackend-1.onrender.com";
+    const BOOKS_API = `${BACKEND_BASE}/api/books`;
+    const COMMENTS_API = `${BACKEND_BASE}/api/comments`;
 
-const BOOKS_API = `${BACKEND_BASE}/api/books`;
-const COMMENTS_API = `${BACKEND_BASE}/api/comments`;
+    const book = JSON.parse(localStorage.getItem("selectedBook") || "null");
 
-const book = JSON.parse(localStorage.getItem("selectedBook") || "null");
-if (!book) {
-  alert("No book selected.");
-  window.location.href = "index.html";
-} else {
-  document.getElementById('bookName').textContent = book.name;
-  document.getElementById('bookAuthor').textContent = book.author;
-  document.getElementById('bookGenre').textContent = book.genre;
-  document.getElementById('bookRating').textContent = book.rating ? '⭐ ' + book.rating : '';
-  document.getElementById('bookPdf').src = book.pdfUrl || "";
-}
-
-/* -------- Suggestion System -------- */
-async function loadSuggestionsFromBackend() {
-  try {
-    const genre = encodeURIComponent(book.genre || "");
-    const res = await fetch(`${BOOKS_API}?genre=${genre}`);
-    const data = await res.json();
-    let suggestions = data.filter(b => b._id !== book._id).slice(0,6);
-    if (suggestions.length < 4) {
-      const res2 = await fetch(BOOKS_API);
-      const all = await res2.json();
-      const randomFill = all.sort(()=>0.5-Math.random()).slice(0,6-suggestions.length);
-      suggestions = [...suggestions, ...randomFill];
+    if (!book) {
+      alert("No book selected!");
+      window.location.href = "index.html";
+    } else {
+      document.getElementById("bookName").textContent = book.name;
+      document.getElementById("bookAuthor").textContent = book.author;
+      document.getElementById("bookGenre").textContent = book.genre;
+      document.getElementById("bookRating").textContent = book.rating ? "⭐ " + book.rating : "";
+      document.getElementById("bookPdf").src = book.pdfUrl || "";
     }
-    renderSuggestions(suggestions);
-  } catch (e) {
-    console.error(e);
-  }
-}
 
-function renderSuggestions(list){
-  const grid = document.getElementById('suggestionGrid');
-  grid.innerHTML = "";
-  if (!list.length) { grid.innerHTML = "<p>No suggestions available.</p>"; return; }
-  list.forEach(b=>{
-    const el=document.createElement('div');
-    el.className="suggestion-card";
-    el.innerHTML=`<img src="${b.thumbnail}" alt="${b.name}"><p>${b.name}</p>`;
-    el.onclick=()=>{localStorage.setItem("selectedBook",JSON.stringify(b));window.location.reload();}
-    grid.appendChild(el);
-  });
-}
+    /* 🔹 Suggestion System */
+    async function loadSuggestions() {
+      try {
+        const res = await fetch(`${BOOKS_API}?genre=${encodeURIComponent(book.genre)}`);
+        const data = await res.json();
+        const suggestions = data.filter(b => b._id !== book._id).slice(0, 6);
+        renderSuggestions(suggestions);
+      } catch (e) {
+        console.error("Suggestion error:", e);
+      }
+    }
 
-/* -------- Comments -------- */
-async function loadComments(){
-  const res = await fetch(`${COMMENTS_API}/${book._id}`);
-  const data = await res.json();
-  const list = document.getElementById('commentsList');
-  list.innerHTML = "";
-  if (!data.length) { list.innerHTML="<p>No comments yet.</p>"; return; }
-  data.forEach(c=>{
-    const div=document.createElement('div');
-    div.className="comment-card";
-    div.innerHTML=`<strong>${c.name}</strong><p>${c.text}</p>`;
-    list.appendChild(div);
-  });
-}
+    function renderSuggestions(list) {
+      const grid = document.getElementById("suggestionGrid");
+      grid.innerHTML = "";
+      if (!list.length) {
+        grid.innerHTML = "<p>No similar books found.</p>";
+        return;
+      }
+      list.forEach(b => {
+        const el = document.createElement("div");
+        el.className = "suggestion-card";
+        el.innerHTML = `<img src="${b.thumbnail}" alt="${b.name}"><p>${b.name}</p>`;
+        el.addEventListener("click", () => {
+          localStorage.setItem("selectedBook", JSON.stringify(b));
+          window.location.reload();
+        });
+        grid.appendChild(el);
+      });
+    }
 
-/* -------- Post Comment -------- */
-document.getElementById('postCommentBtn').addEventListener('click', async()=>{
-  const name=document.getElementById('commentName').value.trim();
-  const text=document.getElementById('commentText').value.trim();
-  if(!name||!text)return alert("Enter name and comment");
-  await fetch(COMMENTS_API,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({bookId:book._id,name,text})
-  });
-  document.getElementById('commentText').value="";
-  loadComments();
-});
+    /* 🔹 Comments */
+    async function loadComments() {
+      try {
+        const res = await fetch(`${COMMENTS_API}/${book._id}`);
+        const comments = await res.json();
+        const list = document.getElementById("commentsList");
+        list.innerHTML = "";
+        if (!comments.length) {
+          list.innerHTML = "<p>No comments yet.</p>";
+          return;
+        }
+        comments.forEach(c => {
+          const card = document.createElement("div");
+          card.className = "comment-card";
+          card.innerHTML = `
+            <div class="comment-meta">
+              <span class="comment-name">${c.name}</span>
+              <button class="reply-btn" onclick="openReplyBox('${c._id}')">Reply</button>
+            </div>
+            <p>${c.text}</p>
+            <div class="reply-box" id="reply-${c._id}">
+              ${(c.replies || []).map(r => `
+                <div class="comment-card" style="background:rgba(255,255,255,0.05)">
+                  <span class="comment-name">${r.name}</span>
+                  <p>${r.text}</p>
+                </div>`).join('')}
+            </div>
+          `;
+          document.getElementById("commentsList").appendChild(card);
+        });
+      } catch (e) {
+        console.error("Load comments error:", e);
+      }
+    }
 
-/* -------- Init -------- */
-loadSuggestionsFromBackend();
-loadComments();
-</script>
+    async function postComment() {
+      const name = document.getElementById("commentName").value.trim();
+      const text = document.getElementById("commentText").value.trim();
+      if (!name || !text) return alert("Enter name and comment");
+      await fetch(COMMENTS_API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookId: book._id, name, text })
+      });
+      document.getElementById("commentText").value = "";
+      loadComments();
+    }
+
+    async function openReplyBox(commentId) {
+      const target = document.getElementById(`reply-${commentId}`);
+      const form = document.createElement("div");
+      form.innerHTML = `
+        <input id="replyName-${commentId}" placeholder="Your name" style="margin-top:8px;width:100%;padding:8px;border-radius:6px;border:none;background:#111;color:#fff">
+        <textarea id="replyText-${commentId}" placeholder="Write a reply..." style="margin-top:5px;width:100%;padding:8px;border-radius:6px;border:none;background:#111;color:#fff"></textarea>
+        <button style="margin-top:5px;background:#ff416c;border:none;padding:6px 12px;border-radius:6px;color:#fff;cursor:pointer;">Send</button>
+      `;
+      form.querySelector("button").onclick = async () => {
+        const name = document.getElementById(`replyName-${commentId}`).value.trim();
+        const text = document.getElementById(`replyText-${commentId}`).value.trim();
+        if (!name || !text) return alert("Enter both fields");
+        await fetch(`${COMMENTS_API}/reply/${commentId}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, text })
+        });
+        loadComments();
+      };
+      target.appendChild(form);
+    }
+
+    document.getElementById("postCommentBtn").addEventListener("click", postComment);
+
+    loadSuggestions();
+    loadComments();
+  </script>
 </body>
 </html>
-
 
