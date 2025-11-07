@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notora</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+ 
+<!-- <header class="header">
+  <div class="logo">📚 EduSpark</div>
+
+  <div class="search-box" id="searchBox">
+    
+  </div>
+  <button id="openSearch" class="icon-btn">🔍</button>
+
+  <div class="right-section">
+    <div class="badge-icon" title="Badges">
+      🏅
+    </div>
+
+    <div class="profile-icon" title="Your Profile">
+      <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Profile">
+    </div>
+    
+
+    
+  </div>
+</header> -->
+<header class="header">
+  <!-- <div class="logo"> Notora</div> -->
+   <div class="logo">
+  <img src="Lucid_Realism_Create_a_modern_flat_educational_logo_with_the_b_1.png" alt="logo" class="logo-img">
+  Notora
+</div>
+
+
+
+
+
+  <div class="search-box" id="searchBox">
+    <!-- Search input to be added dynamically -->
+  </div>
+
+  <!-- <button id="openSearch" class="icon-btn">🔍</button> -->
+   <button id="openSearch" class="icon-btn">
+  <i class="fas fa-search"></i>
+</button>
+
+
+  
+       <!-- <div class="badge-icon" title="Badges">🏅</div> -->
+        <div class="badge-icon" title="Badges">
+  <i class="fa fa-trophy"></i>
+</div>
+
+
+<div id="badgePanel" class="badge-panel hidden">
+  <div class="badge-box">
+    <button id="closeBadge" class="close-badge">✖</button>
+    <h2>Your Reading Badge</h2>
+    <div class="badge-progress">
+      <div class="badge-circle" id="badgeCircle">Level 0</div>
+      <div class="badge-bar">
+        <div id="badgeFill"></div>
+      </div>
+      <p id="badgeReadCount">0</p>
+      <p id="badgeLevelText">Start reading to earn badges!</p>
+    </div>
+  </div>
+</div>
+
+
+
+
+    <div class="profile-icon" title="Your Profile" id="profileIcon">
+      <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Profile" />
+    </div>
+  </div>
+  
+</header>
+<div id="badgePanel" class="badge-panel hidden">
+  <div class="badge-box">
+    <button id="closeBadge" class="close-badge">✖</button>
+    <h2>🏅 Your Badge Progress</h2>
+    <p id="badgeLevelText">Loading...</p>
+    <div class="badge-progress">
+      <div class="badge-circle" id="badgeCircle">Level 0</div>
+      <div class="badge-bar"><div id="badgeFill"></div></div>
+      <p><span id="badgeReadCount">0</span> books read</p>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Profile Fullscreen Section -->
+<!-- <div id="profileOverlay" class="profile-overlay hidden">
+  <div class="profile-content">
+    <button id="closeProfile" class="close-btn">✖</button>
+
+    <div class="profile-pic-container">
+      <img id="userImage" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="User Image">
+      <div class="image-options hidden" id="imageOptions">
+        <button onclick="changeImage()">Change Image</button>
+        <button onclick="deleteImage()">Delete Image</button>
+      </div>
+    </div>
+
+    <div class="username" id="usernameDisplay" onclick="editUsername()">
+      Click to add name
+    </div>
+
+    <div class="badges">
+      <div class="badge">📈 Level: <span id="userLevel">1</span></div>
+      <div class="badge">📚 Total Read: <span id="readBooks">0</span></div>
+      <div class="badge fav-section" onclick="toggleFavBooks()">⭐ "Some features of this website are still under development. Feel free to explore and use the available sections!" </div>
+    </div>
+
+    
+    <div class="fav-books hidden" id="favBooksSection">
+      <h3>Your Favorites Rolex Sir</h3>
+      <div class="book-grid" id="favBookGrid"></div>
+    </div>
+  </div>
+</div> -->
+
+
+
+
+  <main id="mainContent">
+    <div id="categoryContainer"></div>
+  </main>
+
+  <div id="searchOverlay" class="hidden">
+    <div class="search-overlay-box">
+      <input type="text" placeholder="Search books..." id="overlaySearchInput">
+      <button id="closeOverlay">×</button>
+    </div>
+    <div id="searchResults" class="grid-container"></div>
+  </div>
+
+  <!-- <div id="bookModal" class="modal hidden">
+    <button id="closeModal">×</button>
+    <div class="modal-content">
+      <h2 id="modalTitle"></h2>
+      <iframe id="pdfViewer" src="" frameborder="0"></iframe>
+      <button id="fullscreenBtn">Full Screen</button>
+    </div>
+  </div> -->
+
+
+  <div id="bookModal" class="modal hidden">
+  <div class="modal-backdrop"></div>
+  <div class="modal-content scale-in">
+    <button id="closeModal">×</button>
+    <h2 id="modalTitle"></h2>
+    <iframe id="pdfViewer" src="" frameborder="0"></iframe>
+    <button id="fullscreenBtn">📖 Full Screen</button>
+    
+  </div>
+</div>
+
+
+  
+<audio id="notify-sound">
+  <source src="notification-sound-effect-372475.mp3" type="audio/mpeg">
+</audio>
+
+<footer style="background-color: #121212; color: #d1d5db; text-align: center; padding: 2rem 1rem;">
+  <!-- <div style="margin-bottom: 1rem;">
+    <img src="Lucid_Realism_Create_a_modern_flat_educational_logo_with_the_b_1.png" alt="EduSpark Logo" style="height: 40px;">
+    <h2 style="color: #ef4444; font-size: 1.5rem; margin-top: 0.5rem;">Notora</h2>
+  </div> -->
+  <div style="display: flex; justify-content: center; align-items: center; margin-top: 1rem;">
+  <img src="Lucid_Realism_Create_a_modern_flat_educational_logo_with_the_b_1.png" alt="EduSpark Logo" style="height: 40px; margin-right: 8px;">
+  <h2 style="color: #db3535; font-size: 1.8rem; margin: 0;">Notora</h2>
+</div>
+
+
+  <p style="margin-bottom: 1.5rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+    A collaborative platform dedicated to accessible and open education. Share, learn, and grow together.
+  </p>
+  <div style="margin-bottom: 1.5rem;">
+    <a href="#" style="margin: 0 0.5rem;"><img src="youtube-svgrepo-com.svg"alt="YouTube" style="height: 24px; "></a>
+    <a href="#" style="margin: 0 0.5rem;"><img src="128px-Instagram_logo_2016.svg.png" alt="Instagram" style="height: 24px;color:gray;"></a>
+    <a href="#" style="margin: 0 0.5rem;"><img src="telegram-svgrepo-com.svg" alt="Telegram" style="height: 24px;color:gray;"></a>
+  </div>
+  <p style="margin-bottom: 0.5rem;">
+    Have questions? Contact us at <a href="mailto:edusparkofficial@gmail.com" style="color: #ef4444;">univora8@gmail.com</a>
+  </p>
+  <p style="font-size: 0.875rem; color: #9ca3af;">
+    Notora is a part of Univora. For any queries or issues, please contact Univora support.<br>
+    © 2024 Notora. All Rights Reserved.
+  </p>
+</footer>
+  <script src="script.js"></script>
+</body>
+</html>
+
+
