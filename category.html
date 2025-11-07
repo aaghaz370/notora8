@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Category | Notora</title>
+  <link rel="icon" href="images/logo.png">
+  <script src="https://kit.fontawesome.com/1c020da525.js" crossorigin="anonymous"></script>
+  <style>
+    /* ===== Notora Dark Gradient Theme ===== */
+    :root {
+      --bg-dark: #000;
+      --card-bg: #121212;
+      --border: #222;
+      --accent: #e50914;
+      --text: #fff;
+      --muted: #aaa;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: radial-gradient(circle at top, #0b0b0b, #000);
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 20px;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .back-btn {
+      background: none;
+      border: none;
+      color: var(--accent);
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.3s, color 0.3s;
+    }
+    .back-btn:hover {
+      color: #ff3d3d;
+      transform: translateX(-3px);
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      margin: 0;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .sort-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+    }
+
+    select {
+      background: #141414;
+      border: 1px solid #333;
+      color: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    /* ===== Book Grid ===== */
+    .book-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 18px;
+      padding: 20px;
+    }
+
+    .book-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 12px;
+      overflow: hidden;
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+
+    .book-card:hover {
+      transform: translateY(-5px) scale(1.03);
+      box-shadow: 0 0 20px rgba(229, 9, 20, 0.3);
+    }
+
+    .book-card img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .book-card h3 {
+      font-size: 1rem;
+      margin: 8px 0 4px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .book-card p {
+      margin: 2px 0;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ===== Pagination ===== */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 25px;
+    }
+
+    .pagination button {
+      background: #141414;
+      color: var(--accent);
+      border: 1px solid #333;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .pagination button.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .pagination button:hover:not(.active) {
+      background: #ff1a1a;
+      color: white;
+    }
+
+    /* ===== Loader ===== */
+    .loader {
+      text-align: center;
+      padding: 60px;
+    }
+
+    .loader div {
+      width: 12px;
+      height: 12px;
+      margin: 4px;
+      background-color: var(--accent);
+      border-radius: 50%;
+      display: inline-block;
+      animation: bounce 1s infinite ease-in-out;
+    }
+
+    .loader div:nth-child(2) { animation-delay: 0.2s; }
+    .loader div:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1); }
+    }
+
+    @media (max-width: 768px) {
+      .book-grid { grid-template-columns: repeat(2, 1fr); }
+      header h1 { font-size: 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <button class="back-btn" onclick="window.history.back()">
+      <i class="fa-solid fa-arrow-left"></i> Back
+    </button>
+    <h1 id="categoryName">Loading...</h1>
+    <div class="sort-container">
+      <label for="sort">Sort:</label>
+      <select id="sort">
+        <option value="rating">Rating</option>
+        <option value="atoz">A → Z</option>
+        <option value="ztoa">Z → A</option>
+      </select>
+    </div>
+  </header>
+
+  <div id="bookContainer" class="book-grid"></div>
+  <div id="pagination" class="pagination"></div>
+  <div id="loader" class="loader" style="display:none;">
+    <div></div><div></div><div></div>
+  </div>
+
+  <script>
+    const BACKEND_BASE = "https://notoraadminbackend-1.onrender.com";
+    const BOOKS_API = `${BACKEND_BASE}/api/books`;
+
+    const params = new URLSearchParams(window.location.search);
+    const genre = params.get("genre") || "Unknown";
+    const categoryNameEl = document.getElementById("categoryName");
+    const bookContainer = document.getElementById("bookContainer");
+    const paginationEl = document.getElementById("pagination");
+    const sortSelect = document.getElementById("sort");
+    const loader = document.getElementById("loader");
+
+    let allBooks = [];
+    let currentPage = 1;
+    const booksPerPage = 40;
+
+    categoryNameEl.textContent = `${genre} Books`;
+
+    async function fetchBooks() {
+      loader.style.display = "block";
+      bookContainer.innerHTML = "";
+      paginationEl.innerHTML = "";
+      try {
+        const res = await fetch(`${BOOKS_API}?genre=${encodeURIComponent(genre)}`);
+        const data = await res.json();
+        allBooks = data || [];
+        applySorting();
+      } catch (err) {
+        console.error("Error:", err);
+        bookContainer.innerHTML = `<p style="text-align:center;color:#f66;">Failed to load books.</p>`;
+      } finally {
+        loader.style.display = "none";
+      }
+    }
+
+    function renderBooks() {
+      bookContainer.innerHTML = "";
+      const start = (currentPage - 1) * booksPerPage;
+      const end = start + booksPerPage;
+      const visible = allBooks.slice(start, end);
+
+      if (visible.length === 0) {
+        bookContainer.innerHTML = `<p style="text-align:center;margin-top:50px;">No books found in this category.</p>`;
+        return;
+      }
+
+      visible.forEach(book => {
+        const card = document.createElement("div");
+        card.className = "book-card";
+        card.innerHTML = `
+          <img src="${book.thumbnail}" alt="${book.name}">
+          <h3>${book.name}</h3>
+          <p>${book.author || "Unknown"}</p>
+          <p>⭐ ${book.rating || "N/A"}</p>
+        `;
+        card.addEventListener("click", () => {
+          localStorage.setItem("selectedBook", JSON.stringify(book));
+          window.location.href = "book.html";
+        });
+        bookContainer.appendChild(card);
+      });
+
+      renderPagination();
+    }
+
+    function renderPagination() {
+      paginationEl.innerHTML = "";
+      const totalPages = Math.ceil(allBooks.length / booksPerPage);
+      if (totalPages <= 1) return;
+
+      const prevBtn = document.createElement("button");
+      prevBtn.textContent = "← Prev";
+      prevBtn.disabled = currentPage === 1;
+      prevBtn.onclick = () => { currentPage--; renderBooks(); };
+      paginationEl.appendChild(prevBtn);
+
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        btn.classList.toggle("active", i === currentPage);
+        btn.onclick = () => { currentPage = i; renderBooks(); };
+        paginationEl.appendChild(btn);
+      }
+
+      const nextBtn = document.createElement("button");
+      nextBtn.textContent = "Next →";
+      nextBtn.disabled = currentPage === totalPages;
+      nextBtn.onclick = () => { currentPage++; renderBooks(); };
+      paginationEl.appendChild(nextBtn);
+    }
+
+    function applySorting() {
+      const value = sortSelect.value;
+      if (value === "rating") allBooks.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+      else if (value === "atoz") allBooks.sort((a, b) => a.name.localeCompare(b.name));
+      else if (value === "ztoa") allBooks.sort((a, b) => b.name.localeCompare(a.name));
+      currentPage = 1;
+      renderBooks();
+    }
+
+    sortSelect.addEventListener("change", applySorting);
+    fetchBooks();
+  </script>
+</body>
+</html>
