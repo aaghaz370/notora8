@@ -213,10 +213,10 @@
   animation: slideUp 0.5s ease forwards;
 }
 
-.book-card:hover {
+/* .book-card:hover {
   transform: scale(1.05);
   box-shadow: 0 0 20px #e5091455;
-}
+} */
 
 .book-card img {
   width: 100%;
@@ -1065,4 +1065,5 @@ footer small {
 
 
 }
+
 
