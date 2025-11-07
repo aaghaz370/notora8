@@ -3,7 +3,7 @@ const API_URL = "https://notoraadminbackend-1.onrender.com/api/books";
 
 // ✅ Category list
 const categories = [
-  "Fictional", "JEE", "NEET", "Story Hindi", "UPSC", "Biography",
+  "Fictional", "JEE", "NEET", "Hindi Story Book", "UPSC", "Biography",
   "Romance", "Horror", "Fantasy", "Coding", "Business", "CBSE", "ICSE",
   "10th", "11th", "12th", "Spiritual", "Comics", "Self Help"
 ];
@@ -197,3 +197,4 @@ function performSearch(query) {
 
 // ✅ Run on load
 loadAllBooks();
+
