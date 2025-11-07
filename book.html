@@ -162,41 +162,67 @@ function showPopup(msg, bg='#333') {
 }
 
 /* -------- SUGGESTIONS: fetch same-genre books from backend -------- */
+const res = await fetch(`http://localhost:9090/api/books?genre=${encodeURIComponent(genreKey)}`);
+ 
+// 👆 apna backend URL daal (agar local pe ho to "http://localhost:9090/api/books")
+
 async function loadSuggestionsFromBackend() {
   try {
-    const genreQuery = encodeURIComponent(book.genre || "");
-    // assuming backend supports ?genre=...
+    if (!book || !book.genre) return;
+
+    const genreQuery = encodeURIComponent(book.genre);
     const res = await fetch(`${BOOKS_API}?genre=${genreQuery}`);
+
     if (!res.ok) throw new Error("Failed to fetch suggestions");
-    const arr = await res.json();
-    // remove current book and take up to 6
-    const suggestions = arr.filter(b => b._id !== book._id).slice(0,6);
+
+    const data = await res.json();
+
+    // filter out current book and take up to 6
+    let suggestions = data.filter(b => b._id !== book._id).slice(0, 6);
+
+    // 🔁 Fallback: if too few, fetch random others
+    if (suggestions.length < 4) {
+      const res2 = await fetch(BOOKS_API);
+      const all = await res2.json();
+      const others = all.filter(b => b.genre !== book.genre);
+      const randomFill = others.sort(() => 0.5 - Math.random()).slice(0, 6 - suggestions.length);
+      suggestions = [...suggestions, ...randomFill];
+    }
+
     renderSuggestions(suggestions);
   } catch (err) {
-    console.error("Suggestions error:", err);
-    // fallback: if you had local data files, you can fetch those as fallback
-    // renderSuggestions([]);
+    console.error("❌ Suggestions error:", err);
+    renderSuggestions([]);
   }
 }
 
 function renderSuggestions(list) {
   const grid = document.getElementById('suggestionGrid');
   grid.innerHTML = "";
+
   if (!list || list.length === 0) {
-    grid.innerHTML = "<p style='color:#9ca3af'>No suggestions available.</p>";
+    grid.innerHTML = "<p style='color:#9ca3af;text-align:center;'>No suggestions available.</p>";
     return;
   }
+
   list.forEach(b => {
     const el = document.createElement('div');
     el.className = "suggestion-card";
-    el.innerHTML = `<img src="${b.thumbnail}" alt="${b.name}" /><p>${b.name}</p>`;
+    el.innerHTML = `
+      <img src="${b.thumbnail}" alt="${b.name}" />
+      <p>${b.name}</p>
+    `;
     el.addEventListener('click', () => {
-      localStorage.setItem('selectedBook', JSON.stringify(b));
+      localStorage.setItem("selectedBook", JSON.stringify(b));
       window.location.reload();
     });
     grid.appendChild(el);
   });
 }
+
+/* 🚀 Run on load */
+loadSuggestionsFromBackend();
+
 
 /* -------- COMMENTS: load, post, reply -------- */
 const commentsListEl = document.getElementById('commentsList');
