@@ -158,7 +158,6 @@
       border-radius: 8px;
       margin-bottom: 10px;
       animation: fadeIn 0.3s ease;
-      position: relative;
     }
 
     .comment-meta {
@@ -178,47 +177,6 @@
       color: #9ca3af;
       font-size: 0.9rem;
       cursor: pointer;
-    }
-
-    .comment-options {
-      position: absolute;
-      right: 8px;
-      top: 8px;
-    }
-
-    .comment-options button {
-      background: transparent;
-      border: none;
-      color: #bbb;
-      cursor: pointer;
-      font-size: 1rem;
-    }
-
-    .comment-menu {
-      position: absolute;
-      right: 0;
-      top: 20px;
-      background: #111;
-      border-radius: 8px;
-      box-shadow: 0 0 8px rgba(255,255,255,0.1);
-      overflow: hidden;
-      z-index: 10;
-    }
-
-    .comment-menu button {
-      display: block;
-      width: 100%;
-      border: none;
-      background: transparent;
-      color: #fff;
-      padding: 6px 12px;
-      text-align: left;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .comment-menu button:hover {
-      background: rgba(255,255,255,0.1);
     }
 
     .reply-box {
@@ -323,24 +281,25 @@ const BACKEND_BASE = "https://notoraadminbackend-1.onrender.com";
 const BOOKS_API = `${BACKEND_BASE}/api/books`;
 const COMMENTS_API = `${BACKEND_BASE}/api/comments`;
 
+// Load Book
 let book = null;
 try {
   const raw = localStorage.getItem("selectedBook");
   if (!raw || raw === "undefined") throw new Error();
   book = JSON.parse(raw);
 } catch {
-  alert("No book found, returning...");
+  alert("No book found, redirecting...");
   location.href = "index.html";
 }
 
-/* Fill book info */
+// Fill Info
 document.getElementById("bookName").textContent = book.name;
 document.getElementById("bookAuthor").textContent = book.author;
 document.getElementById("bookGenre").textContent = book.genre;
 document.getElementById("bookRating").textContent = "⭐ " + (book.rating || "");
 document.getElementById("bookPdf").src = book.pdfUrl;
 
-/* Suggestions */
+/* Suggestion Loader */
 async function loadSuggestions() {
   const res = await fetch(`${BOOKS_API}?genre=${encodeURIComponent(book.genre)}`);
   const data = await res.json();
@@ -349,8 +308,11 @@ async function loadSuggestions() {
   data.filter(b => b._id !== book._id).slice(0,6).forEach(b => {
     const el = document.createElement("div");
     el.className = "suggestion-card";
-    el.innerHTML = `<img src="${b.thumbnail}"><p>${b.name}</p>`;
-    el.onclick = () => { localStorage.setItem("selectedBook", JSON.stringify(b)); location.href="book.html"; };
+    el.innerHTML = `<img src="${b.thumbnail}" alt="${b.name}"><p>${b.name}</p>`;
+    el.onclick = () => {
+      localStorage.setItem("selectedBook", JSON.stringify(b));
+      location.href = "book.html";
+    };
     grid.appendChild(el);
   });
 }
@@ -361,69 +323,72 @@ async function loadComments() {
   const comments = await res.json();
   const list = document.getElementById("commentsList");
   list.innerHTML = "";
-  if (!comments.length) return list.innerHTML="<p>No comments yet.</p>";
-  comments.forEach(c=>{
-    const div=document.createElement("div");
-    div.className="comment-card";
-    div.innerHTML=`
+  if (!comments.length) return list.innerHTML = "<p>No comments yet.</p>";
+  comments.forEach(c => {
+    const card = document.createElement("div");
+    card.className = "comment-card";
+    card.innerHTML = `
       <div class="comment-meta">
-        <span class="comment-name">${c.name}${c.role==="admin"?'<span class="comment-verified">✓ Admin</span>':""}</span>
-        <div class="comment-options">
-          <button onclick="toggleMenu(this)">⋮</button>
-          <div class="comment-menu" style="display:none">
-            <button onclick="editComment('${c._id}','${c.text.replace(/'/g,"&#39;")}')">Edit</button>
-            <button onclick="deleteComment('${c._id}')">Delete</button>
-          </div>
-        </div>
+        <span class="comment-name">${c.name}${c.role === "admin" ? '<span class="comment-verified">✓ Admin</span>' : ""}</span>
+        <button class="reply-btn" onclick="openReplyBox('${c._id}')">Reply</button>
       </div>
       <p>${c.text}</p>
-    `;
-    list.appendChild(div);
+      <div class="reply-box" id="reply-${c._id}">
+        ${(c.replies || []).map(r => `
+          <div class="comment-card" style="background:rgba(255,255,255,0.08)">
+            <span class="comment-name">${r.name}</span>
+            <p>${r.text}</p>
+          </div>
+        `).join('')}
+      </div>`;
+    list.appendChild(card);
   });
 }
 
-function toggleMenu(btn){
-  const menu = btn.nextElementSibling;
-  menu.style.display = menu.style.display==="block"?"none":"block";
-}
-
-/* Post comment with validation */
-async function postComment(){
-  const name=document.getElementById("commentName").value.trim();
-  const text=document.getElementById("commentText").value.trim();
-  if(name.length<3||name.length>10) return alert("Name must be 3–10 characters.");
-  if(text.length<1||text.length>150) return alert("Comment must be 1–150 characters.");
-
-  await fetch(COMMENTS_API,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({bookId:book._id,name,text})
+/* Post Comment */
+async function postComment() {
+  const name = document.getElementById("commentName").value.trim();
+  const text = document.getElementById("commentText").value.trim();
+  if (name.length < 3 || name.length > 10) return alert("Name must be 3–10 characters.");
+  if (text.length < 1 || text.length > 150) return alert("Comment must be 1–150 characters.");
+  await fetch(COMMENTS_API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ bookId: book._id, name, text })
   });
-  document.getElementById("commentText").value="";
+  document.getElementById("commentText").value = "";
   loadComments();
 }
 
-async function editComment(id,oldText){
-  const newText=prompt("Edit your comment:",oldText);
-  if(!newText||newText.length>150) return alert("Invalid comment!");
-  await fetch(`${COMMENTS_API}/${id}`,{
-    method:"PUT",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({text:newText})
-  });
-  loadComments();
+/* Reply Function */
+async function openReplyBox(id) {
+  const target = document.getElementById(`reply-${id}`);
+  if (target.querySelector("textarea")) return;
+  const box = document.createElement("div");
+  box.innerHTML = `
+    <input placeholder="Your name (3–10 chars)" id="rname-${id}" style="width:100%;background:#111;color:#fff;border:none;border-radius:6px;padding:6px;margin-top:6px">
+    <textarea placeholder="Write a reply (1–150 chars)..." id="rtext-${id}" style="width:100%;background:#111;color:#fff;border:none;border-radius:6px;padding:6px;margin-top:6px"></textarea>
+    <button style="background:#ff416c;border:none;padding:6px 12px;border-radius:6px;color:#fff;cursor:pointer;margin-top:4px">Send</button>
+  `;
+  box.querySelector("button").onclick = async () => {
+    const name = document.getElementById(`rname-${id}`).value.trim();
+    const text = document.getElementById(`rtext-${id}`).value.trim();
+    if (name.length < 3 || name.length > 10) return alert("Name must be 3–10 characters.");
+    if (text.length < 1 || text.length > 150) return alert("Reply must be 1–150 characters.");
+    await fetch(`${COMMENTS_API}/reply/${id}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, text })
+    });
+    loadComments();
+  };
+  target.appendChild(box);
 }
 
-async function deleteComment(id){
-  if(!confirm("Delete this comment?")) return;
-  await fetch(`${COMMENTS_API}/${id}`,{method:"DELETE"});
-  loadComments();
-}
-
-document.getElementById("postCommentBtn").onclick=postComment;
-
+document.getElementById("postCommentBtn").onclick = postComment;
 loadSuggestions();
 loadComments();
 </script>
 </body>
 </html>
+
