@@ -360,45 +360,48 @@ async function loadTop10Books() {
   const container = document.getElementById("top10Books");
 
   try {
-    console.log("🔥 Loading Top 10 Books…");
+    console.log("🔥 Loading Netflix-Style Top 10 Books…");
     const res = await fetch(`${BACKEND}/api/books/top10`);
     if (!res.ok) throw new Error("API error " + res.status);
     const data = await res.json();
 
-    if (!Array.isArray(data) || !data.length) {
-      console.warn("⚠️ No Top 10 data found");
+    if (!data.length) {
       section.style.display = "none";
       return;
     }
 
-    // Show section
     section.style.display = "block";
     section.style.opacity = "1";
+    container.className = "top10-wrapper"; // ✅ layout for top10
 
-    // Render cards
     container.innerHTML = "";
     data.forEach((book, i) => {
-      const card = document.createElement("div");
-      card.className = "top10-card";
-      card.innerHTML = `
+      const item = document.createElement("div");
+      item.className = "top10-item";
+
+      item.innerHTML = `
         <div class="top10-rank">${i + 1}</div>
-        <img src="${book.thumbnail}" alt="${book.name}" />
-        <div class="top10-title">${book.name}</div>
-        <div class="top10-author">${book.author}</div>
+        <div class="top10-card">
+          <img src="${book.thumbnail}" alt="${book.name}" />
+          <div class="book-title">${book.name}</div>
+          <div class="book-author">${book.author}</div>
+        </div>
       `;
-      card.onclick = () => {
+
+      // Click handler
+      item.querySelector(".top10-card").onclick = () => {
         localStorage.setItem("selectedBook", JSON.stringify(book));
         location.href = "book.html";
       };
-      container.appendChild(card);
-    });
 
-    enableArrowsFor("top10-section"); // same scroll buttons
+      container.appendChild(item);
+    });
   } catch (err) {
     console.error("❌ Top 10 Load Error:", err);
     section.style.display = "none";
   }
 }
+
 
 
 
