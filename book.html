@@ -368,7 +368,22 @@
     const BOOKS_API = `${BACKEND_BASE}/api/books`;
     const COMMENTS_API = `${BACKEND_BASE}/api/comments`;
 
-    const book = JSON.parse(localStorage.getItem("selectedBook") || "null");
+    // const book = JSON.parse(localStorage.getItem("selectedBook") || "null");
+let book = null;
+try {
+  const savedBook = localStorage.getItem("selectedBook");
+  if (savedBook && savedBook !== "undefined" && savedBook !== "null") {
+    book = JSON.parse(savedBook);
+  }
+} catch (err) {
+  console.error("Book parse error:", err);
+  localStorage.removeItem("selectedBook");
+}
+
+if (!book) {
+  alert("⚠️ No book selected — please go back and open a book again.");
+  window.location.href = "index.html";
+}
 
     if (!book) {
       alert("No book selected!");
