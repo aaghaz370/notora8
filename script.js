@@ -354,42 +354,49 @@ setTimeout(() => continueSection.classList.add("visible"), 100);
 
 
 
-// 🏆 Load Top 10 Books (Netflix Style)
 async function loadTop10Books() {
   const section = document.getElementById("top10-section");
   const container = document.getElementById("top10Books");
 
   try {
-    const res = await fetch(`${BACKEND_BASE}/api/books/top10`);
+    const res = await fetch(`${BACKEND}/api/books/top10`);
     const data = await res.json();
-    if (!data.length) return;
+    if (!data.length) {
+      section.style.display = "none";
+      return;
+    }
 
     section.style.display = "block";
     setTimeout(() => (section.style.opacity = "1"), 150);
 
     container.innerHTML = "";
+
     data.forEach((book, i) => {
       const card = document.createElement("div");
       card.className = "top10-card";
+
       card.innerHTML = `
-        <div class="top10-number">${i + 1}</div>
-        <div class="top10-cover">
-          <img src="${book.thumbnail}" alt="${book.name}">
-          <div class="top10-title">${book.name}</div>
-        </div>
+        <div class="top10-rank">${i + 1}</div>
+        <img src="${book.thumbnail}" alt="${book.name}" />
+        <div class="top10-title">${book.name}</div>
+        <div class="top10-author">${book.author}</div>
       `;
+
       card.onclick = () => {
         localStorage.setItem("selectedBook", JSON.stringify(book));
         location.href = "book.html";
       };
+
       container.appendChild(card);
     });
+
+    enableArrowsFor("top10-section"); // same scroll behaviour
   } catch (err) {
     console.error("Top 10 Error:", err);
   }
 }
 
-loadTop10Books();
+
 
 
 
