@@ -127,35 +127,52 @@
 <script>
 const BACKEND_BASE = "https://notoraadminbackend-1.onrender.com";
 
+// 🌐 Wait until DOM fully loaded
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(loadBookmarks, 200); // small delay ensures localStorage ready
+});
+
 async function loadBookmarks() {
   const container = document.getElementById("bookmarksContainer");
   const emptyMsg = document.getElementById("emptyMsg");
-  container.innerHTML = "";
 
-  const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
-  const token = localStorage.getItem("notoraToken");
+  // Clear old content before loading
+  container.innerHTML = `
+    <div style="text-align:center;width:100%;margin-top:40px;">
+      <i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;color:#ff416c;"></i>
+      <p style="color:#aaa;">Loading bookmarks...</p>
+    </div>
+  `;
 
   let bookmarks = [];
+  const user = safeParse(localStorage.getItem("notoraUser"));
+  const token = localStorage.getItem("notoraToken");
 
   try {
+    // 🧠 Check user login status
     if (user && token) {
       const res = await fetch(`${BACKEND_BASE}/api/bookmarks`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      bookmarks = await res.json();
+      if (res.ok) bookmarks = await res.json();
     } else {
-      bookmarks = JSON.parse(localStorage.getItem("guestBookmarks") || "[]");
+      bookmarks = safeParse(localStorage.getItem("guestBookmarks")) || [];
     }
 
-    if (!bookmarks.length) {
+    // 🧹 Clear loader
+    container.innerHTML = "";
+
+    if (!bookmarks || bookmarks.length === 0) {
       emptyMsg.style.display = "block";
       return;
-    } else {
-      emptyMsg.style.display = "none";
     }
 
-    bookmarks.forEach(b => {
+    emptyMsg.style.display = "none";
+
+    bookmarks.forEach((b) => {
       const book = b.bookId || b;
+      if (!book || !book.name) return; // skip invalid entries
+
       const card = document.createElement("div");
       card.className = "bookmark-card";
       card.innerHTML = `
@@ -167,38 +184,46 @@ async function loadBookmarks() {
         <button class="delete-btn"><i class="fa-solid fa-trash"></i></button>
       `;
 
-      // View on click
+      // 📖 Open Book
       card.querySelector("img").onclick = () => {
         localStorage.setItem("selectedBook", JSON.stringify(book));
         location.href = "book.html";
       };
 
-      // Delete
+      // ❌ Delete
       card.querySelector(".delete-btn").onclick = async () => {
-        if (confirm("Remove this bookmark?")) {
-          if (user && token && b._id) {
-            await fetch(`${BACKEND_BASE}/api/bookmarks/${b._id}`, {
-              method: "DELETE",
-              headers: { Authorization: `Bearer ${token}` }
-            });
-          } else {
-            const local = JSON.parse(localStorage.getItem("guestBookmarks") || "[]");
-            const updated = local.filter(x => x._id !== book._id);
-            localStorage.setItem("guestBookmarks", JSON.stringify(updated));
-          }
-          loadBookmarks();
+        if (!confirm("Remove this bookmark?")) return;
+
+        if (user && token && b._id) {
+          await fetch(`${BACKEND_BASE}/api/bookmarks/${b._id}`, {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${token}` },
+          });
+        } else {
+          const local = safeParse(localStorage.getItem("guestBookmarks")) || [];
+          const updated = local.filter((x) => x._id !== book._id);
+          localStorage.setItem("guestBookmarks", JSON.stringify(updated));
         }
+        loadBookmarks();
       };
 
       container.appendChild(card);
     });
   } catch (err) {
-    console.error(err);
-    emptyMsg.style.display = "block";
+    console.error("Bookmark load error:", err);
+    container.innerHTML = `<p style="color:#f88;text-align:center;margin-top:40px;">⚠️ Failed to load bookmarks. Try again later.</p>`;
   }
 }
 
-loadBookmarks();
+// 🧩 Utility: safe JSON parse
+function safeParse(val) {
+  try {
+    return JSON.parse(val);
+  } catch {
+    return null;
+  }
+}
 </script>
+
 </body>
 </html>
