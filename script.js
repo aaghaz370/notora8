@@ -430,6 +430,22 @@ async function loadTop10Books() {
 
 
 
+// 🎯 Prevent vertical scroll lock in Top 10 section
+const top10Slider = document.getElementById("top10Books");
+
+if (top10Slider) {
+  top10Slider.addEventListener("wheel", (e) => {
+    // if horizontal scrollable
+    if (e.deltaY !== 0 && top10Slider.scrollWidth > top10Slider.clientWidth) {
+      // scroll horizontally instead of vertically
+      e.preventDefault();
+      top10Slider.scrollBy({
+        left: e.deltaY > 0 ? 100 : -100,
+        behavior: "smooth",
+      });
+    }
+  });
+}
 
 
 
