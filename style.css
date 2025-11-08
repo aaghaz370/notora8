@@ -1139,23 +1139,21 @@ footer small {
   transform: translateY(0);
 }
 
-/* Make all category sections consistent in spacing */
-.category-section {
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-
-/* Ensure alignment consistency with other sections */
-.category-title {
-  margin-left: 0.5rem;
-}
-.category-section {
+/* Only apply spacing to manually added sections */
+#latest-section,
+#continue-section {
   padding-left: clamp(1rem, 3vw, 2rem);
   padding-right: clamp(1rem, 3vw, 2rem);
-}
-.category-section {
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
 }
+
+/* restore normal spacing for other auto sections */
+.category-section:not(#latest-section):not(#continue-section) {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+
 
 
