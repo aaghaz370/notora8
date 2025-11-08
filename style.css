@@ -1130,4 +1130,13 @@ footer small {
 }
 
 
+#continue-section {
+  transform: translateY(10px);
+  transition: all 0.5s ease;
+}
+#continue-section.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 
