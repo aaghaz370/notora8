@@ -296,6 +296,25 @@ document.getElementById("bookGenre").textContent = book.genre;
 document.getElementById("bookRating").textContent = "⭐ " + (book.rating || "N/A");
 document.getElementById("bookPdf").src = book.pdfUrl;
 
+  // 📖 Save to Continue Reading
+function updateContinueReading(book) {
+  let list = JSON.parse(localStorage.getItem("continueReading") || "[]");
+
+  // Remove if already exists
+  list = list.filter(b => b._id !== book._id);
+
+  // Add to top
+  list.unshift(book);
+
+  // Limit to 10
+  if (list.length > 10) list.pop();
+
+  localStorage.setItem("continueReading", JSON.stringify(list));
+}
+
+// Call this once book loads
+updateContinueReading(book);
+
 // 🔖 Load Similar Books
 async function loadSuggestions() {
   try {
