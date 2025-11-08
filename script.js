@@ -357,7 +357,11 @@ loadTop10Books();
 
 async function loadTop10Books() {
   const section = document.getElementById("top10-section");
-  const container = document.getElementById("top10Books");
+  const container = document.createElement("div"); // fresh container
+  container.className = "top10-wrapper";
+  section.innerHTML = `
+    <h2 class="category-title">🏆 TOP 10 BOOKS TODAY</h2>
+  `;
 
   try {
     console.log("🔥 Loading Netflix-Style Top 10 Books…");
@@ -373,17 +377,7 @@ async function loadTop10Books() {
     section.style.display = "block";
     section.style.opacity = "1";
 
-    // 🧱 Create wrapper for arrows + slider
-    const wrapper = document.createElement("div");
-    wrapper.className = "top10-wrapper";
-    wrapper.style.position = "relative";
-    wrapper.style.display = "flex";
-    wrapper.style.alignItems = "flex-end";
-    wrapper.style.overflowX = "auto";
-    wrapper.style.scrollSnapType = "x mandatory";
-
-    container.innerHTML = "";
-
+    // 🎞️ Make horizontal cards with rank + card
     data.forEach((book, i) => {
       const item = document.createElement("div");
       item.className = "top10-item";
@@ -396,6 +390,7 @@ async function loadTop10Books() {
         </div>
       `;
 
+      // Click: open book
       item.querySelector(".top10-card").onclick = () => {
         localStorage.setItem("selectedBook", JSON.stringify(book));
         location.href = "book.html";
@@ -404,23 +399,25 @@ async function loadTop10Books() {
       container.appendChild(item);
     });
 
-    // ✅ Add the same arrow logic (only desktop)
+    // ✅ Add Arrows same as other sections
     if (window.innerWidth > 768) {
+      const wrapper = document.createElement("div");
+      wrapper.style.position = "relative";
+      wrapper.appendChild(container);
+
       const leftArrow = document.createElement("button");
       leftArrow.className = "arrow-btn arrow-left";
       leftArrow.innerHTML = "&#8249;";
-      leftArrow.onclick = () =>
-        container.scrollBy({ left: -400, behavior: "smooth" });
+      leftArrow.onclick = () => container.scrollBy({ left: -400, behavior: "smooth" });
 
       const rightArrow = document.createElement("button");
       rightArrow.className = "arrow-btn arrow-right";
       rightArrow.innerHTML = "&#8250;";
-      rightArrow.onclick = () =>
-        container.scrollBy({ left: 400, behavior: "smooth" });
+      rightArrow.onclick = () => container.scrollBy({ left: 400, behavior: "smooth" });
 
       wrapper.appendChild(leftArrow);
-      wrapper.appendChild(container);
       wrapper.appendChild(rightArrow);
+
       section.appendChild(wrapper);
     } else {
       section.appendChild(container);
@@ -430,6 +427,8 @@ async function loadTop10Books() {
     section.style.display = "none";
   }
 }
+
+
 
 
 
