@@ -255,6 +255,8 @@ document.addEventListener("click", (e) => {
 
 const BACKEND = "https://notoraadminbackend-1.onrender.com"; 
 const BOOKS_API = `${BACKEND}/api/books`;
+const BACKEND_BASE = BACKEND; // ✅ Fix for Top 10 section
+
 
 // 📘 Fetch & render latest 10 books
 async function loadLatestBooks() {
@@ -385,4 +387,5 @@ async function loadTop10Books() {
 }
 
 loadTop10Books();
+
 
