@@ -36,9 +36,7 @@
       transition: transform 0.3s;
     }
 
-    .back-arrow:hover {
-      transform: translateX(-5px);
-    }
+    .back-arrow:hover { transform: translateX(-5px); }
 
     .pdf-container {
       margin: 2rem auto 1rem;
@@ -50,29 +48,7 @@
       box-shadow: 0 0 30px rgba(255, 0, 0, 0.12);
     }
 
-    iframe {
-      width: 100%;
-      height: 500px;
-      border: none;
-      border-radius: 10px;
-    }
-
-    .bookmark-btn {
-      width: 100%;
-      background: linear-gradient(90deg, #ff4b2b, #ff416c);
-      color: #fff;
-      border: none;
-      padding: 0.8rem;
-      font-size: 1rem;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 0.8rem;
-      transition: all 0.3s ease;
-    }
-
-    .bookmark-btn:hover {
-      transform: scale(1.02);
-    }
+    iframe { width: 100%; height: 500px; border: none; border-radius: 10px; }
 
     .book-meta {
       width: 90%;
@@ -84,7 +60,35 @@
       text-align: center;
     }
 
-    /* 🔹 Suggestions */
+    .action-buttons {
+      width: 90%;
+      max-width: 900px;
+      margin: 1rem auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .action-btn {
+      flex: 1 1 250px;
+      background: linear-gradient(90deg, #ff4b2b, #ff416c);
+      color: #fff;
+      border: none;
+      padding: 0.9rem 1rem;
+      font-size: 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255, 65, 108, 0.3);
+      text-align: center;
+    }
+
+    .action-btn:hover {
+      transform: scale(1.04);
+      box-shadow: 0 6px 18px rgba(255, 65, 108, 0.5);
+    }
+
     .suggestions {
       margin: 2.5rem auto 1.5rem;
       width: 90%;
@@ -102,20 +106,12 @@
       border-radius: 10px;
       text-align: center;
       padding: 0.5rem;
-      transition: transform 0.35s;
       cursor: pointer;
+      transition: transform 0.35s;
     }
 
-    .suggestion-card img {
-      width: 100%;
-      height: 170px;
-      object-fit: cover;
-      border-radius: 8px;
-    }
-
-    .suggestion-card:hover {
-      transform: scale(1.05);
-    }
+    .suggestion-card:hover { transform: scale(1.05); }
+    .suggestion-card img { width: 100%; height: 170px; object-fit: cover; border-radius: 8px; }
 
     /* 🔹 Comment Section */
     .comments-wrapper {
@@ -125,184 +121,12 @@
       background: rgba(255, 255, 255, 0.05);
       border-radius: 15px;
       padding: 1.5rem;
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
     }
 
-    .comments-wrapper h3 {
-      font-size: 1.3rem;
-      margin-bottom: 1rem;
-    }
-
-    .comment-inputs {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .comment-inputs input,
-    .comment-inputs textarea {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      padding: 10px;
-      color: #fff;
-      resize: none;
-      font-size: 0.95rem;
-    }
-
-    .comment-inputs button {
-      align-self: flex-end;
-      background: linear-gradient(90deg, #e50914, #ff416c);
-      border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      color: #fff;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-
-    .comment-inputs button:hover {
-      transform: scale(1.05);
-    }
-
-    .comments-list {
-      margin-top: 1rem;
-      max-height: 350px;
-      overflow-y: auto;
-      scrollbar-width: thin;
-      scrollbar-color: #ff416c transparent;
-    }
-
-    .comment-card {
-      background: rgba(0, 0, 0, 0.35);
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 10px;
-      animation: fadeIn 0.3s ease;
-    }
-
-    .comment-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .comment-name {
-      font-weight: 600;
-      color: #ffd;
-    }
-
-    .reply-btn {
-      background: transparent;
-      border: none;
-      color: #9ca3af;
-      font-size: 0.9rem;
-      cursor: pointer;
-    }
-
-    .reply-box {
-      margin-top: 10px;
-      margin-left: 15px;
-      border-left: 2px solid #ff416c;
-      padding-left: 10px;
-    }
-    .comment-options {
-  position: relative;
-  display: inline-block;
-}
-
-.comment-options button {
-  background: transparent;
-  border: none;
-  color: #999;
-  cursor: pointer;
-  font-size: 1.2rem;
-  transition: color 0.2s;
-}
-
-.comment-options button:hover {
-  color: #ff416c;
-}
-
-.comment-menu {
-  position: absolute;
-  right: 0;
-  top: 20px;
-  background: #111;
-  border-radius: 8px;
-  box-shadow: 0 0 8px rgba(255,255,255,0.1);
-  overflow: hidden;
-  z-index: 10;
-}
-
-.comment-menu button {
-  display: block;
-  width: 100%;
-  border: none;
-  background: transparent;
-  color: #fff;
-  padding: 8px 12px;
-  text-align: left;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.comment-menu button:hover {
-  background: rgba(255,255,255,0.1);
-}
-
-.comment-verified {
-  display: inline-block;
-  background: #0078ff;
-  color: white;
-  font-size: 0.7rem;
-  padding: 2px 6px;
-  border-radius: 5px;
-  margin-left: 5px;
-  vertical-align: middle;
-}
-
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ===== ACTION BUTTONS ===== */
-.action-buttons {
-  width: 90%;
-  max-width: 900px;
-  margin: 1rem auto;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-}
-
-.action-btn {
-  flex: 1 1 250px;
-  background: linear-gradient(90deg, #ff4b2b, #ff416c);
-  color: #fff;
-  border: none;
-  padding: 0.9rem 1rem;
-  font-size: 1rem;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(255, 65, 108, 0.3);
-  text-align: center;
-}
-
-.action-btn i {
-  margin-right: 8px;
-}
-
-.action-btn:hover {
-  transform: scale(1.04);
-  box-shadow: 0 6px 18px rgba(255, 65, 108, 0.5);
-  background: linear-gradient(90deg, #ff416c, #ff4b2b);
-}
+    .comments-list { margin-top: 1rem; max-height: 350px; overflow-y: auto; }
+    .comment-card { background: rgba(0, 0, 0, 0.35); padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+    .comment-name { font-weight: 600; color: #ffd; }
+    .comment-verified { background: #0078ff; color: #fff; font-size: 0.7rem; padding: 2px 6px; border-radius: 5px; margin-left: 5px; }
 
   </style>
 </head>
@@ -313,45 +137,29 @@
     <h1 id="bookName">Book</h1>
   </header>
 
-  <div class="pdf-container">
-    <iframe id="bookPdf"></iframe>
+  <div class="pdf-container"><iframe id="bookPdf"></iframe></div>
+
+  <div class="action-buttons">
+    <button id="fullscreenBtn" class="action-btn"><i class="fa-solid fa-expand"></i> Fullscreen</button>
+    <button id="bookmarkBtn" class="action-btn"><i class="fa-solid fa-bookmark"></i> Add to Bookmarks</button>
+    <button id="shareBtn" class="action-btn"><i class="fa-solid fa-share-nodes"></i> Share</button>
   </div>
-
-  <!-- ===== ACTION BUTTONS SECTION ===== -->
-<div class="action-buttons">
-  <button id="fullscreenBtn" class="action-btn">
-    <i class="fa-solid fa-expand"></i> Fullscreen
-  </button>
-  <button id="bookmarkBtn" class="action-btn">
-    <i class="fa-solid fa-bookmark"></i> Add to Bookmarks
-  </button>
-  <button id="shareBtn" class="action-btn">
-    <i class="fa-solid fa-share-nodes"></i> Share This Book
-  </button>
-</div>
-
 
   <section class="book-meta">
     <p><strong>Author:</strong> <span id="bookAuthor"></span></p>
     <p><strong>Genre:</strong> <span id="bookGenre"></span></p>
-    <p class="rating" id="bookRating"></p>
+    <p id="bookRating"></p>
   </section>
 
- <div class="comments-wrapper">
-  <h3>💬 Comments</h3>
-
-  <div class="comment-inputs" id="commentInputs">
-  <textarea id="commentText" placeholder="Write your comment..."></textarea>
-  <button id="postCommentBtn">Post Comment</button>
-  <p id="commentHint" style="color:#aaa;font-size:0.8rem;margin-top:4px;"></p>
-</div>
-
-
-  <div class="comments-list" id="commentsList">
-    <p>Loading comments...</p>
+  <div class="comments-wrapper">
+    <h3>💬 Comments</h3>
+    <div class="comment-inputs" id="commentInputs">
+      <textarea id="commentText" placeholder="Write your comment..."></textarea>
+      <button id="postCommentBtn">Post Comment</button>
+      <p id="commentHint" style="color:#aaa;font-size:0.8rem;margin-top:4px;"></p>
+    </div>
+    <div class="comments-list" id="commentsList"><p>Loading comments...</p></div>
   </div>
-</div>
-
 
   <section class="suggestions">
     <h3>📚 Similar Books You May Like</h3>
@@ -359,273 +167,122 @@
   </section>
 
   <script>
-    // 🧹 Auto-clean corrupted storage on every visit
-if (localStorage.getItem("selectedBook") === "undefined") {
-  localStorage.removeItem("selectedBook");
-}
-
-    window.onerror = function (msg, src, line, col, err) {
-  console.error("🔴 Script Error:", msg, "at", line, col);
-  alert("Something went wrong — check console for details.");
-};
-
     const BACKEND_BASE = "https://notoraadminbackend-1.onrender.com";
     const BOOKS_API = `${BACKEND_BASE}/api/books`;
     const COMMENTS_API = `${BACKEND_BASE}/api/comments`;
 
-    // const book = JSON.parse(localStorage.getItem("selectedBook") || "null");
-// 🔒 Safe book loader — prevents "undefined" crash forever
-let book = null;
-try {
-  const savedBook = localStorage.getItem("selectedBook");
-  if (savedBook && savedBook !== "undefined" && savedBook !== "null" && savedBook.trim() !== "") {
-    book = JSON.parse(savedBook);
-  } else {
-    localStorage.removeItem("selectedBook");
-  }
-} catch (err) {
-  console.error("Book parse error:", err);
-  localStorage.removeItem("selectedBook");
-}
-
-if (!book) {
-  // If book missing or corrupted → redirect safely
-  console.warn("No valid book found, redirecting...");
-  location.replace("index.html");
-}
-
-
-    // if (!book) {
-    //   alert("No book selected!");
-    //   window.location.href = "index.html";
-    } else {
-      document.getElementById("bookName").textContent = book.name;
-      document.getElementById("bookAuthor").textContent = book.author;
-      document.getElementById("bookGenre").textContent = book.genre;
-      document.getElementById("bookRating").textContent = book.rating ? "⭐ " + book.rating : "";
-      document.getElementById("bookPdf").src = book.pdfUrl || "";
+    // ✅ Safe Book Loader
+    let book = null;
+    try {
+      const saved = localStorage.getItem("selectedBook");
+      if (saved && saved !== "undefined" && saved !== "null" && saved.trim() !== "") {
+        book = JSON.parse(saved);
+      }
+    } catch (err) {
+      console.error("Book parse error:", err);
     }
 
-    /* -------- ACTION BUTTONS -------- */
-
-// 🔹 Fullscreen toggle
-document.getElementById("fullscreenBtn").addEventListener("click", () => {
-  const iframe = document.getElementById("bookPdf");
-  if (iframe.requestFullscreen) iframe.requestFullscreen();
-  else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
-  else alert("Fullscreen not supported in this browser.");
-});
-
-// 🔹 Add to Bookmarks (LocalStorage based)
-document.getElementById("bookmarkBtn").addEventListener("click", () => {
-  let bookmarks = JSON.parse(localStorage.getItem("bookmarks") || "[]");
-  if (bookmarks.some((b) => b._id === book._id)) {
-    showPopup("Already Bookmarked", "#ff9f43");
-    return;
-  }
-  bookmarks.unshift(book);
-  localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
-  showPopup("Book Added to Bookmarks!", "#27ae60");
-});
-
-// 🔹 Share This Book
-document.getElementById("shareBtn").addEventListener("click", async () => {
-  const shareData = {
-    title: book.name,
-    text: `Check out this book: "${book.name}" by ${book.author}`,
-    url: window.location.href,
-  };
-  try {
-    if (navigator.share) {
-      await navigator.share(shareData);
-    } else {
-      navigator.clipboard.writeText(shareData.url);
-      showPopup("Link copied to clipboard!", "#3498db");
+    if (!book || !book._id) {
+      alert("No valid book selected. Redirecting...");
+      localStorage.removeItem("selectedBook");
+      window.location.href = "index.html";
     }
-  } catch (err) {
-    console.error("Share failed:", err);
-  }
-});
 
-/* 🔹 Small reusable popup */
-function showPopup(msg, bg = "#333") {
-  const p = document.createElement("div");
-  p.textContent = msg;
-  Object.assign(p.style, {
-    position: "fixed",
-    left: "50%",
-    top: "18%",
-    transform: "translateX(-50%)",
-    background: bg,
-    padding: "10px 18px",
-    borderRadius: "10px",
-    color: "#fff",
-    zIndex: 9999,
-    fontSize: "1rem",
-    fontWeight: "500",
-    boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
-  });
-  document.body.appendChild(p);
-  setTimeout(() => p.remove(), 1800);
-}
+    // ✅ Display Book Info
+    document.getElementById("bookName").textContent = book.name;
+    document.getElementById("bookAuthor").textContent = book.author;
+    document.getElementById("bookGenre").textContent = book.genre;
+    document.getElementById("bookRating").textContent = book.rating ? "⭐ " + book.rating : "";
+    document.getElementById("bookPdf").src = book.pdfUrl || "";
 
+    // ✅ Buttons
+    document.getElementById("fullscreenBtn").addEventListener("click", () => {
+      const iframe = document.getElementById("bookPdf");
+      if (iframe.requestFullscreen) iframe.requestFullscreen();
+    });
 
-    /* 🔹 Suggestion System */
+    document.getElementById("bookmarkBtn").addEventListener("click", () => {
+      let bookmarks = JSON.parse(localStorage.getItem("bookmarks") || "[]");
+      if (bookmarks.some((b) => b._id === book._id)) return alert("Already Bookmarked!");
+      bookmarks.unshift(book);
+      localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
+      alert("Book Added to Bookmarks!");
+    });
+
+    document.getElementById("shareBtn").addEventListener("click", async () => {
+      try {
+        await navigator.share({ title: book.name, text: book.author, url: window.location.href });
+      } catch {
+        navigator.clipboard.writeText(window.location.href);
+        alert("Link copied!");
+      }
+    });
+
+    // ✅ Suggestions
     async function loadSuggestions() {
       try {
         const res = await fetch(`${BOOKS_API}?genre=${encodeURIComponent(book.genre)}`);
         const data = await res.json();
-        const suggestions = data.filter(b => b._id !== book._id).slice(0, 6);
-        renderSuggestions(suggestions);
-      } catch (e) {
-        console.error("Suggestion error:", e);
+        const filtered = data.filter(b => b._id !== book._id).slice(0, 6);
+        const grid = document.getElementById("suggestionGrid");
+        grid.innerHTML = "";
+        filtered.forEach(b => {
+          const el = document.createElement("div");
+          el.className = "suggestion-card";
+          el.innerHTML = `<img src="${b.thumbnail}" alt="${b.name}"><p>${b.name}</p>`;
+          el.onclick = () => {
+            localStorage.setItem("selectedBook", JSON.stringify(b));
+            setTimeout(() => (window.location.href = "book.html"), 100);
+          };
+          grid.appendChild(el);
+        });
+      } catch (err) {
+        console.error("Suggestion Error:", err);
       }
     }
 
-    function renderSuggestions(list) {
-      const grid = document.getElementById("suggestionGrid");
-      grid.innerHTML = "";
-      if (!list.length) {
-        grid.innerHTML = "<p>No similar books found.</p>";
-        return;
-      }
-      list.forEach(b => {
-        const el = document.createElement("div");
-        el.className = "suggestion-card";
-        el.innerHTML = `<img src="${b.thumbnail}" alt="${b.name}"><p>${b.name}</p>`;
-       el.addEventListener("click", () => {
-  if (!b || !b._id) return alert("Invalid book data.");
-  localStorage.setItem("selectedBook", JSON.stringify(b));
-  // Give storage time to save, then open cleanly
-  setTimeout(() => (location.href = "book.html"), 80);
-});
-
-
-
-        grid.appendChild(el);
-      });
-    }
-
-   /* 🔹 Comments */
+    // ✅ Comments
     async function loadComments() {
       try {
         const res = await fetch(`${COMMENTS_API}/${book._id}`);
         const comments = await res.json();
         const list = document.getElementById("commentsList");
         list.innerHTML = "";
-        if (!comments.length) {
-          list.innerHTML = "<p>No comments yet.</p>";
-          return;
-        }
+        if (!comments.length) return list.innerHTML = "<p>No comments yet.</p>";
         comments.forEach(c => {
           const card = document.createElement("div");
           card.className = "comment-card";
           card.innerHTML = `
             <div class="comment-meta">
-               <span class="comment-name">${c.name}
-  ${c.role === "admin" ? `<span class="comment-verified">✓ Admin</span>` : ""}
-</span>
-
-              <button class="reply-btn" onclick="openReplyBox('${c._id}')">Reply</button>
+              <span class="comment-name">${c.name}${c.role === "admin" ? "<span class='comment-verified'>✓ Admin</span>" : ""}</span>
             </div>
             <p>${c.text}</p>
-            <div class="reply-box" id="reply-${c._id}">
-              ${(c.replies || []).map(r => `
-                <div class="comment-card" style="background:rgba(255,255,255,0.05)">
-                  <span class="comment-name">${r.name}</span>
-                  <p>${r.text}</p>
-                </div>`).join('')}
-            </div>
           `;
-          document.getElementById("commentsList").appendChild(card);
+          list.appendChild(card);
         });
-      } catch (e) {
-        console.error("Load comments error:", e);
+      } catch (err) {
+        console.error("Comments Error:", err);
       }
     }
 
-    // async function postComment() {
-    //   const name = document.getElementById("commentName").value.trim();
-    //   const text = document.getElementById("commentText").value.trim();
-    //   if (!name || !text) return alert("Enter name and comment");
-    //   await fetch(COMMENTS_API, {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify({ bookId: book._id, name, text })
-    //   });
-    //   document.getElementById("commentText").value = "";
-    //   loadComments();
-    // }
-  const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
-const token = localStorage.getItem("notoraToken") || null;
+    document.getElementById("postCommentBtn").addEventListener("click", async () => {
+      const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
+      const token = localStorage.getItem("notoraToken") || null;
+      const text = document.getElementById("commentText").value.trim();
+      if (!text) return alert("Write something first.");
+      if (!user || !token) return alert("Please login to comment.");
 
-// Update comment hint (logged in or not)
-const commentHint = document.getElementById("commentHint");
-if (user) commentHint.textContent = `Commenting as ${user.name}`;
-else commentHint.innerHTML = `Not logged in — <a href="login.html" style="color:#ff416c;text-decoration:none;">Login to comment</a>`;
-
-async function postComment() {
-  const text = document.getElementById("commentText").value.trim();
-  if (!text) return alert("Please write a comment.");
-
-  // Require login
-  if (!user || !token) {
-    alert("Login required to post a comment.");
-    return (window.location.href = "login.html");
-  }
-
-  try {
-    await fetch(COMMENTS_API, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        bookId: book._id,
-        name: user.name,
-        userId: user._id,
-        text,
-        role: user.email === "admin@notora.com" ? "admin" : "user",
-      }),
+      await fetch(COMMENTS_API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ bookId: book._id, name: user.name, userId: user._id, text, role: user.email === "admin@notora.com" ? "admin" : "user" })
+      });
+      document.getElementById("commentText").value = "";
+      loadComments();
     });
-    document.getElementById("commentText").value = "";
-    loadComments();
-  } catch (err) {
-    console.error("Post comment failed:", err);
-    alert("Failed to post comment. Try again.");
-  }
-}
-
-
-    async function openReplyBox(commentId) {
-      const target = document.getElementById(`reply-${commentId}`);
-      const form = document.createElement("div");
-      form.innerHTML = `
-        <input id="replyName-${commentId}" placeholder="Your name" style="margin-top:8px;width:100%;padding:8px;border-radius:6px;border:none;background:#111;color:#fff">
-        <textarea id="replyText-${commentId}" placeholder="Write a reply..." style="margin-top:5px;width:100%;padding:8px;border-radius:6px;border:none;background:#111;color:#fff"></textarea>
-        <button style="margin-top:5px;background:#ff416c;border:none;padding:6px 12px;border-radius:6px;color:#fff;cursor:pointer;">Send</button>
-      `;
-      form.querySelector("button").onclick = async () => {
-        const name = document.getElementById(`replyName-${commentId}`).value.trim();
-        const text = document.getElementById(`replyText-${commentId}`).value.trim();
-        if (!name || !text) return alert("Enter both fields");
-        await fetch(`${COMMENTS_API}/reply/${commentId}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, text })
-        });
-        loadComments();
-      };
-      target.appendChild(form);
-    }
-
-    document.getElementById("postCommentBtn").addEventListener("click", postComment);
 
     loadSuggestions();
     loadComments();
   </script>
-
 </body>
 </html>
-
