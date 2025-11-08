@@ -113,20 +113,171 @@
     .suggestion-card:hover { transform: scale(1.05); }
     .suggestion-card img { width: 100%; height: 170px; object-fit: cover; border-radius: 8px; }
 
-    /* 🔹 Comment Section */
-    .comments-wrapper {
-      width: 90%;
-      max-width: 900px;
-      margin: 2rem auto 3rem;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 15px;
-      padding: 1.5rem;
-    }
+    <style>
+/* 🔹 Comment Section */
+.comments-wrapper {
+  width: 90%;
+  max-width: 900px;
+  margin: 2rem auto 3rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
+}
 
-    .comments-list { margin-top: 1rem; max-height: 350px; overflow-y: auto; }
-    .comment-card { background: rgba(0, 0, 0, 0.35); padding: 10px; border-radius: 8px; margin-bottom: 10px; }
-    .comment-name { font-weight: 600; color: #ffd; }
-    .comment-verified { background: #0078ff; color: #fff; font-size: 0.7rem; padding: 2px 6px; border-radius: 5px; margin-left: 5px; }
+.comments-wrapper h3 {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+.comment-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.comment-inputs textarea {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 10px;
+  color: #fff;
+  resize: none;
+  font-size: 0.95rem;
+  transition: 0.2s;
+}
+
+.comment-inputs textarea:focus {
+  border-color: #ff416c;
+  outline: none;
+}
+
+.comment-inputs button {
+  align-self: flex-end;
+  background: linear-gradient(90deg, #e50914, #ff416c);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.comment-inputs button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(255, 65, 108, 0.5);
+}
+
+.comment-hint {
+  color: #bbb;
+  font-size: 0.8rem;
+  margin-top: 3px;
+}
+
+.comments-list {
+  margin-top: 1.3rem;
+  max-height: 400px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #ff416c transparent;
+}
+
+.comment-card {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  animation: fadeIn 0.3s ease;
+}
+
+.comment-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.comment-name {
+  font-weight: 600;
+  color: #ffd;
+  font-size: 1rem;
+}
+
+.comment-verified {
+  display: inline-block;
+  background: #0078ff;
+  color: #fff;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 5px;
+  margin-left: 5px;
+}
+
+.comment-text {
+  color: #ddd;
+  font-size: 0.95rem;
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+.reply-btn {
+  background: transparent;
+  border: none;
+  color: #ff416c;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.reply-btn:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.reply-box {
+  margin-top: 10px;
+  margin-left: 15px;
+  border-left: 2px solid #ff416c;
+  padding-left: 10px;
+}
+
+.reply-input {
+  margin-top: 8px;
+}
+
+.reply-input textarea {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 8px;
+  color: #fff;
+  resize: none;
+  width: 100%;
+  font-size: 0.9rem;
+}
+
+.reply-input button {
+  margin-top: 5px;
+  background: #ff416c;
+  border: none;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.reply-input button:hover {
+  transform: scale(1.05);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
 
   </style>
 </head>
@@ -151,15 +302,20 @@
     <p id="bookRating"></p>
   </section>
 
-  <div class="comments-wrapper">
-    <h3>💬 Comments</h3>
-    <div class="comment-inputs" id="commentInputs">
-      <textarea id="commentText" placeholder="Write your comment..."></textarea>
-      <button id="postCommentBtn">Post Comment</button>
-      <p id="commentHint" style="color:#aaa;font-size:0.8rem;margin-top:4px;"></p>
-    </div>
-    <div class="comments-list" id="commentsList"><p>Loading comments...</p></div>
+ <div class="comments-wrapper">
+  <h3>💬 Comments</h3>
+
+  <div class="comment-inputs" id="commentInputs">
+    <textarea id="commentText" placeholder="Write your comment..."></textarea>
+    <button id="postCommentBtn">Post Comment</button>
+    <p id="commentHint" class="comment-hint"></p>
   </div>
+
+  <div class="comments-list" id="commentsList">
+    <p>Loading comments...</p>
+  </div>
+</div>
+
 
   <section class="suggestions">
     <h3>📚 Similar Books You May Like</h3>
@@ -241,48 +397,109 @@
       }
     }
 
-    // ✅ Comments
-    async function loadComments() {
-      try {
-        const res = await fetch(`${COMMENTS_API}/${book._id}`);
-        const comments = await res.json();
-        const list = document.getElementById("commentsList");
-        list.innerHTML = "";
-        if (!comments.length) return list.innerHTML = "<p>No comments yet.</p>";
-        comments.forEach(c => {
-          const card = document.createElement("div");
-          card.className = "comment-card";
-          card.innerHTML = `
-            <div class="comment-meta">
-              <span class="comment-name">${c.name}${c.role === "admin" ? "<span class='comment-verified'>✓ Admin</span>" : ""}</span>
-            </div>
-            <p>${c.text}</p>
-          `;
-          list.appendChild(card);
-        });
-      } catch (err) {
-        console.error("Comments Error:", err);
-      }
+   // ✅ Safe references
+const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
+const token = localStorage.getItem("notoraToken") || null;
+const hint = document.getElementById("commentHint");
+if (user) hint.textContent = `Commenting as ${user.name}`;
+else hint.innerHTML = `Not logged in — <a href="login.html" style="color:#ff416c;text-decoration:none;">Login to comment</a>`;
+
+// 🔹 Load Comments + Replies
+async function loadComments() {
+  try {
+    const res = await fetch(`${COMMENTS_API}/${book._id}`);
+    const comments = await res.json();
+    const list = document.getElementById("commentsList");
+    list.innerHTML = "";
+
+    if (!comments.length) {
+      list.innerHTML = "<p style='color:#bbb'>No comments yet. Be the first!</p>";
+      return;
     }
 
-    document.getElementById("postCommentBtn").addEventListener("click", async () => {
-      const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
-      const token = localStorage.getItem("notoraToken") || null;
-      const text = document.getElementById("commentText").value.trim();
-      if (!text) return alert("Write something first.");
-      if (!user || !token) return alert("Please login to comment.");
+    comments.forEach(c => {
+      const card = document.createElement("div");
+      card.className = "comment-card";
+      card.innerHTML = `
+        <div class="comment-meta">
+          <span class="comment-name">${c.name}
+            ${c.role === "admin" ? `<span class="comment-verified">✓ Admin</span>` : ""}
+          </span>
+          <button class="reply-btn" onclick="openReplyBox('${c._id}')">Reply</button>
+        </div>
+        <p class="comment-text">${c.text}</p>
+        <div class="reply-box" id="reply-${c._id}">
+          ${(c.replies || []).map(r => `
+            <div class="comment-card" style="background:rgba(255,255,255,0.05);margin-top:8px;">
+              <span class="comment-name">${r.name}
+                ${r.role === "admin" ? `<span class='comment-verified'>✓ Admin</span>` : ""}
+              </span>
+              <p class="comment-text">${r.text}</p>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      list.appendChild(card);
+    });
+  } catch (err) {
+    console.error("Load comments error:", err);
+  }
+}
 
-      await fetch(COMMENTS_API, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ bookId: book._id, name: user.name, userId: user._id, text, role: user.email === "admin@notora.com" ? "admin" : "user" })
-      });
-      document.getElementById("commentText").value = "";
-      loadComments();
+// 🔹 Post new comment
+document.getElementById("postCommentBtn").addEventListener("click", async () => {
+  const text = document.getElementById("commentText").value.trim();
+  if (!text) return alert("Write your comment!");
+  if (!user || !token) return (window.location.href = "login.html");
+
+  await fetch(COMMENTS_API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify({
+      bookId: book._id,
+      name: user.name,
+      userId: user._id,
+      text,
+      role: user.email === "admin@notora.com" ? "admin" : "user",
+    }),
+  });
+
+  document.getElementById("commentText").value = "";
+  loadComments();
+});
+
+// 🔹 Reply System
+async function openReplyBox(commentId) {
+  if (!user || !token) return (window.location.href = "login.html");
+  const target = document.getElementById(`reply-${commentId}`);
+  if (target.querySelector(".reply-input")) return; // prevent duplicates
+
+  const form = document.createElement("div");
+  form.className = "reply-input";
+  form.innerHTML = `
+    <textarea id="replyText-${commentId}" placeholder="Write a reply..."></textarea>
+    <button>Send Reply</button>
+  `;
+  form.querySelector("button").onclick = async () => {
+    const text = document.getElementById(`replyText-${commentId}`).value.trim();
+    if (!text) return alert("Write a reply first.");
+
+    await fetch(`${COMMENTS_API}/reply/${commentId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        name: user.name,
+        text,
+        role: user.email === "admin@notora.com" ? "admin" : "user",
+      }),
     });
 
-    loadSuggestions();
     loadComments();
+  };
+  target.appendChild(form);
+}
+
+loadComments();
   </script>
 </body>
 </html>
