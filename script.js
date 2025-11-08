@@ -301,6 +301,41 @@ function scrollSection(id, direction) {
 document.addEventListener("DOMContentLoaded", loadLatestBooks);
 
 
+// 📚 Continue Reading Section
+function loadContinueReading() {
+  const continueContainer = document.getElementById("continueBooks");
+  const continueData = JSON.parse(localStorage.getItem("continueReading") || "[]");
+
+  if (!continueData.length) {
+    continueContainer.innerHTML = `<p style="color:#888;text-align:center;width:100%">No books read yet.</p>`;
+    return;
+  }
+
+  continueContainer.innerHTML = "";
+  continueData.forEach((book) => {
+    const card = document.createElement("div");
+    card.className = "book-card";
+    card.innerHTML = `
+      <img src="${book.thumbnail}" alt="${book.name}" />
+      <div class="book-title">${book.name}</div>
+      <div class="book-author">${book.author}</div>
+      <div class="book-genre">${book.genre}</div>
+      <div class="book-rating">⭐ ${book.rating || "N/A"}</div>
+    `;
+    card.onclick = () => {
+      localStorage.setItem("selectedBook", JSON.stringify(book));
+      location.href = "book.html";
+    };
+    continueContainer.appendChild(card);
+  });
+}
+
+// ✅ Enable Arrows (reuse previous helper)
+enableArrowsFor("continue-section");
+
+// ✅ Load Continue Reading on homepage load
+loadContinueReading();
+
 
 
 
