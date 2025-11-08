@@ -1155,27 +1155,68 @@ footer small {
 }
 
 
-/* 🏆 Netflix-style Top 10 cards */
-.top10-card {
+/* 🏆 Netflix-Style Top 10 Section */
+.top10-wrapper {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-end;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.top10-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+/* Each Top 10 Item */
+.top10-item {
   position: relative;
   flex: 0 0 auto;
-  width: 140px;
+  width: 160px;
   height: 300px;
-  margin-right: 1rem;
+  scroll-snap-align: start;
+}
+
+/* Big Number Background */
+.top10-rank {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  font-size: 240px;
+  font-weight: 900;
+  color: black;
+  -webkit-text-stroke: 3px white;
+  opacity: 0.15;
+  line-height: 0.9;
+  z-index: 0;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* The Book Card Itself */
+.top10-card {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-25%);
+  width: 140px;
+  height: 280px;
   background: #1f1f1f;
   border-radius: 12px;
+  box-shadow: 0 0 10px #00000050;
   overflow: hidden;
-  transition: transform .3s ease, box-shadow .3s ease;
+  text-align: center;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: flex-start;
-  box-shadow: 0 0 10px #00000060;
+  gap: 0.3rem;
+  z-index: 5;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .top10-card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 25px rgba(255,0,0,.3);
+  transform: translateX(-25%) scale(1.05);
+  box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
 }
 
 .top10-card img {
@@ -1183,33 +1224,20 @@ footer small {
   height: 160px;
   object-fit: cover;
   border-radius: 8px;
-  margin-bottom: .5rem;
+  margin-bottom: 0.4rem;
 }
 
-.top10-card .top10-title {
-  font-size: .9rem;
+.top10-card .book-title {
+  font-size: 1rem;
   color: #fff;
   font-weight: 600;
-  text-align: center;
-  padding: 0 5px;
   line-height: 1.2;
 }
 
-.top10-card .top10-author {
-  font-size: .75rem;
+.top10-card .book-author {
+  font-size: 0.75rem;
   color: #aaa;
 }
 
-.top10-card .top10-rank {
-  position: absolute;
-  left: -10px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 8rem;
-  font-weight: 900;
-  color: rgba(255,255,255,.05);
-  z-index: 0;
-  pointer-events: none;
-  font-family: 'Poppins', sans-serif;
-}
+
 
