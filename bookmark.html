@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bookmarks - Notora</title>
+  <link rel="icon" href="images/logo.png" />
+  <script src="https://kit.fontawesome.com/1c020da525.js" crossorigin="anonymous"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: radial-gradient(circle at top, #111 0%, #000 100%);
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(12px);
+    }
+
+    .back-arrow {
+      position: absolute;
+      left: 20px;
+      font-size: 1.6rem;
+      color: #fff;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .back-arrow:hover {
+      transform: translateX(-5px);
+    }
+
+    h1 {
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .bookmarks-container {
+      width: 90%;
+      max-width: 1000px;
+      margin: 2rem auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1.2rem;
+    }
+
+    .bookmark-card {
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 0 10px rgba(255,255,255,0.05);
+      transition: transform 0.3s;
+    }
+
+    .bookmark-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .bookmark-card img {
+      width: 100%;
+      height: 230px;
+      object-fit: cover;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .bookmark-info {
+      padding: 0.8rem;
+      text-align: center;
+    }
+
+    .bookmark-info h3 {
+      font-size: 1rem;
+      margin: 0.5rem 0;
+    }
+
+    .bookmark-info p {
+      font-size: 0.9rem;
+      color: #bbb;
+      margin: 0;
+    }
+
+    .delete-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255,0,0,0.8);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      width: 30px;
+      height: 30px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .delete-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .empty {
+      text-align: center;
+      color: #888;
+      margin-top: 50px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <i class="fa-solid fa-arrow-left back-arrow" onclick="window.history.back()"></i>
+    <h1>My Bookmarks</h1>
+  </header>
+
+  <div id="bookmarksContainer" class="bookmarks-container"></div>
+  <div id="emptyMsg" class="empty" style="display:none;">No bookmarks yet.</div>
+
+<script>
+const BACKEND_BASE = "https://notoraadminbackend-1.onrender.com";
+
+async function loadBookmarks() {
+  const container = document.getElementById("bookmarksContainer");
+  const emptyMsg = document.getElementById("emptyMsg");
+  container.innerHTML = "";
+
+  const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
+  const token = localStorage.getItem("notoraToken");
+
+  let bookmarks = [];
+
+  try {
+    if (user && token) {
+      const res = await fetch(`${BACKEND_BASE}/api/bookmarks`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      bookmarks = await res.json();
+    } else {
+      bookmarks = JSON.parse(localStorage.getItem("guestBookmarks") || "[]");
+    }
+
+    if (!bookmarks.length) {
+      emptyMsg.style.display = "block";
+      return;
+    } else {
+      emptyMsg.style.display = "none";
+    }
+
+    bookmarks.forEach(b => {
+      const book = b.bookId || b;
+      const card = document.createElement("div");
+      card.className = "bookmark-card";
+      card.innerHTML = `
+        <img src="${book.thumbnail}" alt="${book.name}">
+        <div class="bookmark-info">
+          <h3>${book.name}</h3>
+          <p>${book.author}</p>
+        </div>
+        <button class="delete-btn"><i class="fa-solid fa-trash"></i></button>
+      `;
+
+      // View on click
+      card.querySelector("img").onclick = () => {
+        localStorage.setItem("selectedBook", JSON.stringify(book));
+        location.href = "book.html";
+      };
+
+      // Delete
+      card.querySelector(".delete-btn").onclick = async () => {
+        if (confirm("Remove this bookmark?")) {
+          if (user && token && b._id) {
+            await fetch(`${BACKEND_BASE}/api/bookmarks/${b._id}`, {
+              method: "DELETE",
+              headers: { Authorization: `Bearer ${token}` }
+            });
+          } else {
+            const local = JSON.parse(localStorage.getItem("guestBookmarks") || "[]");
+            const updated = local.filter(x => x._id !== book._id);
+            localStorage.setItem("guestBookmarks", JSON.stringify(updated));
+          }
+          loadBookmarks();
+        }
+      };
+
+      container.appendChild(card);
+    });
+  } catch (err) {
+    console.error(err);
+    emptyMsg.style.display = "block";
+  }
+}
+
+loadBookmarks();
+</script>
+</body>
+</html>
