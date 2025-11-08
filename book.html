@@ -490,12 +490,30 @@ function toggleMenu(event, id, isReply = false, parentId = null) {
   }, 50);
 }
 
-// ✏️ Edit (frontend-only alert)
-function editComment(id, isReply, parentId) {
+async function editComment(id, isReply, parentId) {
   const newText = prompt("Edit your comment:");
   if (!newText) return;
-  alert("Edit API not yet implemented (backend part pending).");
+
+  try {
+    const endpoint = isReply
+      ? `${COMMENTS_API}/reply/${parentId}/${id}`
+      : `${COMMENTS_API}/${id}`;
+
+    const res = await fetch(endpoint, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: newText }),
+    });
+
+    if (!res.ok) throw new Error("Edit failed");
+    alert("Edited successfully!");
+    loadComments();
+  } catch (err) {
+    console.error("Edit error:", err);
+    alert("Error editing comment.");
+  }
 }
+
 
 // 🗑️ Delete Comment/Reply
 async function deleteComment(id, isReply, parentId) {
