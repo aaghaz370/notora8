@@ -278,160 +278,176 @@
 
 <script>
 const BACKEND_BASE = "https://notoraadminbackend-1.onrender.com";
-const BOOKS_API = `${BACKEND_BASE}/api/books`;
 const COMMENTS_API = `${BACKEND_BASE}/api/comments`;
+let book = JSON.parse(localStorage.getItem("selectedBook") || "null");
 
-// Load Book
-let book = null;
-try {
-  const raw = localStorage.getItem("selectedBook");
-  if (!raw || raw === "undefined") throw new Error();
-  book = JSON.parse(raw);
-} catch {
+if (!book) {
   alert("No book found, redirecting...");
   location.href = "index.html";
 }
 
-// Fill Info
-document.getElementById("bookName").textContent = book.name;
-document.getElementById("bookAuthor").textContent = book.author;
-document.getElementById("bookGenre").textContent = book.genre;
-document.getElementById("bookRating").textContent = "⭐ " + (book.rating || "");
-document.getElementById("bookPdf").src = book.pdfUrl;
+const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
+const token = localStorage.getItem("notoraToken");
 
-/* Suggestion Loader */
-async function loadSuggestions() {
-  const res = await fetch(`${BOOKS_API}?genre=${encodeURIComponent(book.genre)}`);
-  const data = await res.json();
-  const grid = document.getElementById("suggestionGrid");
-  grid.innerHTML = "";
-  data.filter(b => b._id !== book._id).slice(0,6).forEach(b => {
-    const el = document.createElement("div");
-    el.className = "suggestion-card";
-    el.innerHTML = `<img src="${b.thumbnail}" alt="${b.name}"><p>${b.name}</p>`;
-    el.onclick = () => {
-      localStorage.setItem("selectedBook", JSON.stringify(b));
-      location.href = "book.html";
-    };
-    grid.appendChild(el);
-  });
-}
+document.addEventListener("DOMContentLoaded", () => {
+  if (user && token) {
+    document.getElementById("commentName").style.display = "none";
+    document.getElementById("commentText").placeholder = "Write a comment as " + user.name;
+  } else {
+    document.getElementById("commentName").disabled = true;
+    document.getElementById("commentText").disabled = true;
+    document.getElementById("postCommentBtn").innerText = "Login to Comment";
+    document.getElementById("postCommentBtn").onclick = () => location.href = "profile.html";
+    return;
+  }
 
-/* Comments */
+  loadComments();
+});
+
 async function loadComments() {
-  const res = await fetch(`${COMMENTS_API}/${book._id}`);
-  const comments = await res.json();
   const list = document.getElementById("commentsList");
-  list.innerHTML = "";
-  if (!comments.length) return list.innerHTML = "<p>No comments yet.</p>";
-  comments.forEach(c => {
-    const card = document.createElement("div");
-    card.className = "comment-card";
-    card.innerHTML = `
-      <div class="comment-meta">
-        <span class="comment-name">${c.name}${c.role === "admin" ? '<span class="comment-verified">✓ Admin</span>' : ""}</span>
-        <button class="reply-btn" onclick="openReplyBox('${c._id}')">Reply</button>
-      </div>
-      <p>${c.text}</p>
-      <div class="reply-box" id="reply-${c._id}">
-        ${(c.replies || []).map(r => `
-          <div class="comment-card" style="background:rgba(255,255,255,0.08)">
-            <span class="comment-name">${r.name}</span>
-            <p>${r.text}</p>
-          </div>
-        `).join('')}
-      </div>`;
-    list.appendChild(card);
-  });
+  list.innerHTML = `<p>Loading comments...</p>`;
+
+  try {
+    const res = await fetch(`${COMMENTS_API}/${book._id}`);
+    const comments = await res.json();
+
+    if (!comments.length) {
+      list.innerHTML = `<p>No comments yet.</p>`;
+      return;
+    }
+
+    list.innerHTML = "";
+    comments.forEach(c => renderComment(c, list, 0));
+  } catch (err) {
+    console.error("Error loading comments:", err);
+    list.innerHTML = `<p>Failed to load comments.</p>`;
+  }
 }
 
-/* Post Comment */
-async function postComment() {
-  const name = document.getElementById("commentName").value.trim();
+function renderComment(c, container, level) {
+  const card = document.createElement("div");
+  card.className = "comment-card";
+  card.style.marginLeft = `${level * 15}px`;
+
+  const isOwn = user && c.name === user.name;
+
+  card.innerHTML = `
+    <div class="comment-meta">
+      <span class="comment-name">${c.name}</span>
+      <div>
+        ${isOwn ? `<button class="reply-btn more-btn" onclick="openMenu('${c._id}')"><i class='fa-solid fa-ellipsis'></i></button>` : ""}
+        <button class="reply-btn" onclick="openReplyBox('${c._id}', ${level})">Reply</button>
+      </div>
+    </div>
+    <p>${c.text}</p>
+    <div class="reply-box" id="reply-${c._id}"></div>
+  `;
+
+  container.appendChild(card);
+
+  // nested replies
+  if (c.replies && c.replies.length > 0) {
+    c.replies.forEach(r => renderReply(r, card.querySelector(`#reply-${c._id}`), level + 1, c._id));
+  }
+}
+
+function renderReply(r, container, level, parentId) {
+  const replyCard = document.createElement("div");
+  replyCard.className = "comment-card";
+  replyCard.style.background = `rgba(255,255,255,${0.05 + level * 0.05})`;
+  replyCard.style.marginLeft = `${level * 15}px`;
+
+  const isOwn = user && r.name === user.name;
+
+  replyCard.innerHTML = `
+    <div class="comment-meta">
+      <span class="comment-name">${r.name}</span>
+      <div>
+        ${isOwn ? `<button class="reply-btn more-btn" onclick="openMenu('${r._id}', true, '${parentId}')"><i class='fa-solid fa-ellipsis'></i></button>` : ""}
+        ${level < 2 ? `<button class="reply-btn" onclick="openReplyBox('${parentId}', ${level + 1}, '${r._id}')">Reply</button>` : ""}
+      </div>
+    </div>
+    <p>${r.text}</p>
+    <div class="reply-box" id="reply-${r._id}"></div>
+  `;
+
+  container.appendChild(replyCard);
+
+  if (r.replies && r.replies.length) {
+    r.replies.forEach(sub => renderReply(sub, replyCard.querySelector(`#reply-${r._id}`), level + 1, parentId));
+  }
+}
+
+/* ➕ Post new comment */
+document.getElementById("postCommentBtn").onclick = async () => {
   const text = document.getElementById("commentText").value.trim();
-  if (name.length < 3 || name.length > 10) return alert("Name must be 3–10 characters.");
-  if (text.length < 1 || text.length > 150) return alert("Comment must be 1–150 characters.");
+  if (!text) return alert("Enter comment first!");
   await fetch(COMMENTS_API, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ bookId: book._id, name, text })
+    body: JSON.stringify({ bookId: book._id, name: user.name, text })
   });
   document.getElementById("commentText").value = "";
   loadComments();
-}
+};
 
-/* Reply Function */
-async function openReplyBox(id) {
-  const target = document.getElementById(`reply-${id}`);
-  if (target.querySelector("textarea")) return;
+/* 💬 Reply box */
+function openReplyBox(id, level, parentReplyId = null) {
+  const target = document.getElementById(`reply-${parentReplyId || id}`);
+  if (!target || target.querySelector("textarea")) return;
+
   const box = document.createElement("div");
   box.innerHTML = `
-    <input placeholder="Your name (3–10 chars)" id="rname-${id}" style="width:100%;background:#111;color:#fff;border:none;border-radius:6px;padding:6px;margin-top:6px">
-    <textarea placeholder="Write a reply (1–150 chars)..." id="rtext-${id}" style="width:100%;background:#111;color:#fff;border:none;border-radius:6px;padding:6px;margin-top:6px"></textarea>
+    <textarea placeholder="Reply as ${user.name}" id="rtext-${id}" style="width:100%;background:#111;color:#fff;border:none;border-radius:6px;padding:6px;margin-top:6px"></textarea>
     <button style="background:#ff416c;border:none;padding:6px 12px;border-radius:6px;color:#fff;cursor:pointer;margin-top:4px">Send</button>
   `;
+
   box.querySelector("button").onclick = async () => {
-    const name = document.getElementById(`rname-${id}`).value.trim();
     const text = document.getElementById(`rtext-${id}`).value.trim();
-    if (name.length < 3 || name.length > 10) return alert("Name must be 3–10 characters.");
-    if (text.length < 1 || text.length > 150) return alert("Reply must be 1–150 characters.");
+    if (!text) return alert("Enter reply text!");
     await fetch(`${COMMENTS_API}/reply/${id}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, text })
+      body: JSON.stringify({ name: user.name, text, parentReplyId })
     });
     loadComments();
   };
+
   target.appendChild(box);
 }
 
-document.getElementById("postCommentBtn").onclick = postComment;
-loadSuggestions();
-loadComments();
+/* ⋮ Edit/Delete Menu */
+function openMenu(id, isReply = false, parentId = null) {
+  const menu = document.createElement("div");
+  menu.style.position = "absolute";
+  menu.style.background = "#222";
+  menu.style.border = "1px solid #555";
+  menu.style.borderRadius = "6px";
+  menu.style.padding = "5px";
+  menu.style.zIndex = 99;
+  menu.innerHTML = `
+    <button style="background:none;border:none;color:#fff;cursor:pointer" onclick="editComment('${id}', ${isReply}, '${parentId}')">Edit</button><br>
+    <button style="background:none;border:none;color:#ff4b2b;cursor:pointer" onclick="deleteComment('${id}', ${isReply}, '${parentId}')">Delete</button>
+  `;
+  document.body.appendChild(menu);
+  document.onclick = () => menu.remove();
+}
 
-  // 🔖 Bookmark button
-document.getElementById("bookmarkBtn").addEventListener("click", async () => {
-  const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
-  const token = localStorage.getItem("notoraToken");
-  const bookmarksKey = user ? "userBookmarks" : "guestBookmarks";
+async function editComment(id, isReply, parentId) {
+  const newText = prompt("Edit your comment:");
+  if (!newText) return;
+  // backend edit API can be added here later
+  alert("Edit API to be implemented");
+}
 
-  try {
-    if (user && token) {
-      // 🧠 Save to backend for logged-in users
-      const res = await fetch(`${BACKEND_BASE}/api/bookmarks`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ bookId: book._id }),
-      });
-
-      if (res.ok) {
-        alert("✅ Book added to your bookmarks!");
-      } else {
-        const msg = await res.text();
-        console.error("Bookmark save failed:", msg);
-        alert("⚠️ Failed to save bookmark. Try logging in again.");
-      }
-    } else {
-      // 💾 Fallback for guest users
-      const local = JSON.parse(localStorage.getItem(bookmarksKey) || "[]");
-      if (local.some((b) => b._id === book._id))
-        return alert("Already bookmarked!");
-
-      local.unshift(book);
-      localStorage.setItem(bookmarksKey, JSON.stringify(local));
-      alert("Bookmarked (saved locally)!");
-    }
-  } catch (err) {
-    console.error("Bookmark error:", err);
-    alert("❌ Error saving bookmark. Try again later.");
-  }
-});
-
-
+async function deleteComment(id, isReply, parentId) {
+  if (!confirm("Delete this comment?")) return;
+  // backend delete API can be added here later
+  alert("Delete API to be implemented");
+}
 </script>
+
 </body>
 </html>
 
