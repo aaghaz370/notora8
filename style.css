@@ -1156,7 +1156,7 @@ footer small {
 
 
 /* 🏆 Netflix-Style Top 10 Section */
-.top10-wrapper {
+/* .top10-wrapper {
   position: relative;
   display: flex;
   gap: 1.5rem;
@@ -1168,7 +1168,19 @@ footer small {
 }
 .top10-wrapper::-webkit-scrollbar {
   display: none;
+} */
+.top10-wrapper {
+  position: relative;
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-end;
+  overflow-x: auto;
+  overflow-y: hidden; /* ⬅️ important line */
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  padding-bottom: 1rem;
 }
+
 
 /* Each Top 10 Item */
 .top10-item {
@@ -1284,6 +1296,7 @@ footer small {
 }
 .arrow-left { left: -10px; }
 .arrow-right { right: -10px; }
+
 
 
 
