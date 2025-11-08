@@ -359,6 +359,11 @@
   </section>
 
   <script>
+    // 🧹 Auto-clean corrupted storage on every visit
+if (localStorage.getItem("selectedBook") === "undefined") {
+  localStorage.removeItem("selectedBook");
+}
+
     window.onerror = function (msg, src, line, col, err) {
   console.error("🔴 Script Error:", msg, "at", line, col);
   alert("Something went wrong — check console for details.");
@@ -369,11 +374,14 @@
     const COMMENTS_API = `${BACKEND_BASE}/api/comments`;
 
     // const book = JSON.parse(localStorage.getItem("selectedBook") || "null");
+// 🔒 Safe book loader — prevents "undefined" crash forever
 let book = null;
 try {
   const savedBook = localStorage.getItem("selectedBook");
-  if (savedBook && savedBook !== "undefined" && savedBook !== "null") {
+  if (savedBook && savedBook !== "undefined" && savedBook !== "null" && savedBook.trim() !== "") {
     book = JSON.parse(savedBook);
+  } else {
+    localStorage.removeItem("selectedBook");
   }
 } catch (err) {
   console.error("Book parse error:", err);
@@ -381,13 +389,15 @@ try {
 }
 
 if (!book) {
-  alert("⚠️ No book selected — please go back and open a book again.");
-  window.location.href = "index.html";
+  // If book missing or corrupted → redirect safely
+  console.warn("No valid book found, redirecting...");
+  location.replace("index.html");
 }
 
-    if (!book) {
-      alert("No book selected!");
-      window.location.href = "index.html";
+
+    // if (!book) {
+    //   alert("No book selected!");
+    //   window.location.href = "index.html";
     } else {
       document.getElementById("bookName").textContent = book.name;
       document.getElementById("bookAuthor").textContent = book.author;
@@ -484,12 +494,13 @@ function showPopup(msg, bg = "#333") {
         el.className = "suggestion-card";
         el.innerHTML = `<img src="${b.thumbnail}" alt="${b.name}"><p>${b.name}</p>`;
        el.addEventListener("click", () => {
-  if (!b || !b._id) return alert("Invalid book data — please try again.");
+  if (!b || !b._id) return alert("Invalid book data.");
   localStorage.setItem("selectedBook", JSON.stringify(b));
-  setTimeout(() => {
-    window.location.href = "book.html";
-  }, 100);
+  // Give storage time to save, then open cleanly
+  setTimeout(() => (location.href = "book.html"), 80);
 });
+
+
 
         grid.appendChild(el);
       });
