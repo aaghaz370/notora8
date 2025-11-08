@@ -344,5 +344,8 @@ loadContinueReading();
 
 
 
+continueSection.style.display = "block";
+setTimeout(() => continueSection.classList.add("visible"), 100);
+
 
 
