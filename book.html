@@ -206,6 +206,63 @@
       border-left: 2px solid #ff416c;
       padding-left: 10px;
     }
+    .comment-options {
+  position: relative;
+  display: inline-block;
+}
+
+.comment-options button {
+  background: transparent;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: color 0.2s;
+}
+
+.comment-options button:hover {
+  color: #ff416c;
+}
+
+.comment-menu {
+  position: absolute;
+  right: 0;
+  top: 20px;
+  background: #111;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(255,255,255,0.1);
+  overflow: hidden;
+  z-index: 10;
+}
+
+.comment-menu button {
+  display: block;
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: #fff;
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.comment-menu button:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.comment-verified {
+  display: inline-block;
+  background: #0078ff;
+  color: white;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 5px;
+  margin-left: 5px;
+  vertical-align: middle;
+}
+
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
@@ -280,17 +337,19 @@
     <p class="rating" id="bookRating"></p>
   </section>
 
-  <div class="comments-wrapper">
-    <h3>💬 Comments</h3>
-    <div class="comment-inputs">
-      <input type="text" id="commentName" placeholder="Enter your name..." />
-      <textarea id="commentText" placeholder="Write your comment..."></textarea>
-      <button id="postCommentBtn">Post Comment</button>
-    </div>
-    <div class="comments-list" id="commentsList">
-      <p>Loading comments...</p>
-    </div>
+ <div class="comments-wrapper">
+  <h3>💬 Comments</h3>
+
+  <div class="comment-inputs" id="commentInputs">
+    <textarea id="commentText" placeholder="Write your comment..."></textarea>
+    <button id="postCommentBtn">Post Comment</button>
   </div>
+
+  <div class="comments-list" id="commentsList">
+    <p>Loading comments...</p>
+  </div>
+</div>
+
 
   <section class="suggestions">
     <h3>📚 Similar Books You May Like</h3>
@@ -410,80 +469,111 @@ function showPopup(msg, bg = "#333") {
       });
     }
 
-    /* 🔹 Comments */
-    async function loadComments() {
-      try {
-        const res = await fetch(`${COMMENTS_API}/${book._id}`);
-        const comments = await res.json();
-        const list = document.getElementById("commentsList");
-        list.innerHTML = "";
-        if (!comments.length) {
-          list.innerHTML = "<p>No comments yet.</p>";
-          return;
-        }
-        comments.forEach(c => {
-          const card = document.createElement("div");
-          card.className = "comment-card";
-          card.innerHTML = `
-            <div class="comment-meta">
-              <span class="comment-name">${c.name}</span>
-              <button class="reply-btn" onclick="openReplyBox('${c._id}')">Reply</button>
-            </div>
-            <p>${c.text}</p>
-            <div class="reply-box" id="reply-${c._id}">
-              ${(c.replies || []).map(r => `
-                <div class="comment-card" style="background:rgba(255,255,255,0.05)">
-                  <span class="comment-name">${r.name}</span>
-                  <p>${r.text}</p>
-                </div>`).join('')}
-            </div>
-          `;
-          document.getElementById("commentsList").appendChild(card);
-        });
-      } catch (e) {
-        console.error("Load comments error:", e);
-      }
+  const COMMENTS_API = "https://notoraadminbackend-1.onrender.com/api/comments";
+const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
+const token = localStorage.getItem("notoraToken") || null;
+
+async function loadComments() {
+  try {
+    const res = await fetch(`${COMMENTS_API}/${book._id}`);
+    const comments = await res.json();
+    const list = document.getElementById("commentsList");
+    list.innerHTML = "";
+
+    if (!comments.length) {
+      list.innerHTML = "<p>No comments yet.</p>";
+      return;
     }
 
-    async function postComment() {
-      const name = document.getElementById("commentName").value.trim();
-      const text = document.getElementById("commentText").value.trim();
-      if (!name || !text) return alert("Enter name and comment");
-      await fetch(COMMENTS_API, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ bookId: book._id, name, text })
-      });
-      document.getElementById("commentText").value = "";
-      loadComments();
-    }
+    comments.forEach(c => {
+      const card = document.createElement("div");
+      card.className = "comment-card";
 
-    async function openReplyBox(commentId) {
-      const target = document.getElementById(`reply-${commentId}`);
-      const form = document.createElement("div");
-      form.innerHTML = `
-        <input id="replyName-${commentId}" placeholder="Your name" style="margin-top:8px;width:100%;padding:8px;border-radius:6px;border:none;background:#111;color:#fff">
-        <textarea id="replyText-${commentId}" placeholder="Write a reply..." style="margin-top:5px;width:100%;padding:8px;border-radius:6px;border:none;background:#111;color:#fff"></textarea>
-        <button style="margin-top:5px;background:#ff416c;border:none;padding:6px 12px;border-radius:6px;color:#fff;cursor:pointer;">Send</button>
+      const isAdmin = c.role === "admin";
+      const isOwn = user && c.userId === user._id;
+
+      card.innerHTML = `
+        <div class="comment-meta">
+          <span class="comment-name">${c.name}
+            ${isAdmin ? `<span class="comment-verified">✓ Admin</span>` : ""}
+          </span>
+          ${isOwn ? `
+          <div class="comment-options">
+            <button onclick="toggleMenu('${c._id}')">⋮</button>
+            <div class="comment-menu" id="menu-${c._id}" style="display:none;">
+              <button onclick="editComment('${c._id}', '${c.text.replace(/'/g, "\\'")}')">Edit</button>
+              <button onclick="deleteComment('${c._id}')">Delete</button>
+            </div>
+          </div>` : ""}
+        </div>
+        <p id="text-${c._id}">${c.text}</p>
       `;
-      form.querySelector("button").onclick = async () => {
-        const name = document.getElementById(`replyName-${commentId}`).value.trim();
-        const text = document.getElementById(`replyText-${commentId}`).value.trim();
-        if (!name || !text) return alert("Enter both fields");
-        await fetch(`${COMMENTS_API}/reply/${commentId}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, text })
-        });
-        loadComments();
-      };
-      target.appendChild(form);
-    }
+      list.appendChild(card);
+    });
+  } catch (e) {
+    console.error("Load comments error:", e);
+  }
+}
 
-    document.getElementById("postCommentBtn").addEventListener("click", postComment);
+function toggleMenu(id) {
+  const menu = document.getElementById(`menu-${id}`);
+  menu.style.display = menu.style.display === "none" ? "block" : "none";
+}
 
-    loadSuggestions();
-    loadComments();
+async function editComment(id, oldText) {
+  const newText = prompt("Edit your comment:", oldText);
+  if (!newText || newText.trim() === oldText) return;
+  await fetch(`${COMMENTS_API}/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({ text: newText })
+  });
+  loadComments();
+}
+
+async function deleteComment(id) {
+  const confirmDel = confirm("Delete this comment?");
+  if (!confirmDel) return;
+  await fetch(`${COMMENTS_API}/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  loadComments();
+}
+
+document.getElementById("postCommentBtn").addEventListener("click", async () => {
+  if (!user || !token) {
+    alert("Login required to post a comment.");
+    return (window.location.href = "login.html");
+  }
+
+  const text = document.getElementById("commentText").value.trim();
+  if (!text) return alert("Please write a comment.");
+
+  await fetch(COMMENTS_API, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      bookId: book._id,
+      name: user.name,
+      userId: user._id,
+      text,
+      role: user.email === "admin@notora.com" ? "admin" : "user"
+    })
+  });
+
+  document.getElementById("commentText").value = "";
+  loadComments();
+});
+
+loadComments();
+
   </script>
 </body>
 </html>
