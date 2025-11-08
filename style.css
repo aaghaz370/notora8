@@ -1155,7 +1155,7 @@ footer small {
 }
 
 
-/* 🏆 TOP 10 NETFLIX STYLE CARDS */
+/* 🏆 Netflix-style Top 10 cards */
 .top10-card {
   position: relative;
   flex: 0 0 auto;
@@ -1165,7 +1165,7 @@ footer small {
   background: #1f1f1f;
   border-radius: 12px;
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform .3s ease, box-shadow .3s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1175,7 +1175,7 @@ footer small {
 
 .top10-card:hover {
   transform: scale(1.05);
-  box-shadow: 0 0 25px rgba(255, 0, 0, 0.3);
+  box-shadow: 0 0 25px rgba(255,0,0,.3);
 }
 
 .top10-card img {
@@ -1183,11 +1183,11 @@ footer small {
   height: 160px;
   object-fit: cover;
   border-radius: 8px;
-  margin-bottom: 0.5rem;
+  margin-bottom: .5rem;
 }
 
 .top10-card .top10-title {
-  font-size: 0.9rem;
+  font-size: .9rem;
   color: #fff;
   font-weight: 600;
   text-align: center;
@@ -1196,11 +1196,10 @@ footer small {
 }
 
 .top10-card .top10-author {
-  font-size: 0.75rem;
+  font-size: .75rem;
   color: #aaa;
 }
 
-/* Large translucent ranking number behind card */
 .top10-card .top10-rank {
   position: absolute;
   left: -10px;
@@ -1208,7 +1207,7 @@ footer small {
   transform: translateY(-50%);
   font-size: 8rem;
   font-weight: 900;
-  color: rgba(255, 255, 255, 0.05);
+  color: rgba(255,255,255,.05);
   z-index: 0;
   pointer-events: none;
   font-family: 'Poppins', sans-serif;
