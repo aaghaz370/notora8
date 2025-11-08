@@ -144,76 +144,77 @@
     </div>
   </div>
 
-  <script>
+ <script>
 const API_BASE = "https://notoraadminbackend-1.onrender.com/api/users";
+
+// Select elements
+const authBox = document.getElementById("authBox");
+const formTitle = document.getElementById("formTitle");
+const nameInput = document.getElementById("name");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
 const authBtn = document.getElementById("authBtn");
 const toggleMode = document.getElementById("toggleMode");
-const formTitle = document.getElementById("formTitle");
 const message = document.getElementById("message");
-const nameInput = document.getElementById("name");
-const loginRegisterBox = document.getElementById("loginRegister");
-const profileSection = document.getElementById("profileSection");
+
+// Create profile section dynamically
+const profileSection = document.createElement("div");
+profileSection.id = "profileSection";
+profileSection.style.display = "none";
+profileSection.innerHTML = `
+  <h2 style="color:#e50914;margin-bottom:1rem;">Your Profile</h2>
+  <p style="margin:5px 0;font-size:1rem;">👤 <strong id="profileName"></strong></p>
+  <p style="margin:5px 0;font-size:0.95rem;color:#bbb;">✉️ <span id="profileEmail"></span></p>
+  <button id="logoutBtn" style="
+    background: linear-gradient(135deg,#ff4141,#e50914);
+    border:none;border-radius:8px;padding:10px 18px;
+    color:#fff;font-weight:600;margin-top:15px;cursor:pointer;
+    transition:transform 0.2s;">Logout</button>
+`;
+document.body.appendChild(profileSection);
+
 const profileName = document.getElementById("profileName");
 const profileEmail = document.getElementById("profileEmail");
 const logoutBtn = document.getElementById("logoutBtn");
 
 let mode = "login";
 
-// 🧩 STEP 1 — Check token on load
+/* ==========================================================
+   1️⃣  Check Login Status Immediately (Stay Logged In)
+========================================================== */
 document.addEventListener("DOMContentLoaded", async () => {
-  const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
   const token = localStorage.getItem("notoraToken");
+  const user = safeParse(localStorage.getItem("notoraUser"));
 
-  if (token && user) {
-    try {
-      const res = await fetch(`${API_BASE}/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        showProfile(data);
-      } else {
-        // Invalid token or expired
-        console.warn("Token invalid, clearing session...");
-        localStorage.removeItem("notoraUser");
-        localStorage.removeItem("notoraToken");
-        showLogin();
-      }
-    } catch (err) {
-      console.error("Profile fetch failed:", err);
-      showLogin();
+  if (!token || !user) return showLogin(); // nothing stored
+
+  try {
+    const res = await fetch(`${API_BASE}/profile`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      console.warn("❌ Invalid or expired token. Resetting session.");
+      localStorage.removeItem("notoraUser");
+      localStorage.removeItem("notoraToken");
+      return showLogin();
     }
-  } else {
+
+    const data = await res.json();
+    showProfile(data);
+  } catch (err) {
+    console.error("⚠️ Profile fetch failed:", err);
     showLogin();
   }
 });
 
-// 🧠 Show profile view
-function showProfile(user) {
-  loginRegisterBox.style.display = "none";
-  profileSection.style.display = "block";
-  formTitle.textContent = "Your Profile";
-  profileName.textContent = user.name;
-  profileEmail.textContent = user.email;
-}
-
-// 🧠 Show login form
-function showLogin() {
-  loginRegisterBox.style.display = "block";
-  profileSection.style.display = "none";
-  formTitle.textContent = "Login to Notora";
-}
-
-// 🔓 Logout
-logoutBtn.onclick = () => {
-  localStorage.removeItem("notoraUser");
-  localStorage.removeItem("notoraToken");
-  showLogin();
-  message.textContent = "Logged out successfully!";
-  message.style.color = "#00ff99";
-};
-
-// 🔄 Toggle between login/register
+/* ==========================================================
+   2️⃣  Login / Register Toggle
+========================================================== */
 toggleMode.onclick = () => {
   if (mode === "login") {
     mode = "register";
@@ -232,11 +233,13 @@ toggleMode.onclick = () => {
   }
 };
 
-// ✅ Login/Register button
+/* ==========================================================
+   3️⃣  Login / Register Functionality
+========================================================== */
 authBtn.onclick = async () => {
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const name = document.getElementById("name").value.trim();
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
+  const name = nameInput.value.trim();
 
   if (!email || !password || (mode === "register" && !name)) {
     message.textContent = "Please fill all fields.";
@@ -244,7 +247,10 @@ authBtn.onclick = async () => {
   }
 
   message.textContent = "Processing...";
-  const endpoint = mode === "login" ? `${API_BASE}/login` : `${API_BASE}/register`;
+  message.style.color = "#fff";
+
+  const endpoint =
+    mode === "login" ? `${API_BASE}/login` : `${API_BASE}/register`;
 
   try {
     const res = await fetch(endpoint, {
@@ -256,19 +262,58 @@ authBtn.onclick = async () => {
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || "Failed");
 
+    // ✅ Save user + token to localStorage
     localStorage.setItem("notoraUser", JSON.stringify(data.user));
     localStorage.setItem("notoraToken", data.token);
 
     message.style.color = "lime";
-    message.textContent = mode === "login" ? "Welcome back!" : "Account created!";
+    message.textContent =
+      mode === "login" ? "Welcome back!" : "Account created successfully!";
 
-    setTimeout(() => showProfile(data.user), 1000);
+    setTimeout(() => showProfile(data.user), 800);
   } catch (err) {
     message.style.color = "#ff4444";
     message.textContent = err.message;
   }
 };
+
+/* ==========================================================
+   4️⃣  Logout Functionality
+========================================================== */
+logoutBtn.onclick = () => {
+  localStorage.removeItem("notoraUser");
+  localStorage.removeItem("notoraToken");
+  showLogin();
+  message.textContent = "Logged out successfully!";
+  message.style.color = "#00ff99";
+};
+
+/* ==========================================================
+   5️⃣  Utility Functions
+========================================================== */
+function showProfile(user) {
+  authBox.style.display = "none";
+  profileSection.style.display = "block";
+  profileName.textContent = user.name;
+  profileEmail.textContent = user.email;
+  console.log("✅ Logged in as:", user.name);
+}
+
+function showLogin() {
+  authBox.style.display = "block";
+  profileSection.style.display = "none";
+  formTitle.textContent = "Login to Notora";
+}
+
+function safeParse(val) {
+  try {
+    return JSON.parse(val);
+  } catch {
+    return null;
+  }
+}
 </script>
+
 
 </body>
 </html>
