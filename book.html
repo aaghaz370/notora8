@@ -276,7 +276,6 @@
     <div class="suggestion-grid" id="suggestionGrid"></div>
   </section>
 
-<script>
 const BACKEND_BASE = "https://notoraadminbackend-1.onrender.com";
 const BOOKS_API = `${BACKEND_BASE}/api/books`;
 const COMMENTS_API = `${BACKEND_BASE}/api/comments`;
@@ -304,16 +303,19 @@ async function loadSuggestions() {
     const data = await res.json();
     const grid = document.getElementById("suggestionGrid");
     grid.innerHTML = "";
-    data.filter(b => b._id !== book._id).slice(0, 6).forEach(b => {
-      const el = document.createElement("div");
-      el.className = "suggestion-card";
-      el.innerHTML = `<img src="${b.thumbnail}" alt="${b.name}"><p>${b.name}</p>`;
-      el.onclick = () => {
-        localStorage.setItem("selectedBook", JSON.stringify(b));
-        location.href = "book.html";
-      };
-      grid.appendChild(el);
-    });
+    data
+      .filter(b => b._id !== book._id)
+      .slice(0, 6)
+      .forEach(b => {
+        const el = document.createElement("div");
+        el.className = "suggestion-card";
+        el.innerHTML = `<img src="${b.thumbnail}" alt="${b.name}"><p>${b.name}</p>`;
+        el.onclick = () => {
+          localStorage.setItem("selectedBook", JSON.stringify(b));
+          location.href = "book.html";
+        };
+        grid.appendChild(el);
+      });
   } catch (err) {
     console.error("Suggestions error:", err);
   }
@@ -334,7 +336,7 @@ if (!user || !token) {
   commentText.disabled = true;
   commentText.placeholder = "Login to comment";
   postBtn.textContent = "Login to Comment";
-  postBtn.onclick = () => location.href = "profile.html";
+  postBtn.onclick = () => (location.href = "profile.html");
 } else {
   commentName.style.display = "none";
   commentText.placeholder = `Write a comment as ${user.name}`;
@@ -456,30 +458,10 @@ function openReplyBox(commentId, level, parentReplyId = null) {
 }
 
 // ⋮ Menu Toggle (Edit/Delete)
-// function toggleMenu(event, id, isReply = false, parentId = null) {
-//   event.stopPropagation();
-//   document.querySelectorAll(".menu-popup").forEach(m => m.remove());
-
-//   const menu = document.createElement("div");
-//   menu.className = "menu-popup";
-//   menu.style.position = "absolute";
-//   menu.style.background = "#222";
-//   menu.style.border = "1px solid #555";
-//   menu.style.borderRadius = "6px";
-//   menu.style.padding = "5px";
-//   menu.style.zIndex = "1000";
-//   menu.style.top = `${event.clientY}px`;
-//   menu.style.left = `${event.clientX}px`;
-//   menu.innerHTML = `
-//     <button style="background:none;border:none;color:#fff;cursor:pointer" onclick="editComment('${id}', ${isReply}, '${parentId}')">Edit</button><br>
-//     <button style="background:none;border:none;color:#ff4b2b;cursor:pointer" onclick="deleteComment('${id}', ${isReply}, '${parentId}')">Delete</button>
-//   `;
-//   document.body.appendChild(menu);
-  function toggleMenu(event, id, isReply = false, parentId = null) {
+function toggleMenu(event, id, isReply = false, parentId = null) {
   event.stopPropagation();
   document.querySelectorAll(".menu-popup").forEach(m => m.remove());
 
-  // ✅ Position menu relative to clicked button
   const button = event.currentTarget;
   const rect = button.getBoundingClientRect();
 
@@ -492,7 +474,7 @@ function openReplyBox(commentId, level, parentReplyId = null) {
   menu.style.padding = "5px";
   menu.style.zIndex = "1000";
   menu.style.top = `${rect.top + rect.height + 4}px`;
-  menu.style.left = `${rect.left - 40}px`; // Slight offset to left of 3-dot
+  menu.style.left = `${rect.left - 40}px`;
 
   menu.innerHTML = `
     <button style="background:none;border:none;color:#fff;cursor:pointer;padding:4px 8px;width:100%;text-align:left"
@@ -503,27 +485,20 @@ function openReplyBox(commentId, level, parentReplyId = null) {
 
   document.body.appendChild(menu);
 
-  // close menu when clicking elsewhere
   setTimeout(() => {
     document.addEventListener("click", () => menu.remove(), { once: true });
   }, 50);
 }
 
-
-  document.addEventListener("click", () => menu.remove(), { once: true });
-}
-
+// ✏️ Edit (frontend-only alert)
 function editComment(id, isReply, parentId) {
   const newText = prompt("Edit your comment:");
   if (!newText) return;
-  alert("Edit API not yet implemented.");
+  alert("Edit API not yet implemented (backend part pending).");
 }
 
-// function deleteComment(id, isReply, parentId) {
-//   if (!confirm("Delete this comment?")) return;
-//   alert("Delete API not yet implemented.");
-// }
-  async function deleteComment(id, isReply, parentId) {
+// 🗑️ Delete Comment/Reply
+async function deleteComment(id, isReply, parentId) {
   if (!confirm("Delete this comment?")) return;
   try {
     const endpoint = isReply
@@ -538,7 +513,6 @@ function editComment(id, isReply, parentId) {
     alert("Error deleting comment.");
   }
 }
-
 
 // 🔖 Bookmark Button
 document.getElementById("bookmarkBtn").onclick = async () => {
@@ -570,4 +544,4 @@ document.getElementById("bookmarkBtn").onclick = async () => {
     alert("❌ Error saving bookmark.");
   }
 };
-</script>
+
