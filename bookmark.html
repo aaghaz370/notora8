@@ -188,6 +188,12 @@
   <div id="emptyMsg" class="empty" style="display:none;">No bookmarks yet.</div>
 
 <script>
+  // 🧹 Auto clear invalid local data
+const guestData = localStorage.getItem("guestBookmarks");
+if (guestData && guestData.includes("undefined")) {
+  localStorage.removeItem("guestBookmarks");
+}
+
 const BACKEND_BASE = "https://notoraadminbackend-1.onrender.com";
 
 // 🌐 Wait until DOM fully loaded
