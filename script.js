@@ -87,28 +87,28 @@ function loadCategory(category) {
   slider.appendChild(showAllCard);
 
   // ✅ Desktop arrows only
-//   if (window.innerWidth > 768) {
-//     const leftArrow = document.createElement("button");
-//     leftArrow.className = "arrow-btn arrow-left";
-//     leftArrow.innerHTML = "&#8249;";
-//     leftArrow.onclick = () => slider.scrollBy({ left: -300, behavior: "smooth" });
+  if (window.innerWidth > 768) {
+    const leftArrow = document.createElement("button");
+    leftArrow.className = "arrow-btn arrow-left";
+    leftArrow.innerHTML = "&#8249;";
+    leftArrow.onclick = () => slider.scrollBy({ left: -300, behavior: "smooth" });
 
-//     const rightArrow = document.createElement("button");
-//     rightArrow.className = "arrow-btn arrow-right";
-//     rightArrow.innerHTML = "&#8250;";
-//     rightArrow.onclick = () => slider.scrollBy({ left: 300, behavior: "smooth" });
+    const rightArrow = document.createElement("button");
+    rightArrow.className = "arrow-btn arrow-right";
+    rightArrow.innerHTML = "&#8250;";
+    rightArrow.onclick = () => slider.scrollBy({ left: 300, behavior: "smooth" });
 
-//     wrapper.appendChild(leftArrow);
-//     wrapper.appendChild(slider);
-//     wrapper.appendChild(rightArrow);
-//   } else {
-//     wrapper.appendChild(slider);
-//   }
+    wrapper.appendChild(leftArrow);
+    wrapper.appendChild(slider);
+    wrapper.appendChild(rightArrow);
+  } else {
+    wrapper.appendChild(slider);
+  }
 
-//   section.appendChild(title);
-//   section.appendChild(wrapper);
-//   categoryContainer.appendChild(section);
-// }
+  section.appendChild(title);
+  section.appendChild(wrapper);
+  categoryContainer.appendChild(section);
+}
   // 🔥 Enable Arrows for Latest Books Section too
 function enableArrowsFor(sectionId) {
   const section = document.getElementById(sectionId);
@@ -299,6 +299,7 @@ function scrollSection(id, direction) {
 
 // ✅ Load latest books on page ready
 document.addEventListener("DOMContentLoaded", loadLatestBooks);
+
 
 
 
