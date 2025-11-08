@@ -1216,10 +1216,10 @@ footer small {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.top10-card:hover {
+/* .top10-card:hover {
   transform: translateX(-25%) scale(1.05);
   box-shadow: 0 0 25px rgba(255, 0, 0, 0.4);
-}
+} */
 
 .top10-card img {
   width: 100%;
@@ -1284,6 +1284,7 @@ footer small {
 }
 .arrow-left { left: -10px; }
 .arrow-right { right: -10px; }
+
 
 
 
