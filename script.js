@@ -352,6 +352,7 @@ loadContinueReading();
 continueSection.style.display = "block";
 setTimeout(() => continueSection.classList.add("visible"), 100);
 
+loadTop10Books();
 
 
 async function loadTop10Books() {
@@ -359,42 +360,47 @@ async function loadTop10Books() {
   const container = document.getElementById("top10Books");
 
   try {
+    console.log("🔥 Loading Top 10 Books…");
     const res = await fetch(`${BACKEND}/api/books/top10`);
+    if (!res.ok) throw new Error("API error " + res.status);
     const data = await res.json();
-    if (!data.length) {
+
+    if (!Array.isArray(data) || !data.length) {
+      console.warn("⚠️ No Top 10 data found");
       section.style.display = "none";
       return;
     }
 
+    // Show section
     section.style.display = "block";
-    setTimeout(() => (section.style.opacity = "1"), 150);
+    section.style.opacity = "1";
 
+    // Render cards
     container.innerHTML = "";
-
     data.forEach((book, i) => {
       const card = document.createElement("div");
       card.className = "top10-card";
-
       card.innerHTML = `
         <div class="top10-rank">${i + 1}</div>
         <img src="${book.thumbnail}" alt="${book.name}" />
         <div class="top10-title">${book.name}</div>
         <div class="top10-author">${book.author}</div>
       `;
-
       card.onclick = () => {
         localStorage.setItem("selectedBook", JSON.stringify(book));
         location.href = "book.html";
       };
-
       container.appendChild(card);
     });
 
-    enableArrowsFor("top10-section"); // same scroll behaviour
+    enableArrowsFor("top10-section"); // same scroll buttons
   } catch (err) {
-    console.error("Top 10 Error:", err);
+    console.error("❌ Top 10 Load Error:", err);
+    section.style.display = "none";
   }
 }
+
+
 
 
 
