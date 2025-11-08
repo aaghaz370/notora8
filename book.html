@@ -456,25 +456,59 @@ function openReplyBox(commentId, level, parentReplyId = null) {
 }
 
 // ⋮ Menu Toggle (Edit/Delete)
-function toggleMenu(event, id, isReply = false, parentId = null) {
+// function toggleMenu(event, id, isReply = false, parentId = null) {
+//   event.stopPropagation();
+//   document.querySelectorAll(".menu-popup").forEach(m => m.remove());
+
+//   const menu = document.createElement("div");
+//   menu.className = "menu-popup";
+//   menu.style.position = "absolute";
+//   menu.style.background = "#222";
+//   menu.style.border = "1px solid #555";
+//   menu.style.borderRadius = "6px";
+//   menu.style.padding = "5px";
+//   menu.style.zIndex = "1000";
+//   menu.style.top = `${event.clientY}px`;
+//   menu.style.left = `${event.clientX}px`;
+//   menu.innerHTML = `
+//     <button style="background:none;border:none;color:#fff;cursor:pointer" onclick="editComment('${id}', ${isReply}, '${parentId}')">Edit</button><br>
+//     <button style="background:none;border:none;color:#ff4b2b;cursor:pointer" onclick="deleteComment('${id}', ${isReply}, '${parentId}')">Delete</button>
+//   `;
+//   document.body.appendChild(menu);
+  function toggleMenu(event, id, isReply = false, parentId = null) {
   event.stopPropagation();
   document.querySelectorAll(".menu-popup").forEach(m => m.remove());
 
+  // ✅ Position menu relative to clicked button
+  const button = event.currentTarget;
+  const rect = button.getBoundingClientRect();
+
   const menu = document.createElement("div");
   menu.className = "menu-popup";
-  menu.style.position = "absolute";
+  menu.style.position = "fixed";
   menu.style.background = "#222";
   menu.style.border = "1px solid #555";
   menu.style.borderRadius = "6px";
   menu.style.padding = "5px";
   menu.style.zIndex = "1000";
-  menu.style.top = `${event.clientY}px`;
-  menu.style.left = `${event.clientX}px`;
+  menu.style.top = `${rect.top + rect.height + 4}px`;
+  menu.style.left = `${rect.left - 40}px`; // Slight offset to left of 3-dot
+
   menu.innerHTML = `
-    <button style="background:none;border:none;color:#fff;cursor:pointer" onclick="editComment('${id}', ${isReply}, '${parentId}')">Edit</button><br>
-    <button style="background:none;border:none;color:#ff4b2b;cursor:pointer" onclick="deleteComment('${id}', ${isReply}, '${parentId}')">Delete</button>
+    <button style="background:none;border:none;color:#fff;cursor:pointer;padding:4px 8px;width:100%;text-align:left"
+      onclick="editComment('${id}', ${isReply}, '${parentId}')">✏️ Edit</button>
+    <button style="background:none;border:none;color:#ff4b2b;cursor:pointer;padding:4px 8px;width:100%;text-align:left"
+      onclick="deleteComment('${id}', ${isReply}, '${parentId}')">🗑️ Delete</button>
   `;
+
   document.body.appendChild(menu);
+
+  // close menu when clicking elsewhere
+  setTimeout(() => {
+    document.addEventListener("click", () => menu.remove(), { once: true });
+  }, 50);
+}
+
 
   document.addEventListener("click", () => menu.remove(), { once: true });
 }
@@ -485,10 +519,26 @@ function editComment(id, isReply, parentId) {
   alert("Edit API not yet implemented.");
 }
 
-function deleteComment(id, isReply, parentId) {
+// function deleteComment(id, isReply, parentId) {
+//   if (!confirm("Delete this comment?")) return;
+//   alert("Delete API not yet implemented.");
+// }
+  async function deleteComment(id, isReply, parentId) {
   if (!confirm("Delete this comment?")) return;
-  alert("Delete API not yet implemented.");
+  try {
+    const endpoint = isReply
+      ? `${COMMENTS_API}/reply/${parentId}/${id}`
+      : `${COMMENTS_API}/${id}`;
+    const res = await fetch(endpoint, { method: "DELETE" });
+    if (!res.ok) throw new Error("Failed to delete");
+    alert("Deleted successfully!");
+    loadComments();
+  } catch (err) {
+    console.error(err);
+    alert("Error deleting comment.");
+  }
 }
+
 
 // 🔖 Bookmark Button
 document.getElementById("bookmarkBtn").onclick = async () => {
