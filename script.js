@@ -198,3 +198,20 @@ function performSearch(query) {
 // ✅ Run on load
 loadAllBooks();
 
+
+const profileIcon = document.getElementById("profileIcon");
+const profileMenu = document.getElementById("profileMenu");
+
+profileIcon.addEventListener("click", (e) => {
+  e.stopPropagation();
+  profileMenu.style.display = profileMenu.style.display === "block" ? "none" : "block";
+});
+
+// Hide menu when clicking outside
+document.addEventListener("click", (e) => {
+  if (!profileIcon.contains(e.target)) {
+    profileMenu.style.display = "none";
+  }
+});
+
+
