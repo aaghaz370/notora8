@@ -145,100 +145,130 @@
   </div>
 
   <script>
-    const API_BASE = "https://notoraadminbackend-1.onrender.com/api/users";
-    const authBtn = document.getElementById("authBtn");
-    const toggleMode = document.getElementById("toggleMode");
-    const formTitle = document.getElementById("formTitle");
-    const message = document.getElementById("message");
-    const nameInput = document.getElementById("name");
-    const loginRegisterBox = document.getElementById("loginRegister");
-    const profileSection = document.getElementById("profileSection");
-    const profileName = document.getElementById("profileName");
-    const profileEmail = document.getElementById("profileEmail");
-    const logoutBtn = document.getElementById("logoutBtn");
+const API_BASE = "https://notoraadminbackend-1.onrender.com/api/users";
+const authBtn = document.getElementById("authBtn");
+const toggleMode = document.getElementById("toggleMode");
+const formTitle = document.getElementById("formTitle");
+const message = document.getElementById("message");
+const nameInput = document.getElementById("name");
+const loginRegisterBox = document.getElementById("loginRegister");
+const profileSection = document.getElementById("profileSection");
+const profileName = document.getElementById("profileName");
+const profileEmail = document.getElementById("profileEmail");
+const logoutBtn = document.getElementById("logoutBtn");
 
-    let mode = "login";
+let mode = "login";
 
-    // 🔍 Check if user already logged in
-    const existingUser = JSON.parse(localStorage.getItem("notoraUser") || "null");
-    if (existingUser) {
-      showProfile(existingUser);
-    }
+// 🧩 STEP 1 — Check token on load
+document.addEventListener("DOMContentLoaded", async () => {
+  const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
+  const token = localStorage.getItem("notoraToken");
 
-    function showProfile(user) {
-      loginRegisterBox.style.display = "none";
-      profileSection.style.display = "block";
-      formTitle.textContent = "Your Profile";
-      profileName.textContent = user.name;
-      profileEmail.textContent = user.email;
-    }
-
-    function showLogin() {
-      loginRegisterBox.style.display = "block";
-      profileSection.style.display = "none";
-      formTitle.textContent = "Login to Notora";
-    }
-
-    logoutBtn.onclick = () => {
-      localStorage.removeItem("notoraUser");
-      localStorage.removeItem("notoraToken");
-      showLogin();
-      message.textContent = "Logged out successfully!";
-      message.style.color = "#00ff99";
-    };
-
-    toggleMode.onclick = () => {
-      if (mode === "login") {
-        mode = "register";
-        nameInput.style.display = "block";
-        formTitle.textContent = "Create Your Notora Account";
-        authBtn.textContent = "Register";
-        toggleMode.textContent = "Already have an account? Login";
-        message.textContent = "";
-      } else {
-        mode = "login";
-        nameInput.style.display = "none";
-        formTitle.textContent = "Login to Notora";
-        authBtn.textContent = "Login";
-        toggleMode.textContent = "New here? Register";
-        message.textContent = "";
-      }
-    };
-
-    authBtn.onclick = async () => {
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const name = document.getElementById("name").value.trim();
-
-      if (!email || !password || (mode === "register" && !name)) {
-        message.textContent = "Please fill all fields.";
-        return;
-      }
-
-      message.textContent = "Processing...";
-      const endpoint = mode === "login" ? `${API_BASE}/login` : `${API_BASE}/register`;
-
-      try {
-        const res = await fetch(endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, password }),
-        });
-
+  if (token && user) {
+    try {
+      const res = await fetch(`${API_BASE}/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
         const data = await res.json();
-        if (!res.ok) throw new Error(data.message || "Failed");
-
-        localStorage.setItem("notoraUser", JSON.stringify(data.user));
-        localStorage.setItem("notoraToken", data.token);
-
-        message.style.color = "lime";
-        message.textContent = mode === "login" ? "Welcome back!" : "Account created!";
-        setTimeout(() => showProfile(data.user), 1000);
-      } catch (err) {
-        message.style.color = "#ff4444";
-        message.textContent = err.message;
+        showProfile(data);
+      } else {
+        // Invalid token or expired
+        console.warn("Token invalid, clearing session...");
+        localStorage.removeItem("notoraUser");
+        localStorage.removeItem("notoraToken");
+        showLogin();
       }
-    };
-  </script>
+    } catch (err) {
+      console.error("Profile fetch failed:", err);
+      showLogin();
+    }
+  } else {
+    showLogin();
+  }
+});
+
+// 🧠 Show profile view
+function showProfile(user) {
+  loginRegisterBox.style.display = "none";
+  profileSection.style.display = "block";
+  formTitle.textContent = "Your Profile";
+  profileName.textContent = user.name;
+  profileEmail.textContent = user.email;
+}
+
+// 🧠 Show login form
+function showLogin() {
+  loginRegisterBox.style.display = "block";
+  profileSection.style.display = "none";
+  formTitle.textContent = "Login to Notora";
+}
+
+// 🔓 Logout
+logoutBtn.onclick = () => {
+  localStorage.removeItem("notoraUser");
+  localStorage.removeItem("notoraToken");
+  showLogin();
+  message.textContent = "Logged out successfully!";
+  message.style.color = "#00ff99";
+};
+
+// 🔄 Toggle between login/register
+toggleMode.onclick = () => {
+  if (mode === "login") {
+    mode = "register";
+    nameInput.style.display = "block";
+    formTitle.textContent = "Create Your Notora Account";
+    authBtn.textContent = "Register";
+    toggleMode.textContent = "Already have an account? Login";
+    message.textContent = "";
+  } else {
+    mode = "login";
+    nameInput.style.display = "none";
+    formTitle.textContent = "Login to Notora";
+    authBtn.textContent = "Login";
+    toggleMode.textContent = "New here? Register";
+    message.textContent = "";
+  }
+};
+
+// ✅ Login/Register button
+authBtn.onclick = async () => {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const name = document.getElementById("name").value.trim();
+
+  if (!email || !password || (mode === "register" && !name)) {
+    message.textContent = "Please fill all fields.";
+    return;
+  }
+
+  message.textContent = "Processing...";
+  const endpoint = mode === "login" ? `${API_BASE}/login` : `${API_BASE}/register`;
+
+  try {
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, password }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Failed");
+
+    localStorage.setItem("notoraUser", JSON.stringify(data.user));
+    localStorage.setItem("notoraToken", data.token);
+
+    message.style.color = "lime";
+    message.textContent = mode === "login" ? "Welcome back!" : "Account created!";
+
+    setTimeout(() => showProfile(data.user), 1000);
+  } catch (err) {
+    message.style.color = "#ff4444";
+    message.textContent = err.message;
+  }
+};
+</script>
+
 </body>
 </html>
