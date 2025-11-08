@@ -388,6 +388,39 @@ async function openReplyBox(id) {
 document.getElementById("postCommentBtn").onclick = postComment;
 loadSuggestions();
 loadComments();
+
+  document.getElementById("bookmarkBtn").addEventListener("click", async () => {
+  const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
+  const token = localStorage.getItem("notoraToken");
+
+  // Guest user → localStorage save
+  if (!user || !token) {
+    let bookmarks = JSON.parse(localStorage.getItem("guestBookmarks") || "[]");
+    if (bookmarks.some(b => b._id === book._id)) return alert("Already bookmarked!");
+    bookmarks.push(book);
+    localStorage.setItem("guestBookmarks", JSON.stringify(bookmarks));
+    return alert("Book added locally! Login to save permanently.");
+  }
+
+  // Logged-in user → API save
+  try {
+    const res = await fetch(`${BACKEND_BASE}/api/bookmarks`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ bookId: book._id })
+    });
+
+    if (res.ok) alert("Book added to your bookmarks!");
+    else alert("Already bookmarked or error occurred.");
+  } catch (err) {
+    console.error(err);
+    alert("Error saving bookmark.");
+  }
+});
+
 </script>
 </body>
 </html>
