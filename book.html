@@ -357,24 +357,30 @@
   </section>
 
   <script>
-    const BACKEND_BASE = "https://notoraadminbackend-1.onrender.com";
-    const BOOKS_API = `${BACKEND_BASE}/api/books`;
-    const COMMENTS_API = `${BACKEND_BASE}/api/comments`;
+const BACKEND_BASE = "https://notoraadminbackend-1.onrender.com";
+const BOOKS_API = `${BACKEND_BASE}/api/books`;
+const COMMENTS_API = `${BACKEND_BASE}/api/comments`;
 
-    const book = JSON.parse(localStorage.getItem("selectedBook") || "null");
+let book = null;
 
-    if (!book) {
-      alert("No book selected!");
-      window.location.href = "index.html";
-    } else {
-      document.getElementById("bookName").textContent = book.name;
-      document.getElementById("bookAuthor").textContent = book.author;
-      document.getElementById("bookGenre").textContent = book.genre;
-      document.getElementById("bookRating").textContent = book.rating ? "⭐ " + book.rating : "";
-      document.getElementById("bookPdf").src = book.pdfUrl || "";
-    }
+try {
+  book = JSON.parse(localStorage.getItem("selectedBook") || "null");
+} catch {
+  localStorage.removeItem("selectedBook");
+}
 
-    /* -------- ACTION BUTTONS -------- */
+if (!book) {
+  alert("No book selected!");
+  window.location.href = "index.html";
+} else {
+  document.getElementById("bookName").textContent = book.name;
+  document.getElementById("bookAuthor").textContent = book.author;
+  document.getElementById("bookGenre").textContent = book.genre;
+  document.getElementById("bookRating").textContent = book.rating ? "⭐ " + book.rating : "";
+  document.getElementById("bookPdf").src = book.pdfUrl || "";
+}
+
+/* ---------------- ACTION BUTTONS ---------------- */
 
 // 🔹 Fullscreen toggle
 document.getElementById("fullscreenBtn").addEventListener("click", () => {
@@ -384,10 +390,10 @@ document.getElementById("fullscreenBtn").addEventListener("click", () => {
   else alert("Fullscreen not supported in this browser.");
 });
 
-// 🔹 Add to Bookmarks (LocalStorage based)
+// 🔹 Add to Bookmarks
 document.getElementById("bookmarkBtn").addEventListener("click", () => {
   let bookmarks = JSON.parse(localStorage.getItem("bookmarks") || "[]");
-  if (bookmarks.some((b) => b._id === book._id)) {
+  if (bookmarks.some(b => b._id === book._id)) {
     showPopup("Already Bookmarked", "#ff9f43");
     return;
   }
@@ -407,7 +413,7 @@ document.getElementById("shareBtn").addEventListener("click", async () => {
     if (navigator.share) {
       await navigator.share(shareData);
     } else {
-      navigator.clipboard.writeText(shareData.url);
+      await navigator.clipboard.writeText(shareData.url);
       showPopup("Link copied to clipboard!", "#3498db");
     }
   } catch (err) {
@@ -415,7 +421,6 @@ document.getElementById("shareBtn").addEventListener("click", async () => {
   }
 });
 
-/* 🔹 Small reusable popup */
 function showPopup(msg, bg = "#333") {
   const p = document.createElement("div");
   p.textContent = msg;
@@ -437,39 +442,38 @@ function showPopup(msg, bg = "#333") {
   setTimeout(() => p.remove(), 1800);
 }
 
+/* ---------------- SUGGESTIONS ---------------- */
+async function loadSuggestions() {
+  try {
+    const res = await fetch(`${BOOKS_API}?genre=${encodeURIComponent(book.genre)}`);
+    const data = await res.json();
+    const suggestions = data.filter(b => b._id !== book._id).slice(0, 6);
+    renderSuggestions(suggestions);
+  } catch (e) {
+    console.error("Suggestion error:", e);
+  }
+}
 
-    /* 🔹 Suggestion System */
-    async function loadSuggestions() {
-      try {
-        const res = await fetch(`${BOOKS_API}?genre=${encodeURIComponent(book.genre)}`);
-        const data = await res.json();
-        const suggestions = data.filter(b => b._id !== book._id).slice(0, 6);
-        renderSuggestions(suggestions);
-      } catch (e) {
-        console.error("Suggestion error:", e);
-      }
-    }
+function renderSuggestions(list) {
+  const grid = document.getElementById("suggestionGrid");
+  grid.innerHTML = "";
+  if (!list.length) {
+    grid.innerHTML = "<p>No similar books found.</p>";
+    return;
+  }
+  list.forEach(b => {
+    const el = document.createElement("div");
+    el.className = "suggestion-card";
+    el.innerHTML = `<img src="${b.thumbnail}" alt="${b.name}"><p>${b.name}</p>`;
+    el.addEventListener("click", () => {
+      localStorage.setItem("selectedBook", JSON.stringify(b));
+      window.location.reload();
+    });
+    grid.appendChild(el);
+  });
+}
 
-    function renderSuggestions(list) {
-      const grid = document.getElementById("suggestionGrid");
-      grid.innerHTML = "";
-      if (!list.length) {
-        grid.innerHTML = "<p>No similar books found.</p>";
-        return;
-      }
-      list.forEach(b => {
-        const el = document.createElement("div");
-        el.className = "suggestion-card";
-        el.innerHTML = `<img src="${b.thumbnail}" alt="${b.name}"><p>${b.name}</p>`;
-        el.addEventListener("click", () => {
-          localStorage.setItem("selectedBook", JSON.stringify(b));
-          window.location.reload();
-        });
-        grid.appendChild(el);
-      });
-    }
-
-  const COMMENTS_API = "https://notoraadminbackend-1.onrender.com/api/comments";
+/* ---------------- COMMENTS ---------------- */
 const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
 const token = localStorage.getItem("notoraToken") || null;
 
@@ -572,9 +576,10 @@ document.getElementById("postCommentBtn").addEventListener("click", async () => 
   loadComments();
 });
 
+loadSuggestions();
 loadComments();
+</script>
 
-  </script>
 </body>
 </html>
 
