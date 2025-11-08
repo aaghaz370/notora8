@@ -372,13 +372,11 @@ async function loadTop10Books() {
 
     section.style.display = "block";
     section.style.opacity = "1";
-    container.className = "top10-wrapper"; // ✅ layout for top10
-
     container.innerHTML = "";
+
     data.forEach((book, i) => {
       const item = document.createElement("div");
       item.className = "top10-item";
-
       item.innerHTML = `
         <div class="top10-rank">${i + 1}</div>
         <div class="top10-card">
@@ -387,13 +385,10 @@ async function loadTop10Books() {
           <div class="book-author">${book.author}</div>
         </div>
       `;
-
-      // Click handler
       item.querySelector(".top10-card").onclick = () => {
         localStorage.setItem("selectedBook", JSON.stringify(book));
         location.href = "book.html";
       };
-
       container.appendChild(item);
     });
   } catch (err) {
@@ -401,6 +396,7 @@ async function loadTop10Books() {
     section.style.display = "none";
   }
 }
+
 
 
 
