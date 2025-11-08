@@ -483,10 +483,14 @@ function showPopup(msg, bg = "#333") {
         const el = document.createElement("div");
         el.className = "suggestion-card";
         el.innerHTML = `<img src="${b.thumbnail}" alt="${b.name}"><p>${b.name}</p>`;
-        el.addEventListener("click", () => {
-          localStorage.setItem("selectedBook", JSON.stringify(b));
-          window.location.reload();
-        });
+       el.addEventListener("click", () => {
+  if (!b || !b._id) return alert("Invalid book data — please try again.");
+  localStorage.setItem("selectedBook", JSON.stringify(b));
+  setTimeout(() => {
+    window.location.href = "book.html";
+  }, 100);
+});
+
         grid.appendChild(el);
       });
     }
