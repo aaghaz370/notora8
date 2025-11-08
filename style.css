@@ -1263,6 +1263,28 @@ footer small {
 .top10-section .arrow-right { right: -10px; }
 
 
+.arrow-btn {
+  position: absolute;
+  top: 45%;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #fff;
+  font-size: 1.8rem;
+  cursor: pointer;
+  padding: 0.5rem 0.8rem;
+  opacity: 0;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(6px);
+  border-radius: 10px;
+  z-index: 10;
+}
+.category-section:hover .arrow-btn {
+  opacity: 1;
+}
+.arrow-left { left: -10px; }
+.arrow-right { right: -10px; }
+
 
 
 
