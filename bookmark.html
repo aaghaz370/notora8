@@ -7,124 +7,174 @@
   <link rel="icon" href="images/logo.png" />
   <script src="https://kit.fontawesome.com/1c020da525.js" crossorigin="anonymous"></script>
   <style>
-    body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background: radial-gradient(circle at top, #111 0%, #000 100%);
-      color: #fff;
-      overflow-x: hidden;
-    }
+   
+  /* 🌌 Base Layout */
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: radial-gradient(circle at top, #111 0%, #000 100%);
+    color: #fff;
+    overflow-x: hidden;
+  }
 
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      padding: 1rem 2rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(12px);
-    }
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 1rem 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(12px);
+  }
 
-    .back-arrow {
-      position: absolute;
-      left: 20px;
-      font-size: 1.6rem;
-      color: #fff;
-      cursor: pointer;
-      transition: transform 0.3s;
-    }
+  .back-arrow {
+    position: absolute;
+    left: 20px;
+    font-size: 1.6rem;
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.3s;
+  }
 
-    .back-arrow:hover {
-      transform: translateX(-5px);
-    }
+  .back-arrow:hover {
+    transform: translateX(-5px);
+  }
 
-    h1 {
-      margin: 0;
-      font-weight: 600;
-    }
+  h1 {
+    margin: 0;
+    font-weight: 600;
+  }
 
+  /* 📚 Bookmark Grid Layout */
+  .bookmarks-container {
+    width: 95%;
+    max-width: 1200px;
+    margin: 2rem auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1.2rem;
+    justify-items: center;
+  }
+
+  /* 🧩 Each Bookmark Card */
+  .bookmark-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    max-width: 180px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+  }
+
+  .bookmark-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 6px 18px rgba(255, 65, 108, 0.3);
+  }
+
+  .bookmark-card img {
+    width: 100%;
+    height: 230px;
+    object-fit: cover;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* 📖 Info below image */
+  .bookmark-info {
+    padding: 0.8rem;
+    text-align: center;
+  }
+
+  .bookmark-info h3 {
+    font-size: 1rem;
+    margin: 0.5rem 0;
+    color: #fff;
+    line-height: 1.2;
+  }
+
+  .bookmark-info p {
+    font-size: 0.9rem;
+    color: #bbb;
+    margin: 0;
+  }
+
+  /* ❌ Delete Button */
+  .delete-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: linear-gradient(135deg, #ff4b2b, #ff416c);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    width: 30px;
+    height: 30px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.3s ease;
+  }
+
+  .delete-btn:hover {
+    transform: scale(1.1);
+    background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  }
+
+  /* 🕳️ Empty State */
+  .empty {
+    text-align: center;
+    color: #888;
+    margin-top: 50px;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+  }
+
+  /* 📱 Responsive Design */
+  @media (max-width: 1024px) {
     .bookmarks-container {
-      width: 90%;
-      max-width: 1000px;
-      margin: 2rem auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 1.2rem;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     }
+  }
 
-    .bookmark-card {
-      background: rgba(255,255,255,0.05);
-      border-radius: 12px;
-      overflow: hidden;
-      position: relative;
-      box-shadow: 0 0 10px rgba(255,255,255,0.05);
-      transition: transform 0.3s;
-    }
-
-    .bookmark-card:hover {
-      transform: translateY(-5px);
+  @media (max-width: 768px) {
+    .bookmarks-container {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
     }
 
     .bookmark-card img {
-      width: 100%;
-      height: 230px;
-      object-fit: cover;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+      height: 210px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .bookmarks-container {
+      grid-template-columns: repeat(2, 1fr); /* ✅ 2 per row on mobile */
+      gap: 0.8rem;
     }
 
-    .bookmark-info {
-      padding: 0.8rem;
-      text-align: center;
+    .bookmark-card img {
+      height: 190px;
     }
 
     .bookmark-info h3 {
-      font-size: 1rem;
-      margin: 0.5rem 0;
+      font-size: 0.9rem;
     }
 
     .bookmark-info p {
-      font-size: 0.9rem;
-      color: #bbb;
-      margin: 0;
+      font-size: 0.8rem;
     }
-
-    .delete-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: rgba(255,0,0,0.8);
-      border: none;
-      border-radius: 50%;
-      color: white;
-      width: 30px;
-      height: 30px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-
-    .delete-btn:hover {
-      transform: scale(1.1);
-    }
-
-    .empty {
-      text-align: center;
-      color: #888;
-      margin-top: 50px;
-    }
-
-    @media (max-width: 600px) {
-  .bookmark-card img {
-    height: 200px;
   }
-  .bookmark-info h3 {
-    font-size: 0.9rem;
+
+  @media (max-width: 400px) {
+    .bookmark-card img {
+      height: 160px;
+    }
   }
-  .bookmark-info p {
-    font-size: 0.8rem;
-  }
-}
+
+
 
   </style>
 </head>
