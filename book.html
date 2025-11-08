@@ -299,7 +299,7 @@ document.getElementById("bookPdf").src = book.pdfUrl;
   // 📖 Save to Continue Reading
 function updateContinueReading(book) {
   let list = JSON.parse(localStorage.getItem("continueReading") || "[]");
-fetch(`${BACKEND_BASE}/api/books/${book._id}/view`, { method: "POST" });
+const res = await fetch(`${BACKEND}/api/books/top10`);
 
   // Remove if already exists
   list = list.filter(b => b._id !== book._id);
