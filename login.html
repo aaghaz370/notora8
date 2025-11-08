@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | Notora</title>
+  <link rel="icon" href="Lucid_Realism_Create_a_modern_flat_educational_logo_with_the_b_1.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: radial-gradient(circle at top, #0a0a0a 0%, #000 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      color: white;
+      overflow: hidden;
+    }
+
+    .auth-container {
+      width: 360px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 2rem;
+      box-shadow: 0 0 20px rgba(229, 9, 20, 0.4);
+      text-align: center;
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    .auth-container h2 {
+      color: #e50914;
+      margin-bottom: 1.2rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      margin-bottom: 10px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: 0.3s;
+    }
+
+    input:focus {
+      box-shadow: 0 0 10px #e50914;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #e50914, #ff4141);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    button:hover {
+      transform: scale(1.03);
+    }
+
+    .toggle {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+
+    .toggle span {
+      color: #e50914;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .message {
+      margin-top: 10px;
+      font-size: 0.85rem;
+      color: #ff5252;
+      min-height: 18px;
+    }
+
+    .fade {
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container fade" id="authBox">
+    <h2 id="formTitle">Login to Notora</h2>
+
+    <input type="email" id="email" placeholder="Email" required />
+    <input type="password" id="password" placeholder="Password" required />
+
+    <input type="text" id="name" placeholder="Full Name" style="display:none;" />
+
+    <button id="authBtn">Login</button>
+    <div class="message" id="message"></div>
+
+    <div class="toggle">
+      <span id="toggleMode">New here? Register</span>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "https://notoraadminbackend-1.onrender.com/api/users";
+    const authBtn = document.getElementById("authBtn");
+    const toggleMode = document.getElementById("toggleMode");
+    const formTitle = document.getElementById("formTitle");
+    const message = document.getElementById("message");
+    const nameInput = document.getElementById("name");
+
+    let mode = "login";
+
+    toggleMode.onclick = () => {
+      if (mode === "login") {
+        mode = "register";
+        nameInput.style.display = "block";
+        formTitle.textContent = "Create Your Notora Account";
+        authBtn.textContent = "Register";
+        toggleMode.textContent = "Already have an account? Login";
+        message.textContent = "";
+      } else {
+        mode = "login";
+        nameInput.style.display = "none";
+        formTitle.textContent = "Login to Notora";
+        authBtn.textContent = "Login";
+        toggleMode.textContent = "New here? Register";
+        message.textContent = "";
+      }
+    };
+
+    authBtn.onclick = async () => {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const name = document.getElementById("name").value.trim();
+
+      if (!email || !password || (mode === "register" && !name)) {
+        message.textContent = "Please fill all fields.";
+        return;
+      }
+
+      message.textContent = "Processing...";
+      const endpoint = mode === "login" ? `${API_BASE}/login` : `${API_BASE}/register`;
+
+      try {
+        const res = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, email, password }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Failed");
+
+        localStorage.setItem("notoraUser", JSON.stringify(data.user));
+        localStorage.setItem("notoraToken", data.token);
+
+        message.style.color = "lime";
+        message.textContent = mode === "login" ? "Welcome back!" : "Account created!";
+        setTimeout(() => (window.location.href = "index.html"), 1000);
+      } catch (err) {
+        message.style.color = "#ff4444";
+        message.textContent = err.message;
+      }
+    };
+  </script>
+</body>
+</html>
