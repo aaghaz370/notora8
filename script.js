@@ -331,7 +331,7 @@ function loadContinueReading() {
       <div class="book-title">${book.name}</div>
       <div class="book-author">${book.author}</div>
       <div class="book-genre">${book.genre}</div>
-      <div class="book-rating">⭐ ${book.rating || "N/A"}</div>
+     
     `;
     card.onclick = () => {
       localStorage.setItem("selectedBook", JSON.stringify(book));
@@ -427,6 +427,7 @@ async function loadTop10Books() {
     section.style.display = "none";
   }
 }
+
 
 
 
