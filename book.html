@@ -6,7 +6,6 @@
   <title>Book Details - Notora</title>
   <link rel="icon" href="images/logo.png" />
   <script src="https://kit.fontawesome.com/1c020da525.js" crossorigin="anonymous"></script>
-
   <style>
     body {
       margin: 0;
@@ -15,7 +14,6 @@
       color: #fff;
       overflow-x: hidden;
     }
-
     header {
       display: flex;
       align-items: center;
@@ -26,225 +24,43 @@
       background: rgba(0, 0, 0, 0.6);
       backdrop-filter: blur(12px);
     }
-
-    .back-arrow {
-      position: absolute;
-      left: 20px;
-      font-size: 1.6rem;
-      color: #fff;
-      cursor: pointer;
-      transition: transform 0.3s;
-    }
-
-    .back-arrow:hover {
-      transform: translateX(-5px);
-    }
-
-    .pdf-container {
-      margin: 2rem auto 1rem;
-      width: 90%;
-      max-width: 900px;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 15px;
-      padding: 1rem;
-      box-shadow: 0 0 30px rgba(255, 0, 0, 0.12);
-    }
-
-    iframe {
-      width: 100%;
-      height: 500px;
-      border: none;
-      border-radius: 10px;
-    }
-
-    .action-buttons {
-      width: 90%;
-      max-width: 900px;
-      margin: 1rem auto;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-    }
-
-    .action-btn {
-      flex: 1 1 250px;
-      background: linear-gradient(90deg, #ff4b2b, #ff416c);
-      color: #fff;
-      border: none;
-      padding: 0.9rem 1rem;
-      font-size: 1rem;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(255, 65, 108, 0.3);
-      text-align: center;
-    }
-
-    .action-btn i {
-      margin-right: 8px;
-    }
-
-    .action-btn:hover {
-      transform: scale(1.04);
-      box-shadow: 0 6px 18px rgba(255, 65, 108, 0.5);
-      background: linear-gradient(90deg, #ff416c, #ff4b2b);
-    }
-
-    .book-meta {
-      width: 90%;
-      max-width: 900px;
-      margin: 1.5rem auto;
-      background: rgba(255, 255, 255, 0.03);
-      padding: 1.5rem;
-      border-radius: 12px;
-      text-align: center;
-    }
-
-    /* Comments */
-    .comments-wrapper {
-      width: 90%;
-      max-width: 900px;
-      margin: 2rem auto 3rem;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 15px;
-      padding: 1.5rem;
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
-    }
-
-    .comment-inputs {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .comment-inputs textarea {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      padding: 10px;
-      color: #fff;
-      resize: none;
-      font-size: 0.95rem;
-    }
-
-    .comment-inputs button {
-      align-self: flex-end;
-      background: linear-gradient(90deg, #e50914, #ff416c);
-      border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      color: #fff;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-
-    .comment-inputs button:hover {
-      transform: scale(1.05);
-    }
-
-    .comments-list {
-      margin-top: 1rem;
-      max-height: 350px;
-      overflow-y: auto;
-      scrollbar-width: thin;
-      scrollbar-color: #ff416c transparent;
-    }
-
-    .comment-card {
-      background: rgba(0, 0, 0, 0.35);
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 10px;
-      animation: fadeIn 0.3s ease;
-    }
-
-    .comment-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .comment-name {
-      font-weight: 600;
-      color: #ffd;
-    }
-
-    .reply-btn {
-      background: transparent;
-      border: none;
-      color: #9ca3af;
-      font-size: 0.9rem;
-      cursor: pointer;
-    }
-
-    .reply-box {
-      margin-top: 10px;
-      margin-left: 15px;
-      border-left: 2px solid #ff416c;
-      padding-left: 10px;
-    }
-
-    .comment-verified {
-      display: inline-block;
-      background: #0078ff;
-      color: white;
-      font-size: 0.7rem;
-      padding: 2px 6px;
-      border-radius: 5px;
-      margin-left: 5px;
-      vertical-align: middle;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Suggestions */
-    .suggestions {
-      margin: 2.5rem auto 1.5rem;
-      width: 90%;
-      max-width: 1100px;
-    }
-
-    .suggestion-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 1rem;
-    }
-
-    .suggestion-card {
-      background: rgba(255, 255, 255, 0.03);
-      border-radius: 10px;
-      text-align: center;
-      padding: 0.5rem;
-      transition: transform 0.35s;
-      cursor: pointer;
-    }
-
-    .suggestion-card img {
-      width: 100%;
-      height: 170px;
-      object-fit: cover;
-      border-radius: 8px;
-    }
-
-    .suggestion-card:hover {
-      transform: scale(1.05);
-    }
+    .back-arrow {position: absolute;left: 20px;font-size: 1.6rem;color: #fff;cursor: pointer;transition: transform 0.3s;}
+    .back-arrow:hover {transform: translateX(-5px);}
+    .pdf-container {margin: 2rem auto 1rem;width: 90%;max-width: 900px;background: rgba(255, 255, 255, 0.05);border-radius: 15px;padding: 1rem;box-shadow: 0 0 30px rgba(255, 0, 0, 0.12);}
+    iframe {width: 100%;height: 500px;border: none;border-radius: 10px;}
+    .action-buttons {width: 90%;max-width: 900px;margin: 1rem auto;display: flex;flex-wrap: wrap;gap: 10px;justify-content: center;}
+    .action-btn {flex: 1 1 250px;background: linear-gradient(90deg, #ff4b2b, #ff416c);color: #fff;border: none;padding: 0.9rem 1rem;font-size: 1rem;border-radius: 10px;cursor: pointer;transition: all 0.3s ease;box-shadow: 0 4px 15px rgba(255, 65, 108, 0.3);text-align: center;}
+    .action-btn:hover {transform: scale(1.04);box-shadow: 0 6px 18px rgba(255, 65, 108, 0.5);}
+    .book-meta {width: 90%;max-width: 900px;margin: 1.5rem auto;background: rgba(255, 255, 255, 0.03);padding: 1.5rem;border-radius: 12px;text-align: center;}
+    .comments-wrapper {width: 90%;max-width: 900px;margin: 2rem auto 3rem;background: rgba(255, 255, 255, 0.05);border-radius: 15px;padding: 1.5rem;box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);}
+    .comment-inputs {display: flex;flex-direction: column;gap: 10px;}
+    .comment-inputs textarea {background: rgba(255, 255, 255, 0.08);border: 1px solid rgba(255, 255, 255, 0.1);border-radius: 8px;padding: 10px;color: #fff;resize: none;font-size: 0.95rem;}
+    .comment-inputs button {align-self: flex-end;background: linear-gradient(90deg, #e50914, #ff416c);border: none;padding: 8px 16px;border-radius: 8px;color: #fff;cursor: pointer;transition: transform 0.2s;}
+    .comment-inputs button:hover {transform: scale(1.05);}
+    .comments-list {margin-top: 1rem;max-height: 350px;overflow-y: auto;scrollbar-width: thin;scrollbar-color: #ff416c transparent;}
+    .comment-card {background: rgba(0, 0, 0, 0.35);padding: 10px;border-radius: 8px;margin-bottom: 10px;animation: fadeIn 0.3s ease;}
+    .comment-meta {display: flex;justify-content: space-between;align-items: center;}
+    .comment-name {font-weight: 600;color: #ffd;}
+    .reply-btn {background: transparent;border: none;color: #9ca3af;font-size: 0.9rem;cursor: pointer;}
+    .reply-box {margin-top: 10px;margin-left: 15px;border-left: 2px solid #ff416c;padding-left: 10px;}
+    .comment-options {position: relative;display: inline-block;}
+    .comment-options button {background: transparent;border: none;color: #999;cursor: pointer;font-size: 1.2rem;transition: color 0.2s;}
+    .comment-options button:hover {color: #ff416c;}
+    .comment-menu {position: absolute;right: 0;top: 20px;background: #111;border-radius: 8px;box-shadow: 0 0 8px rgba(255,255,255,0.1);overflow: hidden;z-index: 10;display:none;}
+    .comment-menu button {display:block;width:100%;border:none;background:transparent;color:#fff;padding:8px 12px;text-align:left;font-size:0.9rem;cursor:pointer;transition:background 0.2s;}
+    .comment-menu button:hover {background: rgba(255,255,255,0.1);}
+    .comment-verified {display: inline-block;background: #0078ff;color: white;font-size: 0.7rem;padding: 2px 6px;border-radius: 5px;margin-left: 5px;vertical-align: middle;}
+    .suggestions {margin: 2.5rem auto 1.5rem;width: 90%;max-width: 1100px;}
+    .suggestion-grid {display: grid;grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));gap: 1rem;}
+    .suggestion-card {background: rgba(255, 255, 255, 0.03);border-radius: 10px;text-align: center;padding: 0.5rem;transition: transform 0.35s;cursor: pointer;}
+    .suggestion-card img {width: 100%;height: 170px;object-fit: cover;border-radius: 8px;}
+    .suggestion-card:hover {transform: scale(1.05);}
+    @keyframes fadeIn {from {opacity: 0;transform: translateY(10px);}to {opacity: 1;transform: translateY(0);}}
   </style>
 </head>
-
 <body>
-  <header>
-    <i class="fa-solid fa-arrow-left back-arrow" onclick="window.history.back()"></i>
-    <h1 id="bookName">Book</h1>
-  </header>
-
-  <div class="pdf-container">
-    <iframe id="bookPdf"></iframe>
-  </div>
+  <header><i class="fa-solid fa-arrow-left back-arrow" onclick="window.history.back()"></i><h1 id="bookName">Book</h1></header>
+  <div class="pdf-container"><iframe id="bookPdf"></iframe></div>
 
   <div class="action-buttons">
     <button id="fullscreenBtn" class="action-btn"><i class="fa-solid fa-expand"></i> Fullscreen</button>
@@ -265,40 +81,27 @@
       <button id="postCommentBtn">Post Comment</button>
       <p id="commentHint" style="color:#aaa;font-size:0.8rem;margin-top:4px;"></p>
     </div>
-    <div class="comments-list" id="commentsList">
-      <p>Loading comments...</p>
-    </div>
+    <div class="comments-list" id="commentsList"><p>Loading comments...</p></div>
   </div>
 
-  <section class="suggestions">
-    <h3>📚 Similar Books You May Like</h3>
-    <div class="suggestion-grid" id="suggestionGrid"></div>
-  </section>
+  <section class="suggestions"><h3>📚 Similar Books You May Like</h3><div class="suggestion-grid" id="suggestionGrid"></div></section>
 
 <script>
 const BACKEND_BASE = "https://notoraadminbackend-1.onrender.com";
 const BOOKS_API = `${BACKEND_BASE}/api/books`;
 const COMMENTS_API = `${BACKEND_BASE}/api/comments`;
 
-/* ✅ FIXED BOOK LOADER */
+/* FIXED BOOK LOADER */
 let book = null;
 try {
   const raw = localStorage.getItem("selectedBook");
-  if (!raw || raw === "undefined" || raw === "null" || raw.trim() === "") {
-    throw new Error("Invalid book data");
-  }
+  if (!raw || raw === "undefined" || raw === "null" || raw.trim() === "") throw new Error("Invalid");
   book = JSON.parse(raw);
-  if (!book || !book._id) throw new Error("Book missing");
+  if (!book || !book._id) throw new Error("Missing book");
 } catch (err) {
-  console.error("Book load error:", err);
   localStorage.removeItem("selectedBook");
-  document.body.innerHTML = `
-    <div style="text-align:center;margin-top:20vh">
-      <h2 style="color:#fff">⚠️ Book not found</h2>
-      <p style="color:#ccc">Please go back and open a valid book.</p>
-      <button onclick="location.href='index.html'" style="background:#ff416c;border:none;color:#fff;padding:10px 20px;border-radius:8px;cursor:pointer;margin-top:10px">Go Home</button>
-    </div>`;
-  throw new Error("Stop execution");
+  document.body.innerHTML = `<div style="text-align:center;margin-top:20vh"><h2>⚠️ Book not found</h2><button onclick="location.href='index.html'" style="background:#ff416c;border:none;color:#fff;padding:10px 20px;border-radius:8px;cursor:pointer;margin-top:10px">Go Home</button></div>`;
+  throw new Error("Stop");
 }
 
 /* Fill book info */
@@ -308,54 +111,30 @@ document.getElementById("bookGenre").textContent = book.genre;
 document.getElementById("bookRating").textContent = book.rating ? "⭐ " + book.rating : "";
 document.getElementById("bookPdf").src = book.pdfUrl || "";
 
-/* Action Buttons */
-document.getElementById("fullscreenBtn").addEventListener("click", () => {
-  const iframe = document.getElementById("bookPdf");
-  if (iframe.requestFullscreen) iframe.requestFullscreen();
-  else alert("Fullscreen not supported");
-});
+/* Logged user */
+const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
+const token = localStorage.getItem("notoraToken") || null;
+const commentHint = document.getElementById("commentHint");
+if (user) commentHint.textContent = `Commenting as ${user.name}`;
+else commentHint.innerHTML = `Not logged in — <a href="login.html" style="color:#ff416c;text-decoration:none;">Login to comment</a>`;
 
-document.getElementById("bookmarkBtn").addEventListener("click", () => {
-  const bookmarks = JSON.parse(localStorage.getItem("bookmarks") || "[]");
-  if (bookmarks.some(b => b._id === book._id)) return alert("Already bookmarked!");
-  bookmarks.unshift(book);
-  localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
-  alert("Book added to bookmarks!");
-});
-
-document.getElementById("shareBtn").addEventListener("click", async () => {
-  const shareData = { title: book.name, text: `Check out "${book.name}"`, url: location.href };
-  if (navigator.share) await navigator.share(shareData);
-  else {
-    navigator.clipboard.writeText(shareData.url);
-    alert("Link copied!");
-  }
-});
-
-/* Suggestions */
-async function loadSuggestions() {
+/* Post comment */
+async function postComment() {
+  const text = document.getElementById("commentText").value.trim();
+  if (!text) return alert("Write something!");
+  if (!user || !token) return location.href = "login.html";
   try {
-    const res = await fetch(`${BOOKS_API}?genre=${encodeURIComponent(book.genre)}`);
-    const data = await res.json();
-    const suggestions = data.filter(b => b._id !== book._id).slice(0, 6);
-    const grid = document.getElementById("suggestionGrid");
-    grid.innerHTML = "";
-    suggestions.forEach(b => {
-      const el = document.createElement("div");
-      el.className = "suggestion-card";
-      el.innerHTML = `<img src="${b.thumbnail}" alt="${b.name}"><p>${b.name}</p>`;
-      el.addEventListener("click", () => {
-        localStorage.setItem("selectedBook", JSON.stringify(b));
-        setTimeout(() => (location.href = "book.html"), 100);
-      });
-      grid.appendChild(el);
+    await fetch(COMMENTS_API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ bookId: book._id, name: user.name, userId: user._id, text, role: user.email === "admin@notora.com" ? "admin" : "user" })
     });
-  } catch (err) {
-    console.error(err);
-  }
+    document.getElementById("commentText").value = "";
+    loadComments();
+  } catch (err) { console.error(err); }
 }
 
-/* Comments */
+/* Load comments */
 async function loadComments() {
   try {
     const res = await fetch(`${COMMENTS_API}/${book._id}`);
@@ -366,66 +145,76 @@ async function loadComments() {
     comments.forEach(c => {
       const card = document.createElement("div");
       card.className = "comment-card";
+      const showMenu = user && (user._id === c.userId || user.email === "admin@notora.com");
       card.innerHTML = `
         <div class="comment-meta">
-          <span class="comment-name">${c.name} ${c.role === "admin" ? '<span class="comment-verified">✓ Admin</span>' : ""}</span>
-          <button class="reply-btn" onclick="openReplyBox('${c._id}')">Reply</button>
+          <span class="comment-name">${c.name}${c.role === "admin" ? '<span class="comment-verified">✓ Admin</span>' : ""}</span>
+          <div>
+            <button class="reply-btn" onclick="openReplyBox('${c._id}')">Reply</button>
+            ${showMenu ? `<div class="comment-options"><button onclick="toggleMenu('${c._id}')">⋮</button><div class="comment-menu" id="menu-${c._id}"><button onclick="editComment('${c._id}','${encodeURIComponent(c.text)}')">Edit</button><button onclick="deleteComment('${c._id}')">Delete</button></div></div>` : ""}
+          </div>
         </div>
         <p>${c.text}</p>
         <div class="reply-box" id="reply-${c._id}">
           ${(c.replies || []).map(r => `
             <div class="comment-card" style="background:rgba(255,255,255,0.08)">
-              <span class="comment-name">${r.name}</span>
-              <p>${r.text}</p>
+              <span class="comment-name">${r.name}</span><p>${r.text}</p>
             </div>`).join('')}
         </div>`;
       list.appendChild(card);
     });
-  } catch (err) {
-    console.error(err);
-  }
+  } catch (err) { console.error(err); }
 }
 
-async function postComment() {
-  const text = document.getElementById("commentText").value.trim();
-  if (!text) return alert("Write something!");
-  try {
-    await fetch(COMMENTS_API, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ bookId: book._id, name: "Guest", text })
-    });
-    document.getElementById("commentText").value = "";
-    loadComments();
-  } catch (err) {
-    console.error(err);
-  }
+/* Edit/Delete */
+function toggleMenu(id){const m=document.getElementById(`menu-${id}`);m.style.display=m.style.display==="block"?"none":"block";}
+async function editComment(id,text){
+  const newText=prompt("Edit your comment:",decodeURIComponent(text));
+  if(!newText||newText.trim()===decodeURIComponent(text))return;
+  await fetch(`${COMMENTS_API}/${id}`,{method:"PUT",headers:{"Content-Type":"application/json",Authorization:`Bearer ${token}`},body:JSON.stringify({text:newText})});
+  loadComments();
+}
+async function deleteComment(id){
+  if(!confirm("Delete this comment?"))return;
+  await fetch(`${COMMENTS_API}/${id}`,{method:"DELETE",headers:{Authorization:`Bearer ${token}`}});
+  loadComments();
 }
 
+/* Reply */
 function openReplyBox(id) {
   const target = document.getElementById(`reply-${id}`);
   if (target.querySelector("textarea")) return;
-  const box = document.createElement("div");
-  box.innerHTML = `
-    <textarea placeholder="Write a reply..." style="width:100%;background:#111;color:#fff;border:none;border-radius:6px;padding:6px;margin-top:6px"></textarea>
-    <button style="background:#ff416c;border:none;padding:6px 12px;border-radius:6px;color:#fff;cursor:pointer;margin-top:4px">Send</button>`;
-  box.querySelector("button").onclick = async () => {
-    const text = box.querySelector("textarea").value.trim();
-    if (!text) return alert("Reply cannot be empty!");
+  const div = document.createElement("div");
+  div.innerHTML = `<textarea placeholder="Write a reply..." style="width:100%;background:#111;color:#fff;border:none;border-radius:6px;padding:6px;margin-top:6px"></textarea>
+                   <button style="background:#ff416c;border:none;padding:6px 12px;border-radius:6px;color:#fff;margin-top:5px;cursor:pointer;">Send</button>`;
+  div.querySelector("button").onclick = async () => {
+    const text = div.querySelector("textarea").value.trim();
+    if (!text) return alert("Empty reply!");
     await fetch(`${COMMENTS_API}/reply/${id}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: "Guest", text })
+      body: JSON.stringify({ name: user ? user.name : "Guest", text })
     });
     loadComments();
   };
-  target.appendChild(box);
+  target.appendChild(div);
 }
 
+/* Buttons */
 document.getElementById("postCommentBtn").addEventListener("click", postComment);
+document.getElementById("fullscreenBtn").addEventListener("click",()=>document.getElementById("bookPdf").requestFullscreen());
+document.getElementById("bookmarkBtn").addEventListener("click",()=>{let b=JSON.parse(localStorage.getItem("bookmarks")||"[]");if(b.some(x=>x._id===book._id))return alert("Already!");b.unshift(book);localStorage.setItem("bookmarks",JSON.stringify(b));alert("Bookmarked!");});
+document.getElementById("shareBtn").addEventListener("click",()=>navigator.share?navigator.share({title:book.name,url:location.href}):navigator.clipboard.writeText(location.href));
 
-loadSuggestions();
-loadComments();
+/* Suggestions */
+async function loadSuggestions(){
+  const res=await fetch(`${BOOKS_API}?genre=${encodeURIComponent(book.genre)}`);const data=await res.json();const g=document.getElementById("suggestionGrid");
+  g.innerHTML="";data.filter(b=>b._id!==book._id).slice(0,6).forEach(b=>{const e=document.createElement("div");e.className="suggestion-card";e.innerHTML=`<img src="${b.thumbnail}" alt="${b.name}"><p>${b.name}</p>`;e.onclick=()=>{localStorage.setItem("selectedBook",JSON.stringify(b));setTimeout(()=>location.href="book.html",80);};g.appendChild(e);});
+}
+
+/* Load all */
+loadSuggestions();loadComments();
 </script>
 </body>
 </html>
+
