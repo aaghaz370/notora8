@@ -563,4 +563,30 @@ document.getElementById("bookmarkBtn").onclick = async () => {
   }
 };
 
+
+
+  // 🎬 Fullscreen button
+document.getElementById("fullscreenBtn").addEventListener("click", () => {
+  const pdfFrame = document.getElementById("bookPdf");
+
+  // Check if Fullscreen API is supported
+  if (pdfFrame.requestFullscreen) {
+    pdfFrame.requestFullscreen();
+  } else if (pdfFrame.webkitRequestFullscreen) { // Safari
+    pdfFrame.webkitRequestFullscreen();
+  } else if (pdfFrame.msRequestFullscreen) { // IE/Edge
+    pdfFrame.msRequestFullscreen();
+  } else {
+    alert("Fullscreen not supported on this browser.");
+  }
+});
+
+// 🧹 Optional: exit fullscreen with Escape key
+document.addEventListener("fullscreenchange", () => {
+  if (!document.fullscreenElement) {
+    console.log("Exited fullscreen");
+  }
+});
+
+
 </script>
