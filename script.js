@@ -1,5 +1,8 @@
 // ✅ Backend API URL
 const API_URL = "https://notoraadminbackend-1.onrender.com/api/books";
+const continueSection = document.getElementById("continue-section");
+const continueContainer = document.getElementById("continueBooks");
+
 
 // ✅ Category list
 const categories = [
@@ -387,5 +390,6 @@ async function loadTop10Books() {
 }
 
 loadTop10Books();
+
 
 
