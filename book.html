@@ -401,45 +401,49 @@ async function loadComments() {
 //     console.error(err);
 //   }
 // }
-  /* ✅ Fixed postComment() — uses logged-in user's name */
+ /* ✅ Universal Safe Comment Function */
 async function postComment() {
   const text = document.getElementById("commentText").value.trim();
-  if (!text) return alert("Write something first!");
+  if (!text) return alert("Please write a comment!");
 
-  // 🧩 Fetch user info from localStorage
+  // 🧠 Try reading user
   const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
   const token = localStorage.getItem("notoraToken");
 
-  if (!user || !token) {
-    alert("Please login to comment!");
-    return location.href = "login.html";
-  }
+  // 🏷 Prepare body data
+  const commentData = {
+    bookId: book._id,
+    text,
+    name: user ? user.name : "Guest",
+    userId: user ? user._id : null,
+    role: user && user.email === "admin@notora.com" ? "admin" : "user"
+  };
 
   try {
-    const bodyData = {
-      bookId: book._id,
-      name: user.name,         // 👈 comment name = logged in user
-      userId: user._id,        // 👈 user id also stored
-      text,
-      role: user.email === "admin@notora.com" ? "admin" : "user"
-    };
-
-    await fetch(COMMENTS_API, {
+    const res = await fetch(COMMENTS_API, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        ...(token ? { Authorization: `Bearer ${token}` } : {})
       },
-      body: JSON.stringify(bodyData),
+      body: JSON.stringify(commentData)
     });
+
+    if (!res.ok) {
+      const msg = await res.text();
+      console.error("Comment failed:", msg);
+      alert("Failed to post comment. Please re-login.");
+      return;
+    }
 
     document.getElementById("commentText").value = "";
     loadComments();
   } catch (err) {
-    console.error("Post comment error:", err);
-    alert("Failed to post comment. Try again.");
+    console.error("❌ Post comment error:", err);
+    alert("Network error. Try again later.");
   }
 }
+
 
 
 function openReplyBox(id) {
