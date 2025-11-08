@@ -87,7 +87,47 @@ function loadCategory(category) {
   slider.appendChild(showAllCard);
 
   // ✅ Desktop arrows only
+//   if (window.innerWidth > 768) {
+//     const leftArrow = document.createElement("button");
+//     leftArrow.className = "arrow-btn arrow-left";
+//     leftArrow.innerHTML = "&#8249;";
+//     leftArrow.onclick = () => slider.scrollBy({ left: -300, behavior: "smooth" });
+
+//     const rightArrow = document.createElement("button");
+//     rightArrow.className = "arrow-btn arrow-right";
+//     rightArrow.innerHTML = "&#8250;";
+//     rightArrow.onclick = () => slider.scrollBy({ left: 300, behavior: "smooth" });
+
+//     wrapper.appendChild(leftArrow);
+//     wrapper.appendChild(slider);
+//     wrapper.appendChild(rightArrow);
+//   } else {
+//     wrapper.appendChild(slider);
+//   }
+
+//   section.appendChild(title);
+//   section.appendChild(wrapper);
+//   categoryContainer.appendChild(section);
+// }
+  // 🔥 Enable Arrows for Latest Books Section too
+function enableArrowsFor(sectionId) {
+  const section = document.getElementById(sectionId);
+  const slider = section.querySelector(".book-slider");
+
   if (window.innerWidth > 768) {
+    // Create wrapper if not already wrapped
+    let wrapper = section.querySelector(".wrapper");
+    if (!wrapper) {
+      wrapper = document.createElement("div");
+      wrapper.className = "wrapper";
+      wrapper.style.position = "relative";
+      wrapper.style.display = "flex";
+      wrapper.style.alignItems = "center";
+      wrapper.appendChild(slider);
+      section.appendChild(wrapper);
+    }
+
+    // Create left & right arrows
     const leftArrow = document.createElement("button");
     leftArrow.className = "arrow-btn arrow-left";
     leftArrow.innerHTML = "&#8249;";
@@ -98,17 +138,14 @@ function loadCategory(category) {
     rightArrow.innerHTML = "&#8250;";
     rightArrow.onclick = () => slider.scrollBy({ left: 300, behavior: "smooth" });
 
-    wrapper.appendChild(leftArrow);
-    wrapper.appendChild(slider);
+    wrapper.prepend(leftArrow);
     wrapper.appendChild(rightArrow);
-  } else {
-    wrapper.appendChild(slider);
   }
-
-  section.appendChild(title);
-  section.appendChild(wrapper);
-  categoryContainer.appendChild(section);
 }
+
+// ✅ Call for Latest Books
+enableArrowsFor("latest-section");
+
 
 // ✅ Search Logic
 const openSearch = document.getElementById("openSearch");
@@ -262,6 +299,7 @@ function scrollSection(id, direction) {
 
 // ✅ Load latest books on page ready
 document.addEventListener("DOMContentLoaded", loadLatestBooks);
+
 
 
 
