@@ -215,3 +215,52 @@ document.addEventListener("click", (e) => {
 });
 
 
+
+const BACKEND = "https://notoraadminbackend-1.onrender.com"; 
+const BOOKS_API = `${BACKEND}/api/books`;
+
+// 📘 Fetch & render latest 10 books
+async function loadLatestBooks() {
+  try {
+    const res = await fetch(BOOKS_API);
+    const books = await res.json();
+
+    // Sort by creation date (latest first)
+    books.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const latest = books.slice(0, 10);
+
+    const container = document.getElementById("latestBooks");
+    container.innerHTML = "";
+
+    latest.forEach(book => {
+      const card = document.createElement("div");
+      card.className = "book-card";
+      card.innerHTML = `
+        <img src="${book.thumbnail}" alt="${book.name}">
+        <div class="book-title">${book.name}</div>
+        <div class="book-author">${book.author}</div>
+        <div class="book-genre">${book.genre}</div>
+        <div class="book-rating">⭐ ${book.rating || "N/A"}</div>
+      `;
+      card.onclick = () => {
+        localStorage.setItem("selectedBook", JSON.stringify(book));
+        location.href = "book.html";
+      };
+      container.appendChild(card);
+    });
+  } catch (err) {
+    console.error("Error loading latest books:", err);
+  }
+}
+
+// ⬅️➡️ Scroll Buttons
+function scrollSection(id, direction) {
+  const slider = document.getElementById(id);
+  const scrollAmount = slider.clientWidth * 0.8;
+  slider.scrollBy({ left: direction * scrollAmount, behavior: "smooth" });
+}
+
+// ✅ Load latest books on page ready
+document.addEventListener("DOMContentLoaded", loadLatestBooks);
+
+
