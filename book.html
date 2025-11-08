@@ -367,6 +367,30 @@ if (!user || !token) {
   postBtn.onclick = postComment;
   loadComments();
 }
+// 🕒 Format time difference (like "2 hours ago", "3 weeks ago")
+function formatTimeAgo(dateString, isEdited = false) {
+  const now = new Date();
+  const past = new Date(dateString);
+  const diff = now - past;
+
+  const seconds = diff / 1000;
+  const minutes = seconds / 60;
+  const hours = minutes / 60;
+  const days = hours / 24;
+  const weeks = days / 7;
+  const months = days / 30;
+  const years = days / 365;
+
+  let result;
+
+  if (hours < 24) result = `${Math.floor(hours)} hour${Math.floor(hours) !== 1 ? "s" : ""} ago`;
+  else if (days < 7) result = `${Math.floor(days)} day${Math.floor(days) !== 1 ? "s" : ""} ago`;
+  else if (weeks < 4) result = `${Math.floor(weeks)} week${Math.floor(weeks) !== 1 ? "s" : ""} ago`;
+  else if (months < 12) result = `${Math.floor(months)} month${Math.floor(months) !== 1 ? "s" : ""} ago`;
+  else result = `${Math.floor(years)} year${Math.floor(years) !== 1 ? "s" : ""} ago`;
+
+  return isEdited ? `edited ${result}` : result;
+}
 
 // 📥 Load Comments
 async function loadComments() {
@@ -399,7 +423,9 @@ function renderComment(c, container, level) {
         <button class="reply-btn" onclick="openReplyBox('${c._id}', ${level})">Reply</button>
       </div>
     </div>
-    <p>${c.text}</p>
+     <p>${c.text}</p>
+<small class="comment-time">${formatTimeAgo(c.updatedAt || c.createdAt, c.updatedAt && c.updatedAt !== c.createdAt)}</small>
+
     <div class="reply-box" id="reply-${c._id}"></div>
   `;
 
@@ -425,6 +451,9 @@ function renderReply(r, container, level, parentId) {
       </div>
     </div>
     <p>${r.text}</p>
+<small class="comment-time">${formatTimeAgo(r.updatedAt || r.createdAt, r.updatedAt && r.updatedAt !== r.createdAt)}</small>
+
+
     <div class="reply-box" id="reply-${r._id}"></div>
   `;
 
