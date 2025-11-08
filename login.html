@@ -173,125 +173,174 @@
 
   <!-- SCRIPT -->
   <script>
-    const API_BASE = "https://notoraadminbackend-1.onrender.com/api/users";
-    const authBox = document.getElementById("authBox");
-    const profileSection = document.getElementById("profileSection");
-    const nameInput = document.getElementById("name");
-    const emailInput = document.getElementById("email");
-    const passwordInput = document.getElementById("password");
-    const message = document.getElementById("message");
-    const authBtn = document.getElementById("authBtn");
-    const toggleMode = document.getElementById("toggleMode");
-    const formTitle = document.getElementById("formTitle");
-    const profileName = document.getElementById("profileName");
-    const profileEmail = document.getElementById("profileEmail");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const themeToggle = document.getElementById("themeToggle");
-    const bookmarkCount = document.getElementById("bookmarkCount");
+const API_BASE = "https://notoraadminbackend-1.onrender.com/api/users";
+const BOOKMARK_API = "https://notoraadminbackend-1.onrender.com/api/bookmarks";
 
-    let mode = "login";
+const authBox = document.getElementById("authBox");
+const profileSection = document.getElementById("profileSection");
+const nameInput = document.getElementById("name");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const message = document.getElementById("message");
+const authBtn = document.getElementById("authBtn");
+const toggleMode = document.getElementById("toggleMode");
+const formTitle = document.getElementById("formTitle");
+const profileName = document.getElementById("profileName");
+const profileEmail = document.getElementById("profileEmail");
+const logoutBtn = document.getElementById("logoutBtn");
+const themeToggle = document.getElementById("themeToggle");
+const bookmarkCount = document.getElementById("bookmarkCount");
 
-    document.addEventListener("DOMContentLoaded", async () => {
-      const user = safeParse(localStorage.getItem("notoraUser"));
-      const token = localStorage.getItem("notoraToken");
-      const theme = localStorage.getItem("notoraTheme");
+let mode = "login";
 
-      if (theme === "light") document.body.classList.add("light-mode");
+/* ==========================================================
+   1️⃣  Check Login Status Immediately (Stay Logged In)
+========================================================== */
+document.addEventListener("DOMContentLoaded", async () => {
+  const user = safeParse(localStorage.getItem("notoraUser"));
+  const token = localStorage.getItem("notoraToken");
+  const theme = localStorage.getItem("notoraTheme");
 
-      if (!user || !token) return showLogin();
+  if (theme === "light") document.body.classList.add("light-mode");
 
-      try {
-        const res = await fetch(`${API_BASE}/profile`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error("Invalid token");
-        const data = await res.json();
-        showProfile(data);
-      } catch {
-        localStorage.clear();
-        showLogin();
-      }
+  if (!user || !token) return showLogin();
+
+  try {
+    const res = await fetch(`${API_BASE}/profile`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) throw new Error("Invalid token");
+    const data = await res.json();
+    showProfile(data);
+  } catch {
+    localStorage.clear();
+    showLogin();
+  }
+});
+
+/* ==========================================================
+   2️⃣  Login/Register Toggle
+========================================================== */
+toggleMode.onclick = () => {
+  if (mode === "login") {
+    mode = "register";
+    nameInput.style.display = "block";
+    formTitle.textContent = "Create Your Notora Account";
+    authBtn.textContent = "Register";
+    toggleMode.textContent = "Already have an account? Login";
+  } else {
+    mode = "login";
+    nameInput.style.display = "none";
+    formTitle.textContent = "Login to Notora";
+    authBtn.textContent = "Login";
+    toggleMode.textContent = "New here? Register";
+  }
+  message.textContent = "";
+};
+
+/* ==========================================================
+   3️⃣  Login/Register Functionality
+========================================================== */
+authBtn.onclick = async () => {
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
+  const name = nameInput.value.trim();
+
+  if (!email || !password || (mode === "register" && !name)) {
+    message.textContent = "Please fill all fields.";
+    return;
+  }
+
+  message.textContent = "Processing...";
+  const endpoint = mode === "login" ? `${API_BASE}/login` : `${API_BASE}/register`;
+
+  try {
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, password }),
     });
 
-    toggleMode.onclick = () => {
-      if (mode === "login") {
-        mode = "register";
-        nameInput.style.display = "block";
-        formTitle.textContent = "Create Your Notora Account";
-        authBtn.textContent = "Register";
-        toggleMode.textContent = "Already have an account? Login";
-      } else {
-        mode = "login";
-        nameInput.style.display = "none";
-        formTitle.textContent = "Login to Notora";
-        authBtn.textContent = "Login";
-        toggleMode.textContent = "New here? Register";
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Failed");
+
+    localStorage.setItem("notoraUser", JSON.stringify(data.user));
+    localStorage.setItem("notoraToken", data.token);
+
+    showProfile(data.user);
+  } catch (err) {
+    message.textContent = err.message;
+  }
+};
+
+/* ==========================================================
+   4️⃣  Logout Functionality
+========================================================== */
+logoutBtn.onclick = () => {
+  localStorage.removeItem("notoraUser");
+  localStorage.removeItem("notoraToken");
+  showLogin();
+};
+
+/* ==========================================================
+   5️⃣  Theme Toggle
+========================================================== */
+themeToggle.onclick = () => {
+  document.body.classList.toggle("light-mode");
+  const theme = document.body.classList.contains("light-mode") ? "light" : "dark";
+  localStorage.setItem("notoraTheme", theme);
+};
+
+/* ==========================================================
+   6️⃣  Show Profile + Correct Bookmark Count
+========================================================== */
+async function showProfile(user) {
+  authBox.style.display = "none";
+  profileSection.style.display = "block";
+  profileName.textContent = user.name || "Unknown";
+  profileEmail.textContent = user.email || "Not provided";
+
+  // 🧠 Fetch accurate bookmark count
+  try {
+    const token = localStorage.getItem("notoraToken");
+    let count = 0;
+
+    if (token) {
+      const res = await fetch(BOOKMARK_API, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const bookmarks = await res.json();
+        count = bookmarks.length || 0;
       }
-      message.textContent = "";
-    };
-
-    authBtn.onclick = async () => {
-      const email = emailInput.value.trim();
-      const password = passwordInput.value.trim();
-      const name = nameInput.value.trim();
-
-      if (!email || !password || (mode === "register" && !name)) {
-        message.textContent = "Please fill all fields.";
-        return;
-      }
-
-      message.textContent = "Processing...";
-      const endpoint = mode === "login" ? `${API_BASE}/login` : `${API_BASE}/register`;
-
-      try {
-        const res = await fetch(endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, password }),
-        });
-
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || "Failed");
-
-        localStorage.setItem("notoraUser", JSON.stringify(data.user));
-        localStorage.setItem("notoraToken", data.token);
-
-        showProfile(data.user);
-      } catch (err) {
-        message.textContent = err.message;
-      }
-    };
-
-    logoutBtn.onclick = () => {
-      localStorage.removeItem("notoraUser");
-      localStorage.removeItem("notoraToken");
-      showLogin();
-    };
-
-    themeToggle.onclick = () => {
-      document.body.classList.toggle("light-mode");
-      const theme = document.body.classList.contains("light-mode") ? "light" : "dark";
-      localStorage.setItem("notoraTheme", theme);
-    };
-
-    function showProfile(user) {
-      authBox.style.display = "none";
-      profileSection.style.display = "block";
-      profileName.textContent = user.name || "Unknown";
-      profileEmail.textContent = user.email || "Not provided";
-      const bookmarks = safeParse(localStorage.getItem("guestBookmarks")) || [];
-      bookmarkCount.textContent = "Bookmarks: " + bookmarks.length;
+    } else {
+      const guestBookmarks = safeParse(localStorage.getItem("guestBookmarks")) || [];
+      count = guestBookmarks.length;
     }
 
-    function showLogin() {
-      authBox.style.display = "block";
-      profileSection.style.display = "none";
-    }
+    bookmarkCount.textContent = `Bookmarks: ${count}`;
+  } catch (err) {
+    console.error("Bookmark count error:", err);
+    bookmarkCount.textContent = "Bookmarks: --";
+  }
+}
 
-    function safeParse(val) {
-      try { return JSON.parse(val); } catch { return null; }
-    }
-  </script>
+/* ==========================================================
+   7️⃣  Show Login Form
+========================================================== */
+function showLogin() {
+  authBox.style.display = "block";
+  profileSection.style.display = "none";
+}
+
+/* ==========================================================
+   🔹 Utility: Safe JSON Parse
+========================================================== */
+function safeParse(val) {
+  try { return JSON.parse(val); } catch { return null; }
+}
+</script>
+
 </body>
 </html>
 
