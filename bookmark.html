@@ -188,11 +188,12 @@
   <div id="emptyMsg" class="empty" style="display:none;">No bookmarks yet.</div>
 
 <script>
-  // 🧹 Auto clear invalid local data
-const guestData = localStorage.getItem("guestBookmarks");
-if (guestData && guestData.includes("undefined")) {
-  localStorage.removeItem("guestBookmarks");
+  // 🔄 Migrate old data (if browser cleared partially)
+if (!localStorage.getItem("userBookmarks") && localStorage.getItem("bookmarks")) {
+  localStorage.setItem("guestBookmarks", localStorage.getItem("bookmarks"));
+  localStorage.removeItem("bookmarks");
 }
+
 
 const BACKEND_BASE = "https://notoraadminbackend-1.onrender.com";
 
@@ -225,7 +226,10 @@ async function loadBookmarks() {
       });
       if (res.ok) bookmarks = await res.json();
     } else {
-      bookmarks = safeParse(localStorage.getItem("guestBookmarks")) || [];
+      bookmarks = safeParse(localStorage.getItem("userBookmarks")) 
+         || safeParse(localStorage.getItem("guestBookmarks")) 
+         || [];
+
     }
 
     // 🧹 Clear loader
