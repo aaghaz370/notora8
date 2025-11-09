@@ -789,6 +789,67 @@ document.getElementById("shareBtn").addEventListener("click", async () => {
 
   if (c.isAdmin) card.classList.add("admin");
 
+// call when user actually reads (e.g., after 60s or on explicit "mark read")
+async function recordEvent(type, bookId = null) {
+  try {
+    const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
+    const token = localStorage.getItem("notoraToken");
+    if (!user || !token) return console.warn("Not logged in, not recording event");
+
+    const res = await fetch(`${BACKEND_BASE}/api/userstats/${user._id}/event`, {
+      method: "POST",
+      headers: {
+        "Content-Type":"application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({ type, bookId })
+    });
+
+    if (res.status === 409) {
+      // duplicate read or anti-cheat
+      const txt = await res.json().catch(()=>({message:'Duplicate'}));
+      console.log("Event ignored (recent):", txt.message || res.status);
+      return;
+    }
+    if (!res.ok) {
+      const txt = await res.text();
+      console.error("Event POST failed:", res.status, txt);
+      return;
+    }
+    const data = await res.json();
+    console.log("Event recorded:", data);
+
+    // update UI instantly: points and lastActive
+    if (data.points != null) {
+      document.getElementById("points")?.textContent = data.points;
+    }
+    if (data.event && data.event.createdAt) {
+      document.getElementById("lastActive") && (document.getElementById("lastActive").textContent = new Date(data.event.createdAt).toLocaleString());
+      // prepend event to UI events list
+      prependEventToUI(data.event);
+    }
+  } catch (err) {
+    console.error("Record event error:", err);
+  }
+}
+
+function prependEventToUI(ev) {
+  try {
+    const evContainer = document.getElementById("events");
+    if (!evContainer) return;
+    const div = document.createElement("div");
+    div.className = "event";
+    const pts = ev.type === "read" ? "+1NT" : ev.type === "share" ? "+2NT" : "+5NT";
+    div.innerHTML = `
+      <div>
+        <div style="font-weight:600">${ev.type.toUpperCase()} <span style="color:#ff4141">(${pts})</span></div>
+        <div class="muted" style="font-size:0.85rem">${ev.bookId ? (ev.bookId.name || ev.bookId) : ""}</div>
+      </div>
+      <div class="muted">${new Date(ev.createdAt).toLocaleString()}</div>
+    `;
+    evContainer.prepend(div);
+  } catch (e) { console.error(e); }
+}
 
 </script>
 
