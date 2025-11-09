@@ -107,35 +107,63 @@ const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
 const lockedNotice = document.getElementById("lockedNotice");
 const content = document.getElementById("content");
 
+// 🔐 If not logged in, show lock screen
 if (!user || !token) {
   lockedNotice.style.display = "block";
+  content.style.display = "none";
 } else {
   fetchAchievements();
 }
 
-document.getElementById("refreshBtn").addEventListener("click", fetchAchievements);
-document.getElementById("goStore").addEventListener("click", () => window.location.href = "/store.html");
-document.getElementById("openStore").addEventListener("click", () => window.location.href = "/store.html");
+// 🔄 Buttons
+document.getElementById("refreshBtn")?.addEventListener("click", fetchAchievements);
+document.getElementById("goStore")?.addEventListener("click", () => window.location.href = "/store.html");
+document.getElementById("openStore")?.addEventListener("click", () => window.location.href = "/store.html");
 
-async function fetchAchievements(){
-  try{
+// ======================================================
+// 🔹 Fetch Achievements
+// ======================================================
+async function fetchAchievements() {
+  try {
+    console.log("Fetching achievements for user:", user?._id);
     const res = await fetch(`${API}/${user._id}/achievements`, {
-      headers: { Authorization: `Bearer ${token}` }
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
     });
-    if (!res.ok) throw new Error("Failed");
+
+    if (!res.ok) {
+      console.warn("Achievements response not OK:", res.status);
+      if (res.status === 401 || res.status === 403) {
+        alert("Session expired. Please log in again.");
+        localStorage.removeItem("notoraUser");
+        localStorage.removeItem("notoraToken");
+        window.location.href = "profile.html";
+        return;
+      }
+      throw new Error("Failed to fetch achievements");
+    }
+
     const data = await res.json();
+    console.log("✅ Achievements data:", data);
+
     populate(data);
     content.style.display = "block";
     lockedNotice.style.display = "none";
-  }catch(err){
-    console.error(err);
-    lockedNotice.style.display = "none";
+  } catch (err) {
+    console.error("❌ Fetch Achievements Error:", err);
     content.style.display = "none";
+    lockedNotice.style.display = "block";
     alert("Unable to load achievements. Try logging in again.");
   }
 }
 
-function populate(d){
+// ======================================================
+// 🎯 Populate Achievements Data into UI
+// ======================================================
+function populate(d) {
   document.getElementById("totalReads").textContent = d.totalReads || 0;
   document.getElementById("monthReads").textContent = d.monthReads || 0;
   document.getElementById("weekReads").textContent = d.weekReads || 0;
@@ -146,25 +174,48 @@ function populate(d){
   document.getElementById("levelLabel").textContent = `Lv ${level}`;
   document.getElementById("levelDesc").textContent = getLevelName(level);
 
-  // progress (simple: points % to next level)
-  let pct = Math.min(100, computeProgressPct(d.totalReads || 0));
-  document.getElementById("levelProgress").style.width = pct + "%";
+  // progress bar (simple: points % to next level)
+  const pct = Math.min(100, computeProgressPct(d.totalReads || 0));
+  const progressBar = document.getElementById("levelProgress");
+  if (progressBar) {
+    progressBar.style.width = pct + "%";
+    progressBar.style.transition = "width 0.6s ease-in-out";
+  }
 
-  document.getElementById("lastActive").textContent = d.lastActive ? new Date(d.lastActive).toLocaleString() : "Never";
+  document.getElementById("lastActive").textContent = d.lastActive
+    ? new Date(d.lastActive).toLocaleString()
+    : "Never";
 
+  // Recent Events List
   const evContainer = document.getElementById("events");
-  evContainer.innerHTML = "";
-  (d.recent || []).forEach(e=>{
-    const div = document.createElement("div");
-    div.className = "event";
-    div.innerHTML = `<div><div style="font-weight:600">${e.type.toUpperCase()}</div><div class="muted" style="font-size:0.85rem">${e.bookId ? (e.bookId.name || e.bookId) : ""}</div></div>
-                     <div class="muted">${new Date(e.createdAt).toLocaleString()}</div>`;
-    evContainer.appendChild(div);
-  });
+  if (evContainer) {
+    evContainer.innerHTML = "";
+    (d.recent || []).forEach((e) => {
+      const div = document.createElement("div");
+      div.className = "event";
+      div.innerHTML = `
+        <div>
+          <div style="font-weight:600;color:#fff">${e.type.toUpperCase()}</div>
+          <div class="muted" style="font-size:0.85rem;color:#bbb">
+            ${e.bookId ? (e.bookId.name || e.bookId) : ""}
+          </div>
+        </div>
+        <div class="muted" style="color:#999">${new Date(e.createdAt).toLocaleString()}</div>
+      `;
+      evContainer.appendChild(div);
+    });
+
+    if (!d.recent || d.recent.length === 0) {
+      evContainer.innerHTML = `<p style="color:#777;text-align:center;">No recent activity yet.</p>`;
+    }
+  }
 }
 
-function getLevelName(l){
-  switch(l){
+// ======================================================
+// 🏅 Helper: Level Name
+// ======================================================
+function getLevelName(l) {
+  switch (l) {
     case 0: return "Newbie";
     case 1: return "Reader I";
     case 2: return "Reader II";
@@ -177,16 +228,20 @@ function getLevelName(l){
   }
 }
 
-function computeProgressPct(totalReads){
-  // compute pct from current level to next
-  const thresholds = [0,5,15,50,80,150,300,400,500];
-  let curIdx = thresholds.findIndex(t=> totalReads < t) - 1;
+// ======================================================
+// 📈 Helper: Level Progress Percent
+// ======================================================
+function computeProgressPct(totalReads) {
+  // thresholds for level transitions
+  const thresholds = [0, 5, 15, 50, 80, 150, 300, 400, 500];
+  let curIdx = thresholds.findIndex((t) => totalReads < t) - 1;
   if (curIdx < 0) curIdx = thresholds.length - 2;
   const cur = thresholds[curIdx] || 0;
-  const next = thresholds[curIdx+1] || (cur+1);
+  const next = thresholds[curIdx + 1] || (cur + 1);
   const pct = ((totalReads - cur) / (next - cur)) * 100;
   return Math.max(5, Math.round(pct));
 }
 </script>
+
 </body>
 </html>
