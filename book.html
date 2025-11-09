@@ -243,11 +243,20 @@ document.getElementById("bookPdf").src = book.pdfUrl;
 async function recordEvent(type, bookId=null) {
   try {
     if (!user || !token) return;
+    // const res = await fetch(`${EVENTS_API}/${user._id}/event`, {
+    //   method: "POST",
+    //   headers: { "Content-Type":"application/json", "Authorization":`Bearer ${token}` },
+    //   body: JSON.stringify({ type, bookId })
+    // });
     const res = await fetch(`${EVENTS_API}/${user._id}/event`, {
-      method: "POST",
-      headers: { "Content-Type":"application/json", "Authorization":`Bearer ${token}` },
-      body: JSON.stringify({ type, bookId })
-    });
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${token}`
+  },
+  body: JSON.stringify({ type, bookId: bookId || null })
+});
+
     if (!res.ok) {
       const msg = await res.text();
       console.warn("Event failed:", msg);
@@ -257,6 +266,8 @@ async function recordEvent(type, bookId=null) {
     console.log("✅ Event recorded:", data);
     if (data.points != null)
       document.getElementById("userPoints").textContent = data.points;
+    alert(`✅ ${type.toUpperCase()} recorded! You now have ${data.points} NT`);
+
   } catch (e) { console.error("recordEvent error:", e); }
 }
 
@@ -328,8 +339,7 @@ async function loadSuggestions() {
 loadSuggestions();
 
 // 🧠 Comment System
-const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
-const token = localStorage.getItem("notoraToken");
+
 const commentName = document.getElementById("commentName");
 const commentText = document.getElementById("commentText");
 const postBtn = document.getElementById("postCommentBtn");
