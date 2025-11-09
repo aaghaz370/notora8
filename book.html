@@ -200,16 +200,24 @@
     <p id="bookRating"></p>
     <p style="margin-top:8px; font-weight:600; color:#ff416c;">Your Points: <span id="userPoints">0</span> NT</p>
   </section>
-
-  <!-- comments & suggestions same as your original -->
-  <div class="comments-wrapper">
-    <!-- unchanged -->
+  
+ <div class="comments-wrapper">
+    <h3>💬 Comments</h3>
+    <div class="comment-inputs">
+      <input id="commentName" placeholder="Enter your name (3–10 chars)" />
+      <textarea id="commentText" placeholder="Write your comment (1–150 chars)..."></textarea>
+      <button id="postCommentBtn">Post Comment</button>
+    </div>
+    <div class="comments-list" id="commentsList">
+      <p>Loading comments...</p>
+    </div>
   </div>
 
   <section class="suggestions">
     <h3>📚 Similar Books You May Like</h3>
     <div class="suggestion-grid" id="suggestionGrid"></div>
   </section>
+  
 
 <script>
 /* ---------------- CONFIG ---------------- */
