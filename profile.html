@@ -414,12 +414,7 @@ if (newName) {
   }
 }
 
-const checkRes = await fetch(`${API_BASE}/check-name?name=${encodeURIComponent(name)}`);
-const checkData = await checkRes.json();
-if (!checkRes.ok) {
-  message.textContent = checkData.message || "Username already taken.";
-  return;
-}
+
 
   editMessage.textContent = "Updating...";
   try {
