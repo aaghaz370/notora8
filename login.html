@@ -173,6 +173,56 @@
 
   <!-- SCRIPT -->
   <script>
+    // === Persistent login storage (fixes auto logout) ===
+async function restoreLoginSafely() {
+  try {
+    // Check if localStorage has user
+    let user = localStorage.getItem("notoraUser");
+    let token = localStorage.getItem("notoraToken");
+
+    // If missing, try cookie backup
+    if (!user || !token) {
+      const cookies = document.cookie.split("; ").reduce((a, c) => {
+        const [k, v] = c.split("=");
+        a[k] = decodeURIComponent(v);
+        return a;
+      }, {});
+      if (cookies.notoraUser && cookies.notoraToken) {
+        localStorage.setItem("notoraUser", cookies.notoraUser);
+        localStorage.setItem("notoraToken", cookies.notoraToken);
+        console.log("✅ Restored from cookie backup");
+        return;
+      }
+    }
+
+    // If still missing, try IndexedDB (cross-domain safe)
+    if ((!user || !token) && "indexedDB" in window) {
+      const db = await new Promise((res, rej) => {
+        const open = indexedDB.open("NotoraDB", 1);
+        open.onupgradeneeded = () => open.result.createObjectStore("session");
+        open.onsuccess = () => res(open.result);
+        open.onerror = rej;
+      });
+
+      const tx = db.transaction("session", "readonly");
+      const store = tx.objectStore("session");
+      const getUser = store.get("notoraUser");
+      const getToken = store.get("notoraToken");
+
+      await new Promise(r => (getUser.onsuccess = getToken.onsuccess = r));
+
+      if (getUser.result && getToken.result) {
+        localStorage.setItem("notoraUser", getUser.result);
+        localStorage.setItem("notoraToken", getToken.result);
+        console.log("✅ Restored from IndexedDB backup");
+      }
+    }
+  } catch (err) {
+    console.error("restoreLoginSafely error:", err);
+  }
+}
+restoreLoginSafely();
+
 const API_BASE = "https://notoraadminbackend-1.onrender.com/api/users";
 const BOOKMARK_API = "https://notoraadminbackend-1.onrender.com/api/bookmarks";
 
@@ -272,14 +322,27 @@ authBtn.onclick = async () => {
     message.textContent = err.message;
   }
 };
-
-    // Save login safely (both cookie + localStorage)
+// --- Save login persistently ---
 localStorage.setItem("notoraUser", JSON.stringify(user));
 localStorage.setItem("notoraToken", token);
 
-// 👇 Cookie backup (for browsers that clear partitioned storage)
-document.cookie = `notoraUser=${encodeURIComponent(JSON.stringify(user))}; path=/; max-age=${60 * 60 * 24 * 7}; secure; samesite=lax`;
-document.cookie = `notoraToken=${token}; path=/; max-age=${60 * 60 * 24 * 7}; secure; samesite=lax`;
+// ✅ Cookie backup
+document.cookie = `notoraUser=${encodeURIComponent(JSON.stringify(user))}; path=/; max-age=${60*60*24*7}; secure; samesite=lax`;
+document.cookie = `notoraToken=${token}; path=/; max-age=${60*60*24*7}; secure; samesite=lax`;
+
+// ✅ IndexedDB backup (cross-domain safe)
+if ("indexedDB" in window) {
+  const open = indexedDB.open("NotoraDB", 1);
+  open.onupgradeneeded = () => open.result.createObjectStore("session");
+  open.onsuccess = () => {
+    const db = open.result;
+    const tx = db.transaction("session", "readwrite");
+    const store = tx.objectStore("session");
+    store.put(JSON.stringify(user), "notoraUser");
+    store.put(token, "notoraToken");
+  };
+}
+
 
 /* ==========================================================
    4️⃣  Logout Functionality
