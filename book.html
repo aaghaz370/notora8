@@ -314,24 +314,43 @@ window.addEventListener("beforeunload", () => {
 });
 
 /* ------------------------------------------
-   📤 SHARE REWARD (still gives +2NT)
+   📤 SHARE BUTTON FUNCTIONALITY + REWARD (+2NT)
 ------------------------------------------ */
-document.getElementById("shareBtn").onclick = async () => {
+const shareBtn = document.getElementById("shareBtn");
+
+shareBtn.addEventListener("click", async () => {
   try {
+    // ✅ Get current book info
+    const book = JSON.parse(localStorage.getItem("selectedBook") || "null");
+    if (!book || !book._id) return alert("Book details not found to share.");
+
+    // ✅ Generate a clean share message
     const shareUrl = `https://notora8.netlify.app/book.html?book=${book._id}`;
+    const shareTitle = `📚 ${book.name} by ${book.author}`;
+    const shareText = `Check out this book on Notora: ${book.name} 📖\n\nGenre: ${book.genre}\nRating: ${book.rating || "N/A"} ⭐`;
+
+    // ✅ Try system share first
     if (navigator.share) {
-      await navigator.share({ title: book.name, text: `Check this on Notora`, url: shareUrl });
-      await recordEvent("share", book._id);
-      alert("Thanks for sharing! (+2NT)");
-    } else {
+      await navigator.share({
+        title: shareTitle,
+        text: shareText,
+        url: shareUrl,
+      });
+      await recordEvent("share", book._id); // 🔹 add +2 NT
+      alert("✅ Thanks for sharing! (+2 NT)");
+    } 
+    else {
+      // 💻 Fallback: copy link
       await navigator.clipboard.writeText(shareUrl);
-      await recordEvent("share", book._id);
-      alert("Link copied! (+2NT)");
+      await recordEvent("share", book._id); // 🔹 add +2 NT
+      alert("🔗 Book link copied to clipboard! (+2 NT)");
     }
-  } catch (e) {
-    console.error(e);
+  } catch (err) {
+    console.error("Error sharing:", err);
+    alert("⚠️ Unable to share this book right now.");
   }
-};
+});
+
 
 
 /* --------------- view increment ---------------- */
@@ -817,35 +836,7 @@ document.addEventListener("fullscreenchange", () => {
   }
 });
 
-// 📤 SHARE BUTTON FUNCTIONALITY
-document.getElementById("shareBtn").addEventListener("click", async () => {
-  try {
-    // ✅ Get current book info from localStorage
-    const book = JSON.parse(localStorage.getItem("selectedBook") || "null");
-    if (!book || !book._id) return alert("Book details not found to share.");
 
-    // ✅ Generate a shareable URL for this book
-    const shareUrl = `https://notora8.netlify.app/book.html?book=${book._id}`;
-    const shareTitle = `📚 ${book.name} by ${book.author}`;
-    const shareText = `Check out this book on Notora: ${book.name} 📖\n\nGenre: ${book.genre}\nRating: ${book.rating || "N/A"} ⭐`;
-
-    // 🧠 If device supports Web Share API (phones, some browsers)
-    if (navigator.share) {
-      await navigator.share({
-        title: shareTitle,
-        text: shareText,
-        url: shareUrl,
-      });
-    } else {
-      // 💻 Fallback: copy link to clipboard
-      await navigator.clipboard.writeText(shareUrl);
-      alert("🔗 Book link copied to clipboard!\nYou can now share it anywhere.");
-    }
-  } catch (err) {
-    console.error("Error sharing:", err);
-    alert("⚠️ Unable to share this book right now.");
-  }
-});
 
   if (c.isAdmin) card.classList.add("admin");
 </script>
