@@ -194,13 +194,27 @@
     <button id="shareBtn" class="action-btn"><i class="fa-solid fa-share-nodes"></i> Share This Book</button>
   </div>
 
-  <section class="book-meta">
+  <!-- <section class="book-meta">
     <p><strong>Author:</strong> <span id="bookAuthor"></span></p>
     <p><strong>Genre:</strong> <span id="bookGenre"></span></p>
     <p id="bookRating"></p>
     <p style="margin-top:8px; font-weight:600; color:#ff416c;">Your Points: <span id="userPoints">0</span> NT</p>
-  </section>
- 
+  </section> -->
+  <section class="book-meta">
+  <p><strong>Author:</strong> <span id="bookAuthor"></span></p>
+  <p><strong>Genre:</strong> <span id="bookGenre"></span></p>
+  <p id="bookRating"></p>
+
+  <!-- 👁️ New: show total views -->
+  <p id="bookViews" style="margin-top:6px; color:#ccc;">
+    <i class="fa-solid fa-eye"></i> 0 Views
+  </p>
+
+  <!-- 🔒 Hide NT points from here -->
+  <p id="userPointsLine" style="display:none;">
+    Your Points: <span id="userPoints">0</span> NT
+  </p>
+</section>
 
   
  <div class="comments-wrapper">
@@ -241,11 +255,15 @@ document.getElementById("bookRating").textContent = "⭐ " + (book.rating || "N/
 document.getElementById("bookPdf").src = book.pdfUrl;
 
 /* --------------- achievements integration ---------------- */
-call backend to record read/share/donate events safely
+// call backend to record read/share/donate events safely
 async function recordEvent(type, bookId=null) {
   try {
     if (!user || !token) return;
-   
+    // const res = await fetch(`${EVENTS_API}/${user._id}/event`, {
+    //   method: "POST",
+    //   headers: { "Content-Type":"application/json", "Authorization":`Bearer ${token}` },
+    //   body: JSON.stringify({ type, bookId })
+    // });
     const res = await fetch(`${EVENTS_API}/${user._id}/event`, {
   method: "POST",
   headers: {
@@ -268,9 +286,6 @@ async function recordEvent(type, bookId=null) {
 
   } catch (e) { console.error("recordEvent error:", e); }
 }
-  
-
-
 
 // record read after 60s automatically
 setTimeout(() => {
@@ -294,8 +309,23 @@ document.getElementById("shareBtn").onclick = async () => {
 };
 
 /* --------------- view increment ---------------- */
- fetch(`${BOOKS_API}/${book._id}/view`, { method:"POST" }).catch(()=>{});
-  
+// fetch(`${BOOKS_API}/${book._id}/view`, { method:"POST" }).catch(()=>{});
+  // 📈 Increment view count and fetch total views
+try {
+  const res = await fetch(`${BOOKS_API}/${book._id}/view`, { method: "POST" });
+  const data = await res.json();
+
+  // data should contain updated views; adjust field name if different
+  if (data.views !== undefined) {
+    document.getElementById("bookViews").innerHTML =
+      `<i class="fa-solid fa-eye"></i> ${data.views} View${data.views !== 1 ? "s" : ""}`;
+  } else if (data.book && data.book.views !== undefined) {
+    document.getElementById("bookViews").innerHTML =
+      `<i class="fa-solid fa-eye"></i> ${data.book.views} View${data.book.views !== 1 ? "s" : ""}`;
+  }
+} catch (err) {
+  console.error("View count error:", err);
+}
 
 
 /* --------------- fetch user points --------------- */
@@ -812,4 +842,3 @@ document.getElementById("shareBtn").addEventListener("click", async () => {
 </script>
 </body>
 </html>
-
