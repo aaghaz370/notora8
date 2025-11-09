@@ -258,6 +258,7 @@
 }
 
 
+
   </style>
 </head>
 
@@ -391,6 +392,7 @@ if (!user || !token) {
   postBtn.onclick = postComment;
   loadComments();
 }
+
 // 🕒 Format time difference (like "2 hours ago", "3 weeks ago")
 function formatTimeAgo(dateString, isEdited = false) {
   const now = new Date();
@@ -406,7 +408,6 @@ function formatTimeAgo(dateString, isEdited = false) {
   const years = days / 365;
 
   let result;
-
   if (hours < 24) result = `${Math.floor(hours)} hour${Math.floor(hours) !== 1 ? "s" : ""} ago`;
   else if (days < 7) result = `${Math.floor(days)} day${Math.floor(days) !== 1 ? "s" : ""} ago`;
   else if (weeks < 4) result = `${Math.floor(weeks)} week${Math.floor(weeks) !== 1 ? "s" : ""} ago`;
@@ -426,6 +427,10 @@ async function loadComments() {
       commentsList.innerHTML = `<p>No comments yet.</p>`;
       return;
     }
+
+    // ✅ Sort admin comments to top (optional)
+    comments.sort((a, b) => (b.isAdmin ? 1 : 0) - (a.isAdmin ? 1 : 0));
+
     comments.forEach(c => renderComment(c, commentsList, 0));
   } catch (err) {
     console.error("Error loading comments:", err);
@@ -437,7 +442,7 @@ function renderComment(c, container, level) {
   const card = document.createElement("div");
   card.className = "comment-card";
 
-  // ✅ Add admin badge if applicable
+  // ✅ Admin badge & style
   const isOwn = user && c.name === user.name;
   const adminBadge = c.isAdmin
     ? `<span class="admin-badge"><i class="fa-solid fa-circle-check"></i> Admin</span>`
@@ -456,7 +461,6 @@ function renderComment(c, container, level) {
     <div class="reply-box" id="reply-${c._id}"></div>
   `;
 
-  // ✅ If admin, give special background
   if (c.isAdmin) {
     card.style.border = "1px solid #ff416c";
     card.style.background = "rgba(255, 65, 108, 0.1)";
@@ -466,7 +470,6 @@ function renderComment(c, container, level) {
   if (c.replies && c.replies.length)
     c.replies.forEach(r => renderReply(r, card.querySelector(`#reply-${c._id}`), level + 1, c._id));
 }
-
 
 function renderReply(r, container, level, parentId) {
   const replyCard = document.createElement("div");
@@ -510,7 +513,12 @@ async function postComment() {
     await fetch(COMMENTS_API, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ bookId: book._id, name: user.name, text })
+      body: JSON.stringify({
+        bookId: book._id,
+        name: user.name,
+        email: user.email,
+        text
+      }),
     });
     commentText.value = "";
     loadComments();
@@ -519,111 +527,6 @@ async function postComment() {
   }
 }
 
-// 💬 Reply Box (works up to 3 levels)
-function openReplyBox(commentId, level, parentReplyId = null) {
-  const boxId = parentReplyId || commentId;
-  const target = document.getElementById(`reply-${boxId}`);
-  if (!target || target.querySelector("textarea")) return;
-
-  const div = document.createElement("div");
-  div.innerHTML = `
-    <textarea placeholder="Reply as ${user.name}" style="width:100%;background:#111;color:#fff;border:none;border-radius:6px;padding:6px;margin-top:6px"></textarea>
-    <button style="background:#ff416c;border:none;padding:6px 12px;border-radius:6px;color:#fff;cursor:pointer;margin-top:4px">Send</button>
-  `;
-
-  const textArea = div.querySelector("textarea");
-  div.querySelector("button").onclick = async () => {
-    const text = textArea.value.trim();
-    if (!text) return alert("Enter reply text!");
-    try {
-      await fetch(`${COMMENTS_API}/reply/${commentId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: user.name, text, parentReplyId })
-      });
-      loadComments();
-    } catch (err) {
-      console.error("Reply error:", err);
-    }
-  };
-
-  target.appendChild(div);
-}
-
-// ⋮ Menu Toggle (Edit/Delete)
-function toggleMenu(event, id, isReply = false, parentId = null) {
-  event.stopPropagation();
-  document.querySelectorAll(".menu-popup").forEach(m => m.remove());
-
-  const button = event.currentTarget;
-  const rect = button.getBoundingClientRect();
-
-  const menu = document.createElement("div");
-  menu.className = "menu-popup";
-  menu.style.position = "fixed";
-  menu.style.background = "#222";
-  menu.style.border = "1px solid #555";
-  menu.style.borderRadius = "6px";
-  menu.style.padding = "5px";
-  menu.style.zIndex = "1000";
-  menu.style.top = `${rect.top + rect.height + 4}px`;
-  menu.style.left = `${rect.left - 40}px`;
-
-  menu.innerHTML = `
-    <button style="background:none;border:none;color:#fff;cursor:pointer;padding:4px 8px;width:100%;text-align:left"
-      onclick="editComment('${id}', ${isReply}, '${parentId}')">✏️ Edit</button>
-    <button style="background:none;border:none;color:#ff4b2b;cursor:pointer;padding:4px 8px;width:100%;text-align:left"
-      onclick="deleteComment('${id}', ${isReply}, '${parentId}')">🗑️ Delete</button>
-  `;
-
-  document.body.appendChild(menu);
-
-  setTimeout(() => {
-    document.addEventListener("click", () => menu.remove(), { once: true });
-  }, 50);
-}
-
-async function editComment(id, isReply, parentId) {
-  const newText = prompt("Edit your comment:");
-  if (!newText) return;
-
-  try {
-    const endpoint = isReply
-      ? `${COMMENTS_API}/reply/${parentId}/${id}`
-      : `${COMMENTS_API}/${id}`;
-
-    const res = await fetch(endpoint, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: newText }),
-    });
-
-    if (!res.ok) throw new Error("Edit failed");
-    alert("Edited successfully!");
-    loadComments();
-  } catch (err) {
-    console.error("Edit error:", err);
-    alert("Error editing comment.");
-  }
-}
-
-
-// 🗑️ Delete Comment/Reply
-async function deleteComment(id, isReply, parentId) {
-  if (!confirm("Delete this comment?")) return;
-  try {
-    const endpoint = isReply
-      ? `${COMMENTS_API}/reply/${parentId}/${id}`
-      : `${COMMENTS_API}/${id}`;
-    const res = await fetch(endpoint, { method: "DELETE" });
-    if (!res.ok) throw new Error("Failed to delete");
-    alert("Deleted successfully!");
-    loadComments();
-  } catch (err) {
-    console.error(err);
-    alert("Error deleting comment.");
-  }
-}
 
 // 🔖 Bookmark Button
 document.getElementById("bookmarkBtn").onclick = async () => {
