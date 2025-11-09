@@ -301,499 +301,450 @@
     <div class="suggestion-grid" id="suggestionGrid"></div>
   </section>
 <script>
+/* ---------------------------
+   Config / Endpoints
+   --------------------------- */
 const BACKEND_BASE = "https://notoraadminbackend-1.onrender.com";
 const BOOKS_API = `${BACKEND_BASE}/api/books`;
 const COMMENTS_API = `${BACKEND_BASE}/api/comments`;
+const EVENTS_API = `${BACKEND_BASE}/api/userstats`;
 
 let book = null;
+let user = JSON.parse(localStorage.getItem("notoraUser") || "null");
+let token = localStorage.getItem("notoraToken");
+let readRecorded = false; // ensure single read event per open
+let autoReadTimeout = null;
+
+/* ---------------------------
+   Load selected book from localStorage
+   --------------------------- */
 try {
   book = JSON.parse(localStorage.getItem("selectedBook") || "null");
-  if (!book) throw new Error();
-} catch {
-  alert("No book found, redirecting...");
+  if (!book) throw new Error("No selected book");
+} catch (e) {
+  alert("No book found, redirecting to home.");
   location.href = "index.html";
 }
 
-// 🧩 Fill Book Details
+/* ---------------------------
+   Fill book meta & PDF
+   --------------------------- */
 document.getElementById("bookName").textContent = book.name;
 document.getElementById("bookAuthor").textContent = book.author;
 document.getElementById("bookGenre").textContent = book.genre;
-document.getElementById("bookRating").textContent = "⭐ " + (book.rating || "N/A");
-document.getElementById("bookPdf").src = book.pdfUrl;
+document.getElementById("bookThumb").src = book.thumbnail || "";
+document.getElementById("bookPdf").src = book.pdfUrl || "";
 
-  // 📖 Save to Continue Reading
-function updateContinueReading(book) {
-  let list = JSON.parse(localStorage.getItem("continueReading") || "[]");
-
-  // Remove if already exists
-  list = list.filter(b => b._id !== book._id);
-
-  // Add to top
-  list.unshift(book);
-
-  // Limit to 10
-  if (list.length > 10) list.pop();
-
-  localStorage.setItem("continueReading", JSON.stringify(list));
+/* Keep continue-reading list */
+function updateContinueReading(b) {
+  try {
+    let list = JSON.parse(localStorage.getItem("continueReading") || "[]");
+    list = list.filter(x => x._id !== b._id);
+    list.unshift(b);
+    if (list.length > 10) list.pop();
+    localStorage.setItem("continueReading", JSON.stringify(list));
+  } catch (e) { console.error(e); }
 }
-// ⏳ Automatically record a "read" event after 60 seconds of reading
-let readRecorded = false;
-setTimeout(() => {
-  if (!readRecorded) {
-    recordEvent("read", book._id);
-    readRecorded = true;
-  }
-}, 60000);
-
-// Call this once book loads
 updateContinueReading(book);
-// 📈 Increment view count every time user opens book.html
-fetch(`${BACKEND_BASE}/api/books/${book._id}/view`, { method: "POST" })
-  .then(res => res.json())
-  .then(data => console.log("📊 View updated:", data))
-  .catch(err => console.error("❌ View update failed:", err));
 
+/* ---------------------------
+   Helpers: safe fetch + JSON
+   --------------------------- */
+async function safeJson(res) {
+  const txt = await res.text();
+  try { return JSON.parse(txt); } catch { return txt; }
+}
 
-  // ==================== 🔥 Record Events (Read / Share / Donate) ====================
+/* ---------------------------
+   VIEW increment (server) & update UI
+   --------------------------- */
+async function incView() {
+  try {
+    const res = await fetch(`${BACKEND_BASE}/api/books/${book._id}/view`, { method: "POST" });
+    if (!res.ok) return console.warn("View increment failed", res.status);
+    const data = await res.json();
+    console.log("📊 View updated:", data);
+    // update UI views if returned
+    if (data.views != null) document.getElementById("viewsText").textContent = `Views: ${data.views}`;
+  } catch (e) { console.error("View update error:", e); }
+}
+incView();
 
-// call when user actually reads (e.g., after 60s or on explicit "mark read")
+/* ---------------------------
+   Events: recordEvent (read/share/donate)
+   --------------------------- */
 async function recordEvent(type, bookId = null) {
   try {
-    const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
-    const token = localStorage.getItem("notoraToken");
-    if (!user || !token) return console.warn("Not logged in, not recording event");
+    if (!user || !token) { console.warn("Not logged in, not recording event"); return; }
+    // prevent duplicate read event from client
+    if (type === "read" && readRecorded) {
+      console.log("Read already recorded this session.");
+      return;
+    }
 
-    const res = await fetch(`${BACKEND_BASE}/api/userstats/${user._id}/event`, {
+    const res = await fetch(`${EVENTS_API}/${user._id}/event`, {
       method: "POST",
-      headers: {
-        "Content-Type":"application/json",
-        "Authorization": `Bearer ${token}`
-      },
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
       body: JSON.stringify({ type, bookId })
     });
 
     if (res.status === 409) {
-      const txt = await res.json().catch(()=>({message:'Duplicate'}));
-      console.log("Event ignored (recent):", txt.message || res.status);
+      const js = await safeJson(res);
+      console.log("Event ignored:", js.message || res.status);
       return;
     }
     if (!res.ok) {
-      const txt = await res.text();
+      const txt = await safeJson(res);
       console.error("Event POST failed:", res.status, txt);
       return;
     }
 
     const data = await res.json();
-    console.log("✅ Event recorded:", data);
+    console.log("Event recorded:", data);
 
-    if (data.points != null) {
-      document.getElementById("points")?.textContent = data.points;
-    }
+    // UI updates: points & lastActive & prepend event
+    if (data.points != null) document.getElementById("points").textContent = data.points;
     if (data.event && data.event.createdAt) {
-      document.getElementById("lastActive") &&
-        (document.getElementById("lastActive").textContent =
-          new Date(data.event.createdAt).toLocaleString());
+      document.getElementById("lastActive").textContent = new Date(data.event.createdAt).toLocaleString();
       prependEventToUI(data.event);
     }
-  } catch (err) {
-    console.error("Record event error:", err);
-  }
+
+    if (type === "read") readRecorded = true;
+    return data;
+  } catch (err) { console.error("Record event error:", err); }
 }
 
+/* Prepend event to UI */
 function prependEventToUI(ev) {
   try {
-    const evContainer = document.getElementById("events");
-    if (!evContainer) return;
+    const eventsArea = document.getElementById("events");
+    if (!eventsArea) return;
     const div = document.createElement("div");
     div.className = "event";
     const pts = ev.type === "read" ? "+1NT" : ev.type === "share" ? "+2NT" : "+5NT";
     div.innerHTML = `
       <div>
-        <div style="font-weight:600">${ev.type.toUpperCase()} <span style="color:#ff4141">(${pts})</span></div>
+        <div style="font-weight:600">${ev.type.toUpperCase()} <span style="color:var(--accent)">${pts}</span></div>
         <div class="muted" style="font-size:0.85rem">${ev.bookId ? (ev.bookId.name || ev.bookId) : ""}</div>
       </div>
-      <div class="muted">${new Date(ev.createdAt).toLocaleString()}</div>
+      <div class="muted" style="color:#999">${new Date(ev.createdAt).toLocaleString()}</div>
     `;
-    evContainer.prepend(div);
-  } catch (e) {
-    console.error(e);
-  }
+    eventsArea.prepend(div);
+  } catch(e) { console.error(e); }
 }
 
-// 🔖 Load Similar Books
+/* auto-record read after 60s (client-side backup) */
+autoReadTimeout = setTimeout(() => {
+  recordEvent("read", book._id);
+}, 60 * 1000);
+
+/* Also record read when user clicks Mark Read */
+document.getElementById("markReadBtn").addEventListener("click", () => {
+  recordEvent("read", book._id);
+});
+
+/* ---------------------------
+   Share functionality (records "share")
+   --------------------------- */
+document.getElementById("shareBtn").addEventListener("click", async () => {
+  try {
+    const shareUrl = `https://notora8.netlify.app/book.html?book=${book._id}`;
+    const shareTitle = `${book.name} — ${book.author}`;
+    if (navigator.share) {
+      await navigator.share({ title: shareTitle, text: book.description || "", url: shareUrl });
+      await recordEvent("share", book._id);
+      alert("Thanks for sharing! (+2NT)");
+    } else {
+      await navigator.clipboard.writeText(shareUrl);
+      await recordEvent("share", book._id);
+      alert("Link copied & share recorded! (+2NT)");
+    }
+  } catch (err) {
+    console.error("Share error:", err);
+    alert("Couldn't share right now.");
+  }
+});
+
+/* ---------------------------
+   Suggestions list
+   --------------------------- */
 async function loadSuggestions() {
   try {
     const res = await fetch(`${BOOKS_API}?genre=${encodeURIComponent(book.genre)}`);
+    if (!res.ok) { console.warn("Suggestions fetch failed", res.status); return; }
     const data = await res.json();
     const grid = document.getElementById("suggestionGrid");
     grid.innerHTML = "";
     data
       .filter(b => b._id !== book._id)
-      .slice(0, 6)
+      .slice(0, 8)
       .forEach(b => {
         const el = document.createElement("div");
         el.className = "suggestion-card";
-        el.innerHTML = `<img src="${b.thumbnail}" alt="${b.name}"><p>${b.name}</p>`;
-        el.onclick = () => {
-          localStorage.setItem("selectedBook", JSON.stringify(b));
-          location.href = "book.html";
-        };
+        el.innerHTML = `<img src="${b.thumbnail}" alt="${b.name}" style="width:100%;height:110px;object-fit:cover;border-radius:6px"><div style="margin-top:6px;font-weight:600;font-size:0.95rem">${b.name}</div><div class="muted" style="font-size:0.85rem">${b.author}</div>`;
+        el.onclick = () => { localStorage.setItem("selectedBook", JSON.stringify(b)); location.href = "book.html"; };
         grid.appendChild(el);
       });
-  } catch (err) {
-    console.error("Suggestions error:", err);
-  }
+  } catch (err) { console.error("Suggestions error:", err); }
 }
 loadSuggestions();
 
-// 🧠 Comment System
-const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
-const token = localStorage.getItem("notoraToken");
-const commentName = document.getElementById("commentName");
+/* ---------------------------
+   Comments: Load/Post/Reply/Edit/Delete
+   --------------------------- */
+const commentNameEl = document.getElementById("commentName");
 const commentText = document.getElementById("commentText");
 const postBtn = document.getElementById("postCommentBtn");
 const commentsList = document.getElementById("commentsList");
 
-// Disable comments for guests
 if (!user || !token) {
-  commentName.style.display = "none";
+  commentNameEl.style.display = "none";
   commentText.disabled = true;
   commentText.placeholder = "Login to comment";
   postBtn.textContent = "Login to Comment";
   postBtn.onclick = () => (location.href = "profile.html");
 } else {
-  commentName.style.display = "none";
+  commentNameEl.style.display = "none";
   commentText.placeholder = `Write a comment as ${user.name}`;
   postBtn.onclick = postComment;
   loadComments();
 }
 
-// 🕒 Format time difference (like "2 hours ago", "3 weeks ago")
+/* Format time ago */
 function formatTimeAgo(dateString, isEdited = false) {
-  const now = new Date();
-  const past = new Date(dateString);
+  const now = new Date(); const past = new Date(dateString);
   const diff = now - past;
-
-  const seconds = diff / 1000;
-  const minutes = seconds / 60;
-  const hours = minutes / 60;
-  const days = hours / 24;
-  const weeks = days / 7;
-  const months = days / 30;
-  const years = days / 365;
-
+  const seconds = diff/1000, minutes = seconds/60, hours = minutes/60, days = hours/24, weeks = days/7, months = days/30, years = days/365;
   let result;
-  if (hours < 24) result = `${Math.floor(hours)} hour${Math.floor(hours) !== 1 ? "s" : ""} ago`;
-  else if (days < 7) result = `${Math.floor(days)} day${Math.floor(days) !== 1 ? "s" : ""} ago`;
-  else if (weeks < 4) result = `${Math.floor(weeks)} week${Math.floor(weeks) !== 1 ? "s" : ""} ago`;
-  else if (months < 12) result = `${Math.floor(months)} month${Math.floor(months) !== 1 ? "s" : ""} ago`;
-  else result = `${Math.floor(years)} year${Math.floor(years) !== 1 ? "s" : ""} ago`;
-
+  if (hours < 24) result = `${Math.floor(hours)} hour${Math.floor(hours)!==1 ? "s":""} ago`;
+  else if (days < 7) result = `${Math.floor(days)} day${Math.floor(days)!==1 ? "s":""} ago`;
+  else if (weeks < 4) result = `${Math.floor(weeks)} week${Math.floor(weeks)!==1 ? "s":""} ago`;
+  else if (months < 12) result = `${Math.floor(months)} month${Math.floor(months)!==1 ? "s":""} ago`;
+  else result = `${Math.floor(years)} year${Math.floor(years)!==1 ? "s":""} ago`;
   return isEdited ? `edited ${result}` : result;
 }
 
-// 📥 Load Comments
+/* Load comments from server */
 async function loadComments() {
   try {
     const res = await fetch(`${COMMENTS_API}/${book._id}`);
+    if (!res.ok) throw new Error("Comments fetch failed");
     const comments = await res.json();
     commentsList.innerHTML = "";
-    if (!comments.length) {
-      commentsList.innerHTML = `<p>No comments yet.</p>`;
-      return;
-    }
+    if (!comments.length) { commentsList.innerHTML = `<p class="muted">No comments yet.</p>`; return; }
 
-    // ✅ Sort admin comments to top (optional)
-    comments.sort((a, b) => (b.isAdmin ? 1 : 0) - (a.isAdmin ? 1 : 0));
-
+    // Optional: show admin comments first
+    comments.sort((a,b) => (b.isAdmin?1:0) - (a.isAdmin?1:0));
     comments.forEach(c => renderComment(c, commentsList, 0));
   } catch (err) {
     console.error("Error loading comments:", err);
-    commentsList.innerHTML = `<p>Failed to load comments.</p>`;
+    commentsList.innerHTML = `<p class="muted">Failed to load comments.</p>`;
   }
 }
 
+/* Render comment (single) */
 function renderComment(c, container, level) {
   const card = document.createElement("div");
   card.className = "comment-card";
 
-  // ✅ Admin badge & style
   const isOwn = user && c.name === user.name;
-  const adminBadge = c.isAdmin
-    ? `<span class="admin-badge"><i class="fa-solid fa-circle-check"></i> Admin</span>`
-    : "";
+  const adminBadge = c.isAdmin ? `<span class="admin-badge"><i class="fa-solid fa-circle-check"></i> Admin</span>` : "";
 
   card.innerHTML = `
     <div class="comment-meta">
-      <span class="comment-name">${c.name} ${adminBadge}</span>
+      <div><span class="comment-name">${escapeHtml(c.name)}</span> ${adminBadge}</div>
       <div>
-        ${isOwn ? `<button class="reply-btn" onclick="toggleMenu(event, '${c._id}', false)"><i class='fa-solid fa-ellipsis'></i></button>` : ""}
+        ${isOwn ? `<button class="reply-btn" onclick="toggleMenu(event,'${c._id}', false)"><i class='fa-solid fa-ellipsis'></i></button>` : ""}
         <button class="reply-btn" onclick="openReplyBox('${c._id}', ${level})">Reply</button>
       </div>
     </div>
-    <p>${c.text}</p>
-    <small class="comment-time">${formatTimeAgo(c.updatedAt || c.createdAt, c.updatedAt && c.updatedAt !== c.createdAt)}</small>
+    <div><p style="white-space:pre-wrap">${escapeHtml(c.text)}</p></div>
+    <div class="muted" style="font-size:0.85rem">${formatTimeAgo(c.updatedAt || c.createdAt, c.updatedAt && c.updatedAt !== c.createdAt)}</div>
     <div class="reply-box" id="reply-${c._id}"></div>
   `;
 
   if (c.isAdmin) {
-    card.style.border = "1px solid #ff416c";
-    card.style.background = "rgba(255, 65, 108, 0.1)";
-  }
-
-  container.appendChild(card);
-  if (c.replies && c.replies.length)
-    c.replies.forEach(r => renderReply(r, card.querySelector(`#reply-${c._id}`), level + 1, c._id));
-}
-
-function renderComment(c, container, level) {
-  const card = document.createElement("div");
-  card.className = "comment-card";
-
-  // ✅ Admin badge & style
-  const isOwn = user && c.name === user.name;
-  const adminBadge = c.isAdmin
-    ? `<span class="admin-badge"><i class="fa-solid fa-circle-check"></i> Admin</span>`
-    : "";
-
-  card.innerHTML = `
-    <div class="comment-meta">
-      <span class="comment-name">${c.name} ${adminBadge}</span>
-      <div>
-        ${isOwn ? `<button class="reply-btn" onclick="toggleMenu(event, '${c._id}', false)"><i class='fa-solid fa-ellipsis'></i></button>` : ""}
-        <button class="reply-btn" onclick="openReplyBox('${c._id}', ${level})">Reply</button>
-      </div>
-    </div>
-    <p>${c.text}</p>
-    <small class="comment-time">${formatTimeAgo(c.updatedAt || c.createdAt, c.updatedAt && c.updatedAt !== c.createdAt)}</small>
-    <div class="reply-box" id="reply-${c._id}"></div>
-  `;
-
-  // ✅ Admin visual style
-  if (c.isAdmin) {
-    card.style.border = "1px solid #ff416c";
-    card.style.background = "rgba(255, 65, 108, 0.1)";
+    card.style.border = "1px solid var(--accent)";
+    card.style.background = "rgba(255,65,108,0.04)";
   }
 
   container.appendChild(card);
 
-  // ✅ Render replies if present
-  if (Array.isArray(c.replies) && c.replies.length > 0) {
+  if (Array.isArray(c.replies) && c.replies.length) {
     const replyContainer = card.querySelector(`#reply-${c._id}`);
-    c.replies.forEach(r => renderReply(r, replyContainer, level + 1, c._id));
+    c.replies.forEach(r => renderReply(r, replyContainer, level+1, c._id));
   }
 }
 
+/* Render nested reply */
 function renderReply(r, container, level, parentId) {
   const replyCard = document.createElement("div");
   replyCard.className = "comment-card";
-  replyCard.style.background = `rgba(255,255,255,${0.04 + level * 0.03})`;
-  replyCard.style.marginLeft = `${level * 15}px`;
+  replyCard.style.background = `rgba(255,255,255,${0.02 + Math.min(0.08, level*0.02)})`;
+  replyCard.style.marginLeft = `${level * 12}px`;
 
   const isOwn = user && r.name === user.name;
-  const adminBadge = r.isAdmin
-    ? `<span class="admin-badge"><i class="fa-solid fa-circle-check"></i> Admin</span>`
-    : "";
+  const adminBadge = r.isAdmin ? `<span class="admin-badge"><i class="fa-solid fa-circle-check"></i> Admin</span>` : "";
 
   replyCard.innerHTML = `
     <div class="comment-meta">
-      <span class="comment-name">${r.name} ${adminBadge}</span>
+      <div><span class="comment-name">${escapeHtml(r.name)}</span> ${adminBadge}</div>
       <div>
-        ${isOwn ? `<button class="reply-btn" onclick="toggleMenu(event, '${r._id}', true, '${parentId}')"><i class='fa-solid fa-ellipsis'></i></button>` : ""}
-        ${level < 2 ? `<button class="reply-btn" onclick="openReplyBox('${parentId}', ${level + 1}, '${r._id}')">Reply</button>` : ""}
+        ${isOwn ? `<button class="reply-btn" onclick="toggleMenu(event,'${r._id}', true, '${parentId}')"><i class='fa-solid fa-ellipsis'></i></button>` : ""}
+        ${level < 2 ? `<button class="reply-btn" onclick="openReplyBox('${parentId}', ${level+1}, '${r._id}')">Reply</button>` : ""}
       </div>
     </div>
-    <p>${r.text}</p>
-    <small class="comment-time">${formatTimeAgo(r.updatedAt || r.createdAt, r.updatedAt && r.updatedAt !== r.createdAt)}</small>
+    <div><p style="white-space:pre-wrap">${escapeHtml(r.text)}</p></div>
+    <div class="muted" style="font-size:0.85rem">${formatTimeAgo(r.updatedAt || r.createdAt, r.updatedAt && r.updatedAt !== r.createdAt)}</div>
     <div class="reply-box" id="reply-${r._id}"></div>
   `;
 
-  if (r.isAdmin) {
-    replyCard.style.border = "1px solid #ff416c";
-    replyCard.style.background = "rgba(255, 65, 108, 0.1)";
-  }
+  if (r.isAdmin) { replyCard.style.border = "1px solid var(--accent)"; replyCard.style.background = "rgba(255,65,108,0.04)"; }
 
   container.appendChild(replyCard);
-
-  if (Array.isArray(r.replies) && r.replies.length > 0) {
+  if (Array.isArray(r.replies) && r.replies.length) {
     const replyContainer = replyCard.querySelector(`#reply-${r._id}`);
-    r.replies.forEach(sub => renderReply(sub, replyContainer, level + 1, parentId));
+    r.replies.forEach(sub => renderReply(sub, replyContainer, level+1, parentId));
   }
 }
 
-// 💬 FIXED Reply Box (works properly now)
+/* Prevent XSS: simple escape for text nodes */
+function escapeHtml(s) {
+  if (!s && s !== 0) return "";
+  return String(s)
+    .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;").replaceAll("'", "&#39;");
+}
+
+/* Reply box creation (now robust) */
 function openReplyBox(commentId, level, parentReplyId = null) {
   const boxId = parentReplyId || commentId;
   const target = document.getElementById(`reply-${boxId}`);
-
-  if (!target) {
-    console.error("❌ Reply target not found for:", boxId);
-    return;
-  }
-
-  // prevent multiple boxes
-  if (target.querySelector("textarea")) return;
+  if (!target) { console.error("Reply target not found for", boxId); return; }
+  if (target.querySelector("textarea")) return; // already open
 
   const div = document.createElement("div");
   div.style.marginTop = "8px";
   div.innerHTML = `
-    <textarea placeholder="Reply as ${user.name}" 
-      style="width:100%;background:#111;color:#fff;border:none;
-             border-radius:6px;padding:6px;margin-top:6px;resize:none"
-      rows="3"></textarea>
-    <button class="reply-send-btn" 
-      style="background:#ff416c;border:none;padding:6px 12px;
-             border-radius:6px;color:#fff;cursor:pointer;
-             margin-top:4px;transition:0.2s">Send</button>
+    <textarea placeholder="Reply as ${user ? escapeHtml(user.name) : 'Guest'}"></textarea>
+    <div style="display:flex;gap:8px;margin-top:6px">
+      <button class="btn send-reply">Send</button>
+      <button class="btn" style="background:#444" id="cancelReply">Cancel</button>
+    </div>
   `;
-
-  const textArea = div.querySelector("textarea");
-  const sendBtn = div.querySelector(".reply-send-btn");
-
-  sendBtn.addEventListener("mouseover", () => (sendBtn.style.opacity = "0.8"));
-  sendBtn.addEventListener("mouseout", () => (sendBtn.style.opacity = "1"));
+  const txt = div.querySelector("textarea");
+  const sendBtn = div.querySelector(".send-reply");
+  div.querySelector("#cancelReply").onclick = () => div.remove();
 
   sendBtn.onclick = async () => {
-    const text = textArea.value.trim();
+    const text = txt.value.trim();
     if (!text) return alert("Enter reply text!");
     try {
+      const payload = { name: user.name, email: user.email, text, parentReplyId };
       const res = await fetch(`${COMMENTS_API}/reply/${commentId}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: user.name,
-          email: user.email,
-          text,
-          parentReplyId,
-        }),
+        headers: { "Content-Type":"application/json" },
+        body: JSON.stringify(payload)
       });
-
-      if (!res.ok) throw new Error("Failed to post reply");
-      loadComments(); // refresh all
+      if (!res.ok) {
+        const js = await safeJson(res);
+        throw new Error(js.message || "Reply failed");
+      }
+      await loadComments();
     } catch (err) {
       console.error("Reply error:", err);
-      alert("Couldn't post reply. Please try again.");
+      alert("Couldn't post reply. Try again.");
     }
   };
 
   target.appendChild(div);
 }
 
-
-// 📝 Post Comment
+/* Post top-level comment */
 async function postComment() {
   const text = commentText.value.trim();
   if (!text) return alert("Please enter a comment.");
   try {
-    await fetch(COMMENTS_API, {
+    const payload = { bookId: book._id, name: user.name, email: user.email, text };
+    const res = await fetch(COMMENTS_API, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        bookId: book._id,
-        name: user.name,
-        email: user.email,
-        text
-      }),
+      headers: { "Content-Type":"application/json" },
+      body: JSON.stringify(payload)
     });
+    if (!res.ok) { const js = await safeJson(res); throw new Error(js.message || "Post failed"); }
     commentText.value = "";
     loadComments();
-  } catch (err) {
-    console.error("Post error:", err);
-  }
+  } catch (err) { console.error("Post error:", err); alert("Couldn't post comment."); }
 }
 
-// ⋮ Menu Toggle (Edit/Delete)
+/* Menu (edit/delete) — same as before */
 function toggleMenu(event, id, isReply = false, parentId = null) {
   event.stopPropagation();
   document.querySelectorAll(".menu-popup").forEach(m => m.remove());
-
   const button = event.currentTarget;
   const rect = button.getBoundingClientRect();
-
   const menu = document.createElement("div");
   menu.className = "menu-popup";
   menu.style.position = "fixed";
   menu.style.background = "#222";
-  menu.style.border = "1px solid #555";
+  menu.style.border = "1px solid #333";
   menu.style.borderRadius = "6px";
   menu.style.padding = "5px";
   menu.style.zIndex = "1000";
-  menu.style.top = `${rect.top + rect.height + 4}px`;
+  menu.style.top = `${rect.top + rect.height + 6}px`;
   menu.style.left = `${rect.left - 40}px`;
-
   menu.innerHTML = `
-    <button style="background:none;border:none;color:#fff;cursor:pointer;padding:4px 8px;width:100%;text-align:left"
-      onclick="editComment('${id}', ${isReply}, '${parentId}')">✏️ Edit</button>
-    <button style="background:none;border:none;color:#ff4b2b;cursor:pointer;padding:4px 8px;width:100%;text-align:left"
-      onclick="deleteComment('${id}', ${isReply}, '${parentId}')">🗑️ Delete</button>
+    <button style="background:none;border:none;color:#fff;cursor:pointer;padding:6px 8px;width:100%;text-align:left" onclick="editComment('${id}', ${isReply}, '${parentId}')">✏️ Edit</button>
+    <button style="background:none;border:none;color:#ff4b2b;cursor:pointer;padding:6px 8px;width:100%;text-align:left" onclick="deleteComment('${id}', ${isReply}, '${parentId}')">🗑️ Delete</button>
   `;
-
   document.body.appendChild(menu);
-
-  setTimeout(() => {
-    document.addEventListener("click", () => menu.remove(), { once: true });
-  }, 50);
+  setTimeout(()=>document.addEventListener("click", ()=>menu.remove(), { once:true }), 50);
 }
 
+/* Edit comment/reply (prompt) */
 async function editComment(id, isReply, parentId) {
   const newText = prompt("Edit your comment:");
   if (!newText) return;
-
   try {
-    const endpoint = isReply
-      ? `${COMMENTS_API}/reply/${parentId}/${id}`
-      : `${COMMENTS_API}/${id}`;
-
-    const res = await fetch(endpoint, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: newText }),
-    });
-
-    if (!res.ok) throw new Error("Edit failed");
-    alert("Edited successfully!");
+    const endpoint = isReply ? `${COMMENTS_API}/reply/${parentId}/${id}` : `${COMMENTS_API}/${id}`;
+    const res = await fetch(endpoint, { method: "PUT", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ text: newText }) });
+    if (!res.ok) { const js = await safeJson(res); throw new Error(js.message || "Edit failed"); }
+    alert("Edited successfully");
     loadComments();
-  } catch (err) {
-    console.error("Edit error:", err);
-    alert("Error editing comment.");
-  }
+  } catch (err) { console.error("Edit error:", err); alert("Error editing comment."); }
 }
 
-
-// 🗑️ Delete Comment/Reply
+/* Delete comment/reply */
 async function deleteComment(id, isReply, parentId) {
   if (!confirm("Delete this comment?")) return;
   try {
-    const endpoint = isReply
-      ? `${COMMENTS_API}/reply/${parentId}/${id}`
-      : `${COMMENTS_API}/${id}`;
+    const endpoint = isReply ? `${COMMENTS_API}/reply/${parentId}/${id}` : `${COMMENTS_API}/${id}`;
     const res = await fetch(endpoint, { method: "DELETE" });
-    if (!res.ok) throw new Error("Failed to delete");
-    alert("Deleted successfully!");
+    if (!res.ok) { const js = await safeJson(res); throw new Error(js.message || "Delete failed"); }
+    alert("Deleted successfully");
     loadComments();
-  } catch (err) {
-    console.error(err);
-    alert("Error deleting comment.");
-  }
+  } catch (err) { console.error("Delete error:", err); alert("Could not delete comment."); }
 }
-// 🔖 Bookmark Button
-document.getElementById("bookmarkBtn").onclick = async () => {
-  const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
-  const token = localStorage.getItem("notoraToken");
-  const key = user ? "userBookmarks" : "guestBookmarks";
 
+/* refresh comments button */
+document.getElementById("refreshComments").addEventListener("click", loadComments);
+
+/* ---------------------------
+   Bookmarks
+   --------------------------- */
+document.getElementById("bookmarkBtn").addEventListener("click", async () => {
   try {
+    const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
+    const token = localStorage.getItem("notoraToken");
+    const key = user ? "userBookmarks" : "guestBookmarks";
     if (user && token) {
       const res = await fetch(`${BACKEND_BASE}/api/bookmarks`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ bookId: book._id }),
+        headers: { "Content-Type":"application/json", "Authorization": `Bearer ${token}` },
+        body: JSON.stringify({ bookId: book._id })
       });
-      if (res.ok) alert("✅ Book added to your bookmarks!");
-      else alert("⚠️ Failed to save bookmark. Try logging in again.");
+      if (!res.ok) { const js = await safeJson(res); throw new Error(js.message || "Bookmark failed"); }
+      alert("Bookmarked!");
     } else {
       const local = JSON.parse(localStorage.getItem(key) || "[]");
       if (local.some(b => b._id === book._id)) return alert("Already bookmarked!");
@@ -801,73 +752,33 @@ document.getElementById("bookmarkBtn").onclick = async () => {
       localStorage.setItem(key, JSON.stringify(local));
       alert("Bookmarked locally!");
     }
-  } catch (err) {
-    console.error("Bookmark error:", err);
-    alert("❌ Error saving bookmark.");
-  }
-};
-
-
-
-  // 🎬 Fullscreen button
-document.getElementById("fullscreenBtn").addEventListener("click", () => {
-  const pdfFrame = document.getElementById("bookPdf");
-
-  // Check if Fullscreen API is supported
-  if (pdfFrame.requestFullscreen) {
-    pdfFrame.requestFullscreen();
-  } else if (pdfFrame.webkitRequestFullscreen) { // Safari
-    pdfFrame.webkitRequestFullscreen();
-  } else if (pdfFrame.msRequestFullscreen) { // IE/Edge
-    pdfFrame.msRequestFullscreen();
-  } else {
-    alert("Fullscreen not supported on this browser.");
-  }
+  } catch (err) { console.error("Bookmark error:", err); alert("Couldn't bookmark."); }
 });
 
-// 🧹 Optional: exit fullscreen with Escape key
-document.addEventListener("fullscreenchange", () => {
-  if (!document.fullscreenElement) {
-    console.log("Exited fullscreen");
-  }
-});
-
-// 📤 SHARE BUTTON FUNCTIONALITY
-document.getElementById("shareBtn").addEventListener("click", async () => {
+/* ---------------------------
+   Load user points/lastActive (small refresh)
+   --------------------------- */
+async function refreshUserInfo() {
   try {
-    // ✅ Get current book info from localStorage
-    const book = JSON.parse(localStorage.getItem("selectedBook") || "null");
-    if (!book || !book._id) return alert("Book details not found to share.");
+    if (!user || !token) return;
+    const res = await fetch(`${EVENTS_API}/${user._id}/achievements`, { headers: {"Authorization": `Bearer ${token}`} });
+    if (!res.ok) return;
+    const js = await res.json();
+    if (js.points != null) document.getElementById("points").textContent = js.points;
+    if (js.lastActive) document.getElementById("lastActive").textContent = new Date(js.lastActive).toLocaleString();
+  } catch(e) { console.error("refreshUserInfo error", e); }
+}
+refreshUserInfo();
 
-    // ✅ Generate a shareable URL for this book
-        // ✅ Record share event (2NT reward)
-    recordEvent("share", book._id);
+/* ---------------------------
+   Clean up on page unload
+   --------------------------- */
+window.addEventListener("beforeunload", () => { if (autoReadTimeout) clearTimeout(autoReadTimeout); });
 
-    const shareUrl = `https://notora8.netlify.app/book.html?book=${book._id}`;
-    const shareTitle = `📚 ${book.name} by ${book.author}`;
-    const shareText = `Check out this book on Notora: ${book.name} 📖\n\nGenre: ${book.genre}\nRating: ${book.rating || "N/A"} ⭐`;
-
-    // 🧠 If device supports Web Share API (phones, some browsers)
-    if (navigator.share) {
-      await navigator.share({
-        title: shareTitle,
-        text: shareText,
-        url: shareUrl,
-      });
-    } else {
-      // 💻 Fallback: copy link to clipboard
-      await navigator.clipboard.writeText(shareUrl);
-      alert("🔗 Book link copied to clipboard!\nYou can now share it anywhere.");
-    }
-  } catch (err) {
-    console.error("Error sharing:", err);
-    alert("⚠️ Unable to share this book right now.");
-  }
-});
-
-  if (c.isAdmin) card.classList.add("admin");
-
-
+/* ---------------------------
+   Initial small console message
+   --------------------------- */
+console.log("Book page loaded for:", book._id, "user:", user ? user.email : "guest");
 </script>
 
 
