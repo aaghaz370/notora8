@@ -238,45 +238,84 @@ document.getElementById("bookGenre").textContent = book.genre;
 document.getElementById("bookRating").textContent = "⭐ " + (book.rating || "N/A");
 document.getElementById("bookPdf").src = book.pdfUrl;
 
-/* --------------- achievements integration ---------------- */
-// call backend to record read/share/donate events safely
-async function recordEvent(type, bookId=null) {
+/* --------------- achievements integration (anti-cheat safe) ---------------- */
+let readRecorded = false;  // ✅ Prevents multiple +1NT in one session
+let readTimer = null;
+
+// Helper: record event safely
+async function recordEvent(type, bookId = null) {
   try {
     if (!user || !token) return;
-    // const res = await fetch(`${EVENTS_API}/${user._id}/event`, {
-    //   method: "POST",
-    //   headers: { "Content-Type":"application/json", "Authorization":`Bearer ${token}` },
-    //   body: JSON.stringify({ type, bookId })
-    // });
+
     const res = await fetch(`${EVENTS_API}/${user._id}/event`, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    "Authorization": `Bearer ${token}`
-  },
-  body: JSON.stringify({ type, bookId: bookId || null })
-});
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({ type, bookId: bookId || null })
+    });
 
     if (!res.ok) {
       const msg = await res.text();
       console.warn("Event failed:", msg);
       return;
     }
+
     const data = await res.json();
     console.log("✅ Event recorded:", data);
+
     if (data.points != null)
       document.getElementById("userPoints").textContent = data.points;
-    alert(`✅ ${type.toUpperCase()} recorded! You now have ${data.points} NT`);
 
-  } catch (e) { console.error("recordEvent error:", e); }
+    alert(`✅ ${type.toUpperCase()} recorded! You now have ${data.points} NT`);
+  } catch (e) {
+    console.error("recordEvent error:", e);
+  }
 }
 
-// record read after 60s automatically
-setTimeout(() => {
-  recordEvent("read", book._id);
-}, 60000);
+/* ------------------------------------------
+   📖 READ REWARD: Only once per book per user
+------------------------------------------ */
+const READ_DELAY_MS = 60000; // 60 seconds
+const LAST_READ_KEY = `notora_lastRead_${user?._id || "guest"}`; // local memory
 
-// share button (also gives points)
+(function setupReadReward() {
+  if (!user || !book?._id) return;
+
+  const lastRead = JSON.parse(localStorage.getItem(LAST_READ_KEY) || "{}");
+  const now = Date.now();
+  const cooldownMs = 10 * 60 * 1000; // 10-minute cooldown
+
+  // ⛔ Skip if same book within 10 minutes
+  if (lastRead.bookId === book._id && now - lastRead.time < cooldownMs) {
+    console.log("⏸️ Recently read this book, no new NT yet.");
+    return;
+  }
+
+  // ⏱️ Grant +1 NT after 60 seconds (once)
+  readTimer = setTimeout(async () => {
+    if (readRecorded) return;
+    readRecorded = true;
+
+    await recordEvent("read", book._id);
+    localStorage.setItem(
+      LAST_READ_KEY,
+      JSON.stringify({ bookId: book._id, time: Date.now() })
+    );
+
+    console.log("✅ +1 NT granted for reading:", book.name);
+  }, READ_DELAY_MS);
+})();
+
+// 🧹 cleanup if user closes tab before timer triggers
+window.addEventListener("beforeunload", () => {
+  if (readTimer) clearTimeout(readTimer);
+});
+
+/* ------------------------------------------
+   📤 SHARE REWARD (still gives +2NT)
+------------------------------------------ */
 document.getElementById("shareBtn").onclick = async () => {
   try {
     const shareUrl = `https://notora8.netlify.app/book.html?book=${book._id}`;
@@ -289,8 +328,11 @@ document.getElementById("shareBtn").onclick = async () => {
       await recordEvent("share", book._id);
       alert("Link copied! (+2NT)");
     }
-  } catch(e){ console.error(e); }
+  } catch (e) {
+    console.error(e);
+  }
 };
+
 
 /* --------------- view increment ---------------- */
 fetch(`${BOOKS_API}/${book._id}/view`, { method:"POST" }).catch(()=>{});
