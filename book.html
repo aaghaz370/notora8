@@ -527,7 +527,80 @@ async function postComment() {
   }
 }
 
+// ⋮ Menu Toggle (Edit/Delete)
+function toggleMenu(event, id, isReply = false, parentId = null) {
+  event.stopPropagation();
+  document.querySelectorAll(".menu-popup").forEach(m => m.remove());
 
+  const button = event.currentTarget;
+  const rect = button.getBoundingClientRect();
+
+  const menu = document.createElement("div");
+  menu.className = "menu-popup";
+  menu.style.position = "fixed";
+  menu.style.background = "#222";
+  menu.style.border = "1px solid #555";
+  menu.style.borderRadius = "6px";
+  menu.style.padding = "5px";
+  menu.style.zIndex = "1000";
+  menu.style.top = `${rect.top + rect.height + 4}px`;
+  menu.style.left = `${rect.left - 40}px`;
+
+  menu.innerHTML = `
+    <button style="background:none;border:none;color:#fff;cursor:pointer;padding:4px 8px;width:100%;text-align:left"
+      onclick="editComment('${id}', ${isReply}, '${parentId}')">✏️ Edit</button>
+    <button style="background:none;border:none;color:#ff4b2b;cursor:pointer;padding:4px 8px;width:100%;text-align:left"
+      onclick="deleteComment('${id}', ${isReply}, '${parentId}')">🗑️ Delete</button>
+  `;
+
+  document.body.appendChild(menu);
+
+  setTimeout(() => {
+    document.addEventListener("click", () => menu.remove(), { once: true });
+  }, 50);
+}
+
+async function editComment(id, isReply, parentId) {
+  const newText = prompt("Edit your comment:");
+  if (!newText) return;
+
+  try {
+    const endpoint = isReply
+      ? `${COMMENTS_API}/reply/${parentId}/${id}`
+      : `${COMMENTS_API}/${id}`;
+
+    const res = await fetch(endpoint, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: newText }),
+    });
+
+    if (!res.ok) throw new Error("Edit failed");
+    alert("Edited successfully!");
+    loadComments();
+  } catch (err) {
+    console.error("Edit error:", err);
+    alert("Error editing comment.");
+  }
+}
+
+
+// 🗑️ Delete Comment/Reply
+async function deleteComment(id, isReply, parentId) {
+  if (!confirm("Delete this comment?")) return;
+  try {
+    const endpoint = isReply
+      ? `${COMMENTS_API}/reply/${parentId}/${id}`
+      : `${COMMENTS_API}/${id}`;
+    const res = await fetch(endpoint, { method: "DELETE" });
+    if (!res.ok) throw new Error("Failed to delete");
+    alert("Deleted successfully!");
+    loadComments();
+  } catch (err) {
+    console.error(err);
+    alert("Error deleting comment.");
+  }
+}
 // 🔖 Bookmark Button
 document.getElementById("bookmarkBtn").onclick = async () => {
   const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
