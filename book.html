@@ -244,16 +244,6 @@
   color: #ccc;
 }
 .admin-badge {
-  color: #00e0ff;
-  margin-left: 4px;
-  font-size: 0.8rem;
-  vertical-align: middle;
-}
-.comment-card.admin {
-  background: rgba(0, 224, 255, 0.05);
-  border-left: 3px solid #00e0ff;
-}
-.admin-badge {
   font-size: 0.75rem;
   color: #ff416c;
   background: rgba(255, 65, 108, 0.1);
@@ -266,10 +256,7 @@
   color: #ff416c;
   margin-right: 3px;
 }
-.admin-comment {
-  border: 1px solid #ff416c;
-  background: rgba(255, 65, 108, 0.08);
-}
+
 
   </style>
 </head>
@@ -446,17 +433,16 @@ async function loadComments() {
   }
 }
 
-// 🧾 Render Comment (with admin badge)
 function renderComment(c, container, level) {
   const card = document.createElement("div");
   card.className = "comment-card";
-  if (c.isAdmin) card.classList.add("admin-comment");
 
+  // ✅ Add admin badge if applicable
+  const isOwn = user && c.name === user.name;
   const adminBadge = c.isAdmin
     ? `<span class="admin-badge"><i class="fa-solid fa-circle-check"></i> Admin</span>`
     : "";
 
-  const isOwn = user && c.name === user.name;
   card.innerHTML = `
     <div class="comment-meta">
       <span class="comment-name">${c.name} ${adminBadge}</span>
@@ -469,24 +455,30 @@ function renderComment(c, container, level) {
     <small class="comment-time">${formatTimeAgo(c.updatedAt || c.createdAt, c.updatedAt && c.updatedAt !== c.createdAt)}</small>
     <div class="reply-box" id="reply-${c._id}"></div>
   `;
+
+  // ✅ If admin, give special background
+  if (c.isAdmin) {
+    card.style.border = "1px solid #ff416c";
+    card.style.background = "rgba(255, 65, 108, 0.1)";
+  }
+
   container.appendChild(card);
   if (c.replies && c.replies.length)
     c.replies.forEach(r => renderReply(r, card.querySelector(`#reply-${c._id}`), level + 1, c._id));
 }
 
-// 🧾 Render Reply (with admin highlight)
+
 function renderReply(r, container, level, parentId) {
   const replyCard = document.createElement("div");
   replyCard.className = "comment-card";
-  if (r.isAdmin) replyCard.classList.add("admin-comment");
   replyCard.style.background = `rgba(255,255,255,${0.04 + level * 0.03})`;
   replyCard.style.marginLeft = `${level * 15}px`;
 
+  const isOwn = user && r.name === user.name;
   const adminBadge = r.isAdmin
     ? `<span class="admin-badge"><i class="fa-solid fa-circle-check"></i> Admin</span>`
     : "";
 
-  const isOwn = user && r.name === user.name;
   replyCard.innerHTML = `
     <div class="comment-meta">
       <span class="comment-name">${r.name} ${adminBadge}</span>
@@ -499,6 +491,12 @@ function renderReply(r, container, level, parentId) {
     <small class="comment-time">${formatTimeAgo(r.updatedAt || r.createdAt, r.updatedAt && r.updatedAt !== r.createdAt)}</small>
     <div class="reply-box" id="reply-${r._id}"></div>
   `;
+
+  if (r.isAdmin) {
+    replyCard.style.border = "1px solid #ff416c";
+    replyCard.style.background = "rgba(255, 65, 108, 0.1)";
+  }
+
   container.appendChild(replyCard);
   if (r.replies && r.replies.length)
     r.replies.forEach(sub => renderReply(sub, replyCard.querySelector(`#reply-${r._id}`), level + 1, parentId));
