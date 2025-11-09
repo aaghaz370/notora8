@@ -272,10 +272,24 @@ authBtn.onclick = async () => {
   const password = passwordInput.value.trim();
   const name = nameInput.value.trim();
 
+  // if (!email || !password || (mode === "register" && !name)) {
+  //   message.textContent = "Please fill all fields.";
+  //   return;
+  // }
   if (!email || !password || (mode === "register" && !name)) {
-    message.textContent = "Please fill all fields.";
+  message.textContent = "Please fill all fields.";
+  return;
+}
+
+// ✅ Username validation (for register)
+if (mode === "register") {
+  const nameRegex = /^[A-Za-z0-9 ]{3,10}$/; // only letters, numbers, space allowed
+  if (!nameRegex.test(name)) {
+    message.textContent = "Name must be 3–10 characters, no special symbols or emojis.";
     return;
   }
+}
+
 
   message.textContent = "Processing...";
   const endpoint = mode === "login" ? `${API_BASE}/login` : `${API_BASE}/register`;
@@ -382,10 +396,24 @@ saveChangesBtn.onclick = async () => {
   const newName = editName.value.trim();
   const newPassword = editPassword.value.trim();
 
+  // if (!newName && !newPassword) {
+  //   editMessage.textContent = "Please enter a new name or password.";
+  //   return;
+  // }
   if (!newName && !newPassword) {
-    editMessage.textContent = "Please enter a new name or password.";
+  editMessage.textContent = "Please enter a new name or password.";
+  return;
+}
+
+// ✅ Validate name if provided
+if (newName) {
+  const nameRegex = /^[A-Za-z0-9 ]{3,10}$/;
+  if (!nameRegex.test(newName)) {
+    editMessage.textContent = "Name must be 3–10 characters, no special symbols or emojis.";
     return;
   }
+}
+
 
   editMessage.textContent = "Updating...";
   try {
