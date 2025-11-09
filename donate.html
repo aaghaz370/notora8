@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Donate Book | Notora</title>
+  <link rel="icon" href="images/logo.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: radial-gradient(circle at top, #111 0%, #000 100%);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: rgba(255,255,255,0.05);
+      padding: 2rem 2.5rem;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(255,65,108,0.3);
+      backdrop-filter: blur(10px);
+      width: 350px;
+      text-align: center;
+    }
+    h2 {
+      color: #ff4141;
+      margin-bottom: 1.5rem;
+    }
+    input {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      outline: none;
+      font-size: 0.95rem;
+    }
+    input:disabled {
+      opacity: 0.7;
+      background: rgba(255,255,255,0.05);
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ff4141, #e50914);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: 0.3s;
+    }
+    button:hover {
+      transform: scale(1.03);
+    }
+    .msg {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: #ff6b6b;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>📚 Donate a Book</h2>
+    <input type="text" id="name" placeholder="Book Name *" required />
+    <input type="text" id="author" placeholder="Author *" required />
+    <input type="text" id="genre" placeholder="Genre *" required />
+    <input type="number" id="rating" placeholder="Rating (1–5) *" min="1" max="5" required />
+    <input type="text" id="thumbnail" placeholder="Thumbnail URL *" required />
+    <input type="text" id="pdfUrl" placeholder="PDF URL *" required />
+    <input type="email" id="email" placeholder="Your Email" disabled />
+    <button id="donateBtn">Donate Book</button>
+    <div class="msg" id="msg"></div>
+  </div>
+
+  <script>
+    const BACKEND = "https://notoraadminbackend-1.onrender.com/api/donations";
+    const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
+    const token = localStorage.getItem("notoraToken");
+    const msg = document.getElementById("msg");
+    const emailInput = document.getElementById("email");
+
+    // 🧠 Check login
+    if (!user || !token) {
+      alert("Please login first to donate a book!");
+      location.href = "profile.html";
+    }
+
+    // Autofill email
+    emailInput.value = user.email;
+    emailInput.disabled = true;
+
+    document.getElementById("donateBtn").addEventListener("click", async () => {
+      const name = document.getElementById("name").value.trim();
+      const author = document.getElementById("author").value.trim();
+      const genre = document.getElementById("genre").value.trim();
+      const rating = document.getElementById("rating").value.trim();
+      const thumbnail = document.getElementById("thumbnail").value.trim();
+      const pdfUrl = document.getElementById("pdfUrl").value.trim();
+
+      if (!name || !author || !genre || !rating || !thumbnail || !pdfUrl) {
+        msg.textContent = "⚠️ Please fill all required fields.";
+        return;
+      }
+
+      msg.textContent = "⏳ Submitting donation...";
+      try {
+        const res = await fetch(BACKEND, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify({ name, author, genre, rating, thumbnail, pdfUrl })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          msg.style.color = "#00ff88";
+          msg.textContent = "✅ Book submitted successfully! Pending admin approval.";
+          document.getElementById("donateBtn").disabled = true;
+        } else {
+          msg.textContent = data.message || "❌ Error submitting book.";
+        }
+      } catch (err) {
+        console.error(err);
+        msg.textContent = "❌ Something went wrong.";
+      }
+    });
+  </script>
+</body>
+</html>
