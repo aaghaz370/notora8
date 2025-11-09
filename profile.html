@@ -135,6 +135,19 @@
       background: radial-gradient(circle at top, #eee 0%, #ddd 100%);
       color: #111;
     }
+
+    #editForm input {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+#editForm button {
+  margin-top: 8px;
+  background: linear-gradient(135deg, #ff416c, #e50914);
+}
+#editForm button:hover {
+  transform: scale(1.03);
+}
+
   </style>
 </head>
 
@@ -160,16 +173,29 @@
   </div>
 
   <!-- PROFILE SECTION -->
-  <div id="profileSection" style="display:none;">
-    <h2>Your Profile</h2>
-    <div class="user-detail"><i class="fa-solid fa-user"></i> <span id="profileName">Loading...</span></div>
-    <div class="user-detail"><i class="fa-solid fa-envelope"></i> <span id="profileEmail"></span></div>
-    <div class="extras">
-      <p id="bookmarkCount">Bookmarks: --</p>
-    </div>
-    <button id="logoutBtn">Logout</button>
-    <button class="theme-toggle" id="themeToggle"><i class="fa-solid fa-sun"></i> Toggle Theme</button>
+<div id="profileSection" style="display:none;">
+  <h2>Your Profile</h2>
+  <div class="user-detail"><i class="fa-solid fa-user"></i> <span id="profileName">Loading...</span></div>
+  <div class="user-detail"><i class="fa-solid fa-envelope"></i> <span id="profileEmail"></span></div>
+  <div class="extras">
+    <p id="bookmarkCount">Bookmarks: --</p>
   </div>
+
+  <!-- 🔹 Edit button -->
+  <button id="editProfileBtn" style="margin-top:10px;">✏️ Edit Profile</button>
+  
+  <!-- 🔹 Edit Form (hidden by default) -->
+  <div id="editForm" style="display:none; margin-top:15px;">
+    <input type="text" id="editName" placeholder="Enter new name" />
+    <input type="password" id="editPassword" placeholder="Enter new password" />
+    <button id="saveChangesBtn">💾 Save Changes</button>
+    <p id="editMessage" style="color:#ff5252;font-size:0.85rem;"></p>
+  </div>
+
+  <button id="logoutBtn" style="margin-top:15px;">Logout</button>
+  <button class="theme-toggle" id="themeToggle"><i class="fa-solid fa-sun"></i> Toggle Theme</button>
+</div>
+
 
   <!-- SCRIPT -->
   <script>
@@ -324,6 +350,76 @@ async function showProfile(user) {
     bookmarkCount.textContent = "Bookmarks: --";
   }
 }
+
+
+    /* ==========================================================
+   ✏️ 8️⃣ Edit Profile Feature (Change Name / Password)
+========================================================== */
+const editProfileBtn = document.getElementById("editProfileBtn");
+const editForm = document.getElementById("editForm");
+const editName = document.getElementById("editName");
+const editPassword = document.getElementById("editPassword");
+const saveChangesBtn = document.getElementById("saveChangesBtn");
+const editMessage = document.getElementById("editMessage");
+
+editProfileBtn.onclick = () => {
+  const user = safeParse(localStorage.getItem("notoraUser"));
+  if (!user) return alert("You must be logged in.");
+
+  // Toggle visibility
+  if (editForm.style.display === "none") {
+    editForm.style.display = "block";
+    editName.value = user.name || "";
+    editPassword.value = "";
+    editMessage.textContent = "";
+  } else {
+    editForm.style.display = "none";
+  }
+};
+
+saveChangesBtn.onclick = async () => {
+  const token = localStorage.getItem("notoraToken");
+  const newName = editName.value.trim();
+  const newPassword = editPassword.value.trim();
+
+  if (!newName && !newPassword) {
+    editMessage.textContent = "Please enter a new name or password.";
+    return;
+  }
+
+  editMessage.textContent = "Updating...";
+  try {
+    const res = await fetch(`${API_BASE}/update`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ name: newName || undefined, password: newPassword || undefined }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Update failed");
+
+    // Update local user data
+    const user = safeParse(localStorage.getItem("notoraUser"));
+    if (newName) user.name = newName;
+    localStorage.setItem("notoraUser", JSON.stringify(user));
+
+    profileName.textContent = newName || user.name;
+    editMessage.style.color = "#4caf50";
+    editMessage.textContent = "✅ Profile updated successfully!";
+    editPassword.value = "";
+
+    setTimeout(() => {
+      editForm.style.display = "none";
+      editMessage.textContent = "";
+    }, 1500);
+  } catch (err) {
+    editMessage.style.color = "#ff5252";
+    editMessage.textContent = err.message;
+  }
+};
 
 /* ==========================================================
    7️⃣  Show Login Form
