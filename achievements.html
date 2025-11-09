@@ -5,41 +5,49 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Achievements | Notora</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://kit.fontawesome.com/1c020da525.js" crossorigin="anonymous"></script>
 <style>
   :root{
-    --bg:#0f0f10; --card:#141414; --accent:#ff416c; --muted:#9aa0a6;
+    --bg:#0f0f10; --card:#141414; --accent:#ff4141; --muted:#9aa0a6;
   }
-  body{margin:0;font-family:Poppins,system-ui;background:linear-gradient(180deg,#070707 0%, #0f0f0f 100%);color:#fff;padding:18px;}
+  body{
+    margin:0;
+    font-family:Poppins,system-ui;
+    background:radial-gradient(circle at top, #0a0a0a, #000);
+    color:#fff;
+    padding:18px;
+  }
   .container{max-width:1100px;margin:0 auto;}
-  .header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
-  h1{margin:0;font-size:1.3rem;color:var(--accent)}
+  .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+  h1{margin:0;font-size:1.5rem;color:var(--accent)}
   .card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-bottom:18px}
   .card{background:var(--card);padding:14px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.6);}
   .big-num{font-size:2rem;font-weight:700}
   .muted{color:var(--muted);font-size:0.9rem}
   .level-badge{display:flex;align-items:center;gap:8px;padding:8px;border-radius:10px;background:linear-gradient(90deg,rgba(255,65,108,0.06),transparent);border:1px solid rgba(255,65,108,0.06)}
   .progress{height:10px;background:#0b0b0b;border-radius:10px;overflow:hidden;margin-top:8px}
-  .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#e50914);width:0%}
+  .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#e50914);width:0%;transition:width 0.6s ease-in-out}
   .events{max-height:320px;overflow:auto;padding:8px;display:flex;flex-direction:column;gap:8px}
-  .event{display:flex;justify-content:space-between;gap:8px;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02)}
+  .event{display:flex;justify-content:space-between;gap:8px;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02);transition:0.3s}
+  .event:hover{background:rgba(255,65,108,0.08);}
   .locked{display:flex;align-items:center;justify-content:center;padding:40px;border-radius:12px;background:linear-gradient(180deg,rgba(255,65,108,0.04),transparent);border:1px dashed rgba(255,65,108,0.06)}
-  .btn{background:linear-gradient(135deg,var(--accent),#e50914);padding:8px 12px;border-radius:8px;border:none;color:#fff;cursor:pointer}
-  @media(min-width:900px){ .header h1{font-size:1.6rem} }
+  .btn{background:linear-gradient(135deg,var(--accent),#e50914);padding:8px 12px;border-radius:8px;border:none;color:#fff;cursor:pointer;transition:transform 0.3s}
+  .btn:hover{transform:scale(1.05)}
+  .nt{color:#ff4141;font-weight:700}
+  @media(min-width:900px){ .header h1{font-size:1.7rem} }
 </style>
 </head>
 <body>
 <div class="container" id="app">
   <div class="header">
-    <h1>Achievements & Rewards</h1>
-    <div>
-      <button class="btn" id="goStore">Go to Store</button>
-    </div>
+    <h1><i class="fa-solid fa-medal" style="color:#ff4141"></i> Achievements & Rewards</h1>
+    <div><button class="btn" id="goStore"><i class="fa-solid fa-store"></i> Store</button></div>
   </div>
 
   <div id="lockedNotice" style="display:none" class="locked">
     <div>
       <div style="font-weight:700;font-size:1.1rem">Login to unlock achievements</div>
-      <div class="muted" style="margin-top:6px">This page is personal — sign in to see your stats & points.</div>
+      <div class="muted" style="margin-top:6px">Sign in to view your personal stats and Notora rewards.</div>
     </div>
   </div>
 
@@ -50,26 +58,26 @@
         <div class="big-num" id="totalReads">0</div>
         <div class="muted">This month / week / today</div>
         <div style="display:flex;gap:6px;margin-top:8px">
-          <div class="card" style="padding:8px;background:rgba(255,255,255,0.02);min-width:80px">
+          <div class="card" style="padding:8px;background:rgba(255,255,255,0.03);min-width:80px">
             <div class="muted">Month</div><div id="monthReads" class="big-num" style="font-size:1.2rem">0</div>
           </div>
-          <div class="card" style="padding:8px;background:rgba(255,255,255,0.02);min-width:80px">
+          <div class="card" style="padding:8px;background:rgba(255,255,255,0.03);min-width:80px">
             <div class="muted">Week</div><div id="weekReads" class="big-num" style="font-size:1.2rem">0</div>
           </div>
-          <div class="card" style="padding:8px;background:rgba(255,255,255,0.02);min-width:80px">
+          <div class="card" style="padding:8px;background:rgba(255,255,255,0.03);min-width:80px">
             <div class="muted">Today</div><div id="todayReads" class="big-num" style="font-size:1.2rem">0</div>
           </div>
         </div>
       </div>
 
       <div class="card">
-        <div class="muted">Points</div>
-        <div class="big-num" id="points">0</div>
-        <div class="muted" style="margin-top:8px">Breakdown: read=+1, share=+2, donate=+5</div>
+        <div class="muted">Your Balance</div>
+        <div class="big-num"><i class="fa-solid fa-coins" style="color:#ff4141"></i> <span id="points">0</span><span class="nt"> NT</span></div>
+        <div class="muted" style="margin-top:8px">Earn: +1NT (read) • +2NT (share) • +5NT (donate)</div>
       </div>
 
       <div class="card">
-        <div class="muted">Level</div>
+        <div class="muted">Level Progress</div>
         <div class="level-badge">
           <div style="font-size:1.3rem;font-weight:700" id="levelLabel">Lv 0</div>
           <div class="muted" id="levelDesc">Newbie</div>
@@ -80,20 +88,20 @@
       <div class="card">
         <div class="muted">Last Active</div>
         <div id="lastActive" class="muted">—</div>
-        <div style="margin-top:12px"><button class="btn" id="refreshBtn">Refresh</button></div>
+        <div style="margin-top:12px"><button class="btn" id="refreshBtn"><i class="fa-solid fa-rotate-right"></i> Refresh</button></div>
       </div>
     </div>
 
     <div style="display:flex;gap:12px;flex-wrap:wrap">
       <div style="flex:1;min-width:320px" class="card">
-        <div class="muted">Recent Activity</div>
+        <div class="muted"><i class="fa-solid fa-clock-rotate-left"></i> Recent Activity</div>
         <div class="events" id="events"></div>
       </div>
 
       <div style="width:320px" class="card">
-        <div class="muted">Store (Preview)</div>
-        <div style="margin-top:10px">You can exchange points for items here. (Implementation: separate store endpoints)</div>
-        <div style="margin-top:12px"><button class="btn" id="openStore">Open Store</button></div>
+        <div class="muted"><i class="fa-solid fa-gift"></i> Store (Preview)</div>
+        <div style="margin-top:10px">Exchange your NT points for Notora rewards and perks.</div>
+        <div style="margin-top:12px"><button class="btn" id="openStore"><i class="fa-solid fa-bag-shopping"></i> Open Store</button></div>
       </div>
     </div>
   </div>
@@ -107,7 +115,6 @@ const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
 const lockedNotice = document.getElementById("lockedNotice");
 const content = document.getElementById("content");
 
-// 🔐 If not logged in, show lock screen
 if (!user || !token) {
   lockedNotice.style.display = "block";
   content.style.display = "none";
@@ -115,17 +122,12 @@ if (!user || !token) {
   fetchAchievements();
 }
 
-// 🔄 Buttons
 document.getElementById("refreshBtn")?.addEventListener("click", fetchAchievements);
 document.getElementById("goStore")?.addEventListener("click", () => window.location.href = "/store.html");
 document.getElementById("openStore")?.addEventListener("click", () => window.location.href = "/store.html");
 
-// ======================================================
-// 🔹 Fetch Achievements
-// ======================================================
 async function fetchAchievements() {
   try {
-    console.log("Fetching achievements for user:", user?._id);
     const res = await fetch(`${API}/${user._id}/achievements`, {
       method: "GET",
       headers: {
@@ -134,21 +136,9 @@ async function fetchAchievements() {
       },
     });
 
-    if (!res.ok) {
-      console.warn("Achievements response not OK:", res.status);
-      if (res.status === 401 || res.status === 403) {
-        alert("Session expired. Please log in again.");
-        localStorage.removeItem("notoraUser");
-        localStorage.removeItem("notoraToken");
-        window.location.href = "profile.html";
-        return;
-      }
-      throw new Error("Failed to fetch achievements");
-    }
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
     const data = await res.json();
-    console.log("✅ Achievements data:", data);
-
     populate(data);
     content.style.display = "block";
     lockedNotice.style.display = "none";
@@ -156,13 +146,9 @@ async function fetchAchievements() {
     console.error("❌ Fetch Achievements Error:", err);
     content.style.display = "none";
     lockedNotice.style.display = "block";
-    alert("Unable to load achievements. Try logging in again.");
   }
 }
 
-// ======================================================
-// 🎯 Populate Achievements Data into UI
-// ======================================================
 function populate(d) {
   document.getElementById("totalReads").textContent = d.totalReads || 0;
   document.getElementById("monthReads").textContent = d.monthReads || 0;
@@ -174,46 +160,35 @@ function populate(d) {
   document.getElementById("levelLabel").textContent = `Lv ${level}`;
   document.getElementById("levelDesc").textContent = getLevelName(level);
 
-  // progress bar (simple: points % to next level)
   const pct = Math.min(100, computeProgressPct(d.totalReads || 0));
-  const progressBar = document.getElementById("levelProgress");
-  if (progressBar) {
-    progressBar.style.width = pct + "%";
-    progressBar.style.transition = "width 0.6s ease-in-out";
-  }
+  document.getElementById("levelProgress").style.width = pct + "%";
 
   document.getElementById("lastActive").textContent = d.lastActive
     ? new Date(d.lastActive).toLocaleString()
     : "Never";
 
-  // Recent Events List
   const evContainer = document.getElementById("events");
-  if (evContainer) {
-    evContainer.innerHTML = "";
-    (d.recent || []).forEach((e) => {
-      const div = document.createElement("div");
-      div.className = "event";
-      div.innerHTML = `
-        <div>
-          <div style="font-weight:600;color:#fff">${e.type.toUpperCase()}</div>
-          <div class="muted" style="font-size:0.85rem;color:#bbb">
-            ${e.bookId ? (e.bookId.name || e.bookId) : ""}
-          </div>
-        </div>
-        <div class="muted" style="color:#999">${new Date(e.createdAt).toLocaleString()}</div>
-      `;
-      evContainer.appendChild(div);
-    });
-
-    if (!d.recent || d.recent.length === 0) {
-      evContainer.innerHTML = `<p style="color:#777;text-align:center;">No recent activity yet.</p>`;
-    }
+  evContainer.innerHTML = "";
+  (d.recent || []).forEach((e) => {
+    const div = document.createElement("div");
+    div.className = "event";
+    const points =
+      e.type === "read" ? "+1NT" :
+      e.type === "share" ? "+2NT" :
+      e.type === "donate" ? "+5NT" : "+0NT";
+    div.innerHTML = `
+      <div>
+        <div style="font-weight:600;color:#fff">${e.type.toUpperCase()} <span style="color:#ff4141">(${points})</span></div>
+        <div class="muted" style="font-size:0.85rem">${e.bookId ? (e.bookId.name || e.bookId) : ""}</div>
+      </div>
+      <div class="muted">${new Date(e.createdAt).toLocaleString()}</div>`;
+    evContainer.appendChild(div);
+  });
+  if (!d.recent || d.recent.length === 0) {
+    evContainer.innerHTML = `<p style="color:#777;text-align:center;">No recent activity yet.</p>`;
   }
 }
 
-// ======================================================
-// 🏅 Helper: Level Name
-// ======================================================
 function getLevelName(l) {
   switch (l) {
     case 0: return "Newbie";
@@ -228,11 +203,7 @@ function getLevelName(l) {
   }
 }
 
-// ======================================================
-// 📈 Helper: Level Progress Percent
-// ======================================================
 function computeProgressPct(totalReads) {
-  // thresholds for level transitions
   const thresholds = [0, 5, 15, 50, 80, 150, 300, 400, 500];
   let curIdx = thresholds.findIndex((t) => totalReads < t) - 1;
   if (curIdx < 0) curIdx = thresholds.length - 2;
@@ -242,6 +213,6 @@ function computeProgressPct(totalReads) {
   return Math.max(5, Math.round(pct));
 }
 </script>
-
 </body>
 </html>
+
