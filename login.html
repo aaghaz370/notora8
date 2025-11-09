@@ -273,6 +273,14 @@ authBtn.onclick = async () => {
   }
 };
 
+    // Save login safely (both cookie + localStorage)
+localStorage.setItem("notoraUser", JSON.stringify(user));
+localStorage.setItem("notoraToken", token);
+
+// 👇 Cookie backup (for browsers that clear partitioned storage)
+document.cookie = `notoraUser=${encodeURIComponent(JSON.stringify(user))}; path=/; max-age=${60 * 60 * 24 * 7}; secure; samesite=lax`;
+document.cookie = `notoraToken=${token}; path=/; max-age=${60 * 60 * 24 * 7}; secure; samesite=lax`;
+
 /* ==========================================================
    4️⃣  Logout Functionality
 ========================================================== */
