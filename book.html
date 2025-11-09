@@ -242,36 +242,81 @@ document.getElementById("bookPdf").src = book.pdfUrl;
 
 /* --------------- achievements integration ---------------- */
 // call backend to record read/share/donate events safely
-async function recordEvent(type, bookId=null) {
-  try {
-    if (!user || !token) return;
-    // const res = await fetch(`${EVENTS_API}/${user._id}/event`, {
-    //   method: "POST",
-    //   headers: { "Content-Type":"application/json", "Authorization":`Bearer ${token}` },
-    //   body: JSON.stringify({ type, bookId })
-    // });
-    const res = await fetch(`${EVENTS_API}/${user._id}/event`, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    "Authorization": `Bearer ${token}`
-  },
-  body: JSON.stringify({ type, bookId: bookId || null })
-});
+// async function recordEvent(type, bookId=null) {
+//   try {
+//     if (!user || !token) return;
+   
+//     const res = await fetch(`${EVENTS_API}/${user._id}/event`, {
+//   method: "POST",
+//   headers: {
+//     "Content-Type": "application/json",
+//     "Authorization": `Bearer ${token}`
+//   },
+//   body: JSON.stringify({ type, bookId: bookId || null })
+// });
 
-    if (!res.ok) {
-      const msg = await res.text();
-      console.warn("Event failed:", msg);
+//     if (!res.ok) {
+//       const msg = await res.text();
+//       console.warn("Event failed:", msg);
+//       return;
+//     }
+//     const data = await res.json();
+//     console.log("✅ Event recorded:", data);
+//     if (data.points != null)
+//       document.getElementById("userPoints").textContent = data.points;
+//     alert(`✅ ${type.toUpperCase()} recorded! You now have ${data.points} NT`);
+
+//   } catch (e) { console.error("recordEvent error:", e); }
+// }
+  // ✅ Secure event recorder — prevents multiple points for same book/day
+async function recordEvent(type, bookId = null) {
+  try {
+    if (!user || !token) return console.warn("Not logged in");
+
+    // Anti-spam lock: prevent multiple local triggers in same session
+    const key = `event_${type}_${bookId}`;
+    const last = localStorage.getItem(key);
+    if (last && Date.now() - Number(last) < 1000 * 60 * 60 * 12) {
+      console.log("Event skipped (already recorded recently)");
+      return; // skip if done in last 12 hours
+    }
+
+    const res = await fetch(`${EVENTS_API}/${user._id}/event`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({ type, bookId })
+    });
+
+    if (res.status === 409) {
+      console.log("Event already counted by server");
       return;
     }
+
+    if (!res.ok) {
+      const txt = await res.text();
+      console.warn("Event failed:", txt);
+      return;
+    }
+
     const data = await res.json();
     console.log("✅ Event recorded:", data);
-    if (data.points != null)
-      document.getElementById("userPoints").textContent = data.points;
-    alert(`✅ ${type.toUpperCase()} recorded! You now have ${data.points} NT`);
 
-  } catch (e) { console.error("recordEvent error:", e); }
+    // Save timestamp locally to avoid duplicate calls
+    localStorage.setItem(key, Date.now().toString());
+
+    // Update points UI (if present)
+    if (data.points != null) {
+      const el = document.getElementById("userPoints");
+      if (el) el.textContent = data.points;
+    }
+  } catch (e) {
+    console.error("recordEvent error:", e);
+  }
 }
+
 
 // record read after 60s automatically
 setTimeout(() => {
