@@ -668,13 +668,51 @@ async function deleteComment(id, isReply, parentId) {
   }
 }
 // 🔖 Bookmark Button
-document.getElementById("bookmarkBtn").onclick = async () => {
-  const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
-  const token = localStorage.getItem("notoraToken");
-  const key = user ? "userBookmarks" : "guestBookmarks";
+// document.getElementById("bookmarkBtn").onclick = async () => {
+//   const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
+//   const token = localStorage.getItem("notoraToken");
+//   const key = user ? "userBookmarks" : "guestBookmarks";
+
+//   try {
+//     if (user && token) {
+//       const res = await fetch(`${BACKEND_BASE}/api/bookmarks`, {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//           Authorization: `Bearer ${token}`,
+//         },
+//         body: JSON.stringify({ bookId: book._id }),
+//       });
+//       if (res.ok) alert("✅ Book added to your bookmarks!");
+//       else alert("⚠️ Failed to save bookmark. Try logging in again.");
+//     } else {
+//       const local = JSON.parse(localStorage.getItem(key) || "[]");
+//       if (local.some(b => b._id === book._id)) return alert("Already bookmarked!");
+//       local.unshift(book);
+//       localStorage.setItem(key, JSON.stringify(local));
+//       alert("Bookmarked locally!");
+//     }
+//   } catch (err) {
+//     console.error("Bookmark error:", err);
+//     alert("❌ Error saving bookmark.");
+//   }
+// };
+// 🔖 Bookmark Button (Fixed - No duplicates + smooth feedback)
+const bookmarkBtn = document.getElementById("bookmarkBtn");
+
+bookmarkBtn.addEventListener("click", async () => {
+  if (!book || !book._id) return alert("Book not found!");
+
+  bookmarkBtn.disabled = true; // prevent spam click
+  bookmarkBtn.innerHTML = "⏳ Adding...";
 
   try {
+    const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
+    const token = localStorage.getItem("notoraToken");
+    const key = user ? "userBookmarks" : "guestBookmarks";
+
     if (user && token) {
+      // ✅ Backend bookmark
       const res = await fetch(`${BACKEND_BASE}/api/bookmarks`, {
         method: "POST",
         headers: {
@@ -683,20 +721,34 @@ document.getElementById("bookmarkBtn").onclick = async () => {
         },
         body: JSON.stringify({ bookId: book._id }),
       });
-      if (res.ok) alert("✅ Book added to your bookmarks!");
-      else alert("⚠️ Failed to save bookmark. Try logging in again.");
+
+      const data = await res.json();
+      if (res.status === 409 || data.message?.includes("already")) {
+        alert("⚠️ Already in your bookmarks!");
+      } else if (res.ok) {
+        alert("✅ Book added to your bookmarks!");
+      } else {
+        alert("⚠️ Failed to save bookmark. Try logging in again.");
+      }
     } else {
+      // ✅ Guest mode localStorage
       const local = JSON.parse(localStorage.getItem(key) || "[]");
-      if (local.some(b => b._id === book._id)) return alert("Already bookmarked!");
-      local.unshift(book);
-      localStorage.setItem(key, JSON.stringify(local));
-      alert("Bookmarked locally!");
+      if (local.some(b => b._id === book._id)) {
+        alert("⚠️ Already bookmarked!");
+      } else {
+        local.unshift(book);
+        localStorage.setItem(key, JSON.stringify(local));
+        alert("✅ Bookmarked locally!");
+      }
     }
   } catch (err) {
     console.error("Bookmark error:", err);
     alert("❌ Error saving bookmark.");
+  } finally {
+    bookmarkBtn.disabled = false;
+    bookmarkBtn.innerHTML = `<i class="fa-solid fa-bookmark"></i> Add to Bookmarks`;
   }
-};
+});
 
 
 
