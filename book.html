@@ -238,6 +238,26 @@ document.getElementById("bookGenre").textContent = book.genre;
 document.getElementById("bookRating").textContent = "⭐ " + (book.rating || "N/A");
 document.getElementById("bookPdf").src = book.pdfUrl;
 
+
+  /* Keep continue-reading list */
+function updateContinueReading(b) {
+  try {
+    let list = JSON.parse(localStorage.getItem("continueReading") || "[]");
+    list = list.filter(x => x._id !== b._id);
+    list.unshift(b);
+    if (list.length > 10) list.pop();
+    localStorage.setItem("continueReading", JSON.stringify(list));
+  } catch (e) { console.error(e); }
+}
+updateContinueReading(book);
+
+/* ---------------------------
+   Helpers: safe fetch + JSON
+   --------------------------- */
+async function safeJson(res) {
+  const txt = await res.text();
+  try { return JSON.parse(txt); } catch { return txt; }
+}
 /* --------------- achievements integration (anti-cheat safe) ---------------- */
 let readRecorded = false;  // ✅ Prevents multiple +1NT in one session
 let readTimer = null;
