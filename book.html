@@ -427,7 +427,10 @@ function renderComment(c, container, level) {
   const isOwn = user && c.name === user.name;
   card.innerHTML = `
     <div class="comment-meta">
-      <span class="comment-name">${c.name}</span>
+      <span class="comment-name">
+  ${c.name} ${c.isAdmin ? '<span class="admin-badge">✔️</span>' : ''}
+</span>
+
       <div>
         ${isOwn ? `<button class="reply-btn" onclick="toggleMenu(event, '${c._id}', false)"><i class='fa-solid fa-ellipsis'></i></button>` : ""}
         <button class="reply-btn" onclick="openReplyBox('${c._id}', ${level})">Reply</button>
@@ -680,5 +683,8 @@ document.getElementById("shareBtn").addEventListener("click", async () => {
     alert("⚠️ Unable to share this book right now.");
   }
 });
+
+  if (c.isAdmin) card.classList.add("admin");
+
 
 </script>
