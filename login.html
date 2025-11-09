@@ -172,61 +172,10 @@
   </div>
 
   <!-- SCRIPT -->
- <script>
+  <script>
 const API_BASE = "https://notoraadminbackend-1.onrender.com/api/users";
 const BOOKMARK_API = "https://notoraadminbackend-1.onrender.com/api/bookmarks";
 
-/* ==========================================================
-   🔹 1️⃣ Safe Restore Login (runs immediately)
-========================================================== */
-(async function restoreLoginSafely() {
-  try {
-    let user = localStorage.getItem("notoraUser");
-    let token = localStorage.getItem("notoraToken");
-
-    // Try restoring from cookie
-    if (!user || !token) {
-      const cookies = document.cookie.split("; ").reduce((a, c) => {
-        const [k, v] = c.split("=");
-        a[k] = decodeURIComponent(v || "");
-        return a;
-      }, {});
-      if (cookies.notoraUser && cookies.notoraToken) {
-        localStorage.setItem("notoraUser", cookies.notoraUser);
-        localStorage.setItem("notoraToken", cookies.notoraToken);
-        console.log("✅ Restored from cookie backup");
-        return;
-      }
-    }
-
-    // Try IndexedDB (cross-domain safe)
-    if ((!user || !token) && "indexedDB" in window) {
-      const db = await new Promise((res, rej) => {
-        const open = indexedDB.open("NotoraDB", 1);
-        open.onupgradeneeded = () => open.result.createObjectStore("session");
-        open.onsuccess = () => res(open.result);
-        open.onerror = rej;
-      });
-
-      const tx = db.transaction("session", "readonly");
-      const store = tx.objectStore("session");
-      const [getUser, getToken] = [store.get("notoraUser"), store.get("notoraToken")];
-
-      await new Promise(r => (getUser.onsuccess = getToken.onsuccess = r));
-
-      if (getUser.result && getToken.result) {
-        localStorage.setItem("notoraUser", getUser.result);
-        localStorage.setItem("notoraToken", getToken.result);
-        console.log("✅ Restored from IndexedDB backup");
-      }
-    }
-  } catch (err) {
-    console.warn("restoreLoginSafely error:", err);
-  }
-})();
-</script>
-
-<script>
 const authBox = document.getElementById("authBox");
 const profileSection = document.getElementById("profileSection");
 const nameInput = document.getElementById("name");
@@ -245,7 +194,7 @@ const bookmarkCount = document.getElementById("bookmarkCount");
 let mode = "login";
 
 /* ==========================================================
-   🔹 2️⃣  Auto Check Login
+   1️⃣  Check Login Status Immediately (Stay Logged In)
 ========================================================== */
 document.addEventListener("DOMContentLoaded", async () => {
   const user = safeParse(localStorage.getItem("notoraUser"));
@@ -270,19 +219,27 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 /* ==========================================================
-   🔹 3️⃣ Login/Register Toggle
+   2️⃣  Login/Register Toggle
 ========================================================== */
 toggleMode.onclick = () => {
-  mode = mode === "login" ? "register" : "login";
-  nameInput.style.display = mode === "register" ? "block" : "none";
-  formTitle.textContent = mode === "login" ? "Login to Notora" : "Create Your Notora Account";
-  authBtn.textContent = mode === "login" ? "Login" : "Register";
-  toggleMode.textContent = mode === "login" ? "New here? Register" : "Already have an account? Login";
+  if (mode === "login") {
+    mode = "register";
+    nameInput.style.display = "block";
+    formTitle.textContent = "Create Your Notora Account";
+    authBtn.textContent = "Register";
+    toggleMode.textContent = "Already have an account? Login";
+  } else {
+    mode = "login";
+    nameInput.style.display = "none";
+    formTitle.textContent = "Login to Notora";
+    authBtn.textContent = "Login";
+    toggleMode.textContent = "New here? Register";
+  }
   message.textContent = "";
 };
 
 /* ==========================================================
-   🔹 4️⃣ Login/Register
+   3️⃣  Login/Register Functionality
 ========================================================== */
 authBtn.onclick = async () => {
   const email = emailInput.value.trim();
@@ -303,67 +260,39 @@ authBtn.onclick = async () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email, password }),
     });
+
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || "Failed");
 
-    const user = data.user;
-    const token = data.token;
+    localStorage.setItem("notoraUser", JSON.stringify(data.user));
+    localStorage.setItem("notoraToken", data.token);
 
-    // ✅ Save persistent session after successful login
-    persistLogin(user, token);
-    showProfile(user);
+    showProfile(data.user);
   } catch (err) {
     message.textContent = err.message;
   }
 };
 
 /* ==========================================================
-   🔹 5️⃣ Save Persistent Session (Fixed Timing)
-========================================================== */
-function persistLogin(user, token) {
-  localStorage.setItem("notoraUser", JSON.stringify(user));
-  localStorage.setItem("notoraToken", token);
-
-  // Cookie backup
-  document.cookie = `notoraUser=${encodeURIComponent(JSON.stringify(user))}; path=/; max-age=${60 * 60 * 24 * 7}; secure; samesite=lax`;
-  document.cookie = `notoraToken=${token}; path=/; max-age=${60 * 60 * 24 * 7}; secure; samesite=lax`;
-
-  // IndexedDB backup
-  if ("indexedDB" in window) {
-    const open = indexedDB.open("NotoraDB", 1);
-    open.onupgradeneeded = () => open.result.createObjectStore("session");
-    open.onsuccess = () => {
-      const db = open.result;
-      const tx = db.transaction("session", "readwrite");
-      const store = tx.objectStore("session");
-      store.put(JSON.stringify(user), "notoraUser");
-      store.put(token, "notoraToken");
-    };
-  }
-}
-
-/* ==========================================================
-   🔹 6️⃣ Logout
+   4️⃣  Logout Functionality
 ========================================================== */
 logoutBtn.onclick = () => {
   localStorage.removeItem("notoraUser");
   localStorage.removeItem("notoraToken");
-  document.cookie = "notoraUser=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-  document.cookie = "notoraToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-  if ("indexedDB" in window) indexedDB.deleteDatabase("NotoraDB");
   showLogin();
 };
 
 /* ==========================================================
-   🔹 7️⃣ Theme
+   5️⃣  Theme Toggle
 ========================================================== */
 themeToggle.onclick = () => {
   document.body.classList.toggle("light-mode");
-  localStorage.setItem("notoraTheme", document.body.classList.contains("light-mode") ? "light" : "dark");
+  const theme = document.body.classList.contains("light-mode") ? "light" : "dark";
+  localStorage.setItem("notoraTheme", theme);
 };
 
 /* ==========================================================
-   🔹 8️⃣ Show Profile
+   6️⃣  Show Profile + Correct Bookmark Count
 ========================================================== */
 async function showProfile(user) {
   authBox.style.display = "none";
@@ -371,24 +300,33 @@ async function showProfile(user) {
   profileName.textContent = user.name || "Unknown";
   profileEmail.textContent = user.email || "Not provided";
 
+  // 🧠 Fetch accurate bookmark count
   try {
     const token = localStorage.getItem("notoraToken");
     let count = 0;
+
     if (token) {
-      const res = await fetch(BOOKMARK_API, { headers: { Authorization: `Bearer ${token}` } });
-      if (res.ok) count = (await res.json()).length || 0;
+      const res = await fetch(BOOKMARK_API, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const bookmarks = await res.json();
+        count = bookmarks.length || 0;
+      }
     } else {
       const guestBookmarks = safeParse(localStorage.getItem("guestBookmarks")) || [];
       count = guestBookmarks.length;
     }
+
     bookmarkCount.textContent = `Bookmarks: ${count}`;
-  } catch {
+  } catch (err) {
+    console.error("Bookmark count error:", err);
     bookmarkCount.textContent = "Bookmarks: --";
   }
 }
 
 /* ==========================================================
-   🔹 9️⃣ Show Login
+   7️⃣  Show Login Form
 ========================================================== */
 function showLogin() {
   authBox.style.display = "block";
@@ -396,14 +334,12 @@ function showLogin() {
 }
 
 /* ==========================================================
-   🔹 Utility
+   🔹 Utility: Safe JSON Parse
 ========================================================== */
 function safeParse(val) {
   try { return JSON.parse(val); } catch { return null; }
 }
 </script>
 
-
 </body>
 </html>
-
