@@ -268,17 +268,24 @@ document.getElementById("bookPdf").src = book.pdfUrl;
 
 //   } catch (e) { console.error("recordEvent error:", e); }
 // }
-  // ✅ Secure event recorder — prevents multiple points for same book/day
+  
+/* --------------- achievements integration (safe + persistent) ---------------- */
 async function recordEvent(type, bookId = null) {
   try {
-    if (!user || !token) return console.warn("Not logged in");
+    // ✅ Re-read from storage each time (fixes "login lost" issue)
+    const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
+    const token = localStorage.getItem("notoraToken");
+    if (!user || !token) {
+      console.warn("User not logged in, skipping event record");
+      return;
+    }
 
-    // Anti-spam lock: prevent multiple local triggers in same session
-    const key = `event_${type}_${bookId}`;
+    // ✅ Prevent duplicates within 12 hours (locally)
+    const key = `event_${type}_${bookId || "none"}_${user._id}`;
     const last = localStorage.getItem(key);
     if (last && Date.now() - Number(last) < 1000 * 60 * 60 * 12) {
-      console.log("Event skipped (already recorded recently)");
-      return; // skip if done in last 12 hours
+      console.log("⏸️ Event skipped: recently recorded");
+      return;
     }
 
     const res = await fetch(`${EVENTS_API}/${user._id}/event`, {
@@ -287,35 +294,70 @@ async function recordEvent(type, bookId = null) {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
       },
-      body: JSON.stringify({ type, bookId })
+      body: JSON.stringify({ type, bookId: bookId || null })
     });
 
     if (res.status === 409) {
-      console.log("Event already counted by server");
+      console.log("🚫 Event already recorded recently (server-side)");
       return;
     }
 
     if (!res.ok) {
-      const txt = await res.text();
-      console.warn("Event failed:", txt);
+      const msg = await res.text();
+      console.warn("⚠️ Event failed:", msg);
       return;
     }
 
     const data = await res.json();
-    console.log("✅ Event recorded:", data);
+    console.log("✅ Event recorded successfully:", data);
 
-    // Save timestamp locally to avoid duplicate calls
+    // ✅ Save local timestamp (for safety)
     localStorage.setItem(key, Date.now().toString());
 
-    // Update points UI (if present)
+    // ✅ Update Points (if visible)
     if (data.points != null) {
       const el = document.getElementById("userPoints");
       if (el) el.textContent = data.points;
     }
-  } catch (e) {
-    console.error("recordEvent error:", e);
+
+  } catch (err) {
+    console.error("❌ recordEvent error:", err);
   }
 }
+
+/* --------------- secure SHARE button integration ---------------- */
+document.getElementById("shareBtn").addEventListener("click", async () => {
+  try {
+    const book = JSON.parse(localStorage.getItem("selectedBook") || "null");
+    if (!book || !book._id) return alert("Book not found to share.");
+
+    const shareUrl = `https://notora8.netlify.app/book.html?book=${book._id}`;
+    const shareText = `📖 ${book.name} by ${book.author}\nGenre: ${book.genre}\n⭐ Rating: ${book.rating || "N/A"}\n\nRead it on Notora: ${shareUrl}`;
+
+    // ✅ Modern browsers (Web Share API)
+    if (navigator.share) {
+      await navigator.share({
+        title: book.name,
+        text: shareText,
+        url: shareUrl,
+      });
+      console.log("Shared successfully (native)");
+      await recordEvent("share", book._id);
+      alert("✅ Thanks for sharing! +2NT added!");
+    } 
+    // 💻 Fallback (copy to clipboard)
+    else {
+      await navigator.clipboard.writeText(shareUrl);
+      console.log("Copied link to clipboard");
+      await recordEvent("share", book._id);
+      alert("🔗 Link copied! +2NT added!");
+    }
+
+  } catch (err) {
+    console.error("❌ Share error:", err);
+    alert("⚠️ Unable to share this book right now.");
+  }
+});
 
 
 // record read after 60s automatically
