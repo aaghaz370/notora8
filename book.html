@@ -378,15 +378,19 @@ shareBtn.addEventListener("click", async () => {
 fetch(`${BOOKS_API}/${book._id}/view`, { method:"POST" }).catch(()=>{});
 
 
-  // ✅ Fetch updated view count
+// ✅ Fetch updated view count (safe for both array or object response)
 fetch(`${BOOKS_API}/${book._id}`)
   .then(res => res.json())
   .then(data => {
-    if (data && data.views != null) {
-      document.getElementById("bookViews").textContent = data.views;
+    const bookData = Array.isArray(data) ? data[0] : (data.book || data);
+    if (bookData && bookData.views != null) {
+      document.getElementById("bookViews").textContent = bookData.views;
+    } else {
+      document.getElementById("bookViews").textContent = "N/A";
     }
   })
   .catch(err => console.error("View count fetch error:", err));
+
 
 
 /* --------------- fetch user points --------------- */
