@@ -198,6 +198,7 @@
     <p><strong>Author:</strong> <span id="bookAuthor"></span></p>
     <p><strong>Genre:</strong> <span id="bookGenre"></span></p>
     <p id="bookRating"></p>
+    <p><strong>Views:</strong> <span id="bookViews">0</span></p>
     <p style="margin-top:8px; font-weight:600; color:#ff416c;">Your Points: <span id="userPoints">0</span> NT</p>
   </section>
   
@@ -375,6 +376,18 @@ shareBtn.addEventListener("click", async () => {
 
 /* --------------- view increment ---------------- */
 fetch(`${BOOKS_API}/${book._id}/view`, { method:"POST" }).catch(()=>{});
+
+
+  // ✅ Fetch updated view count
+fetch(`${BOOKS_API}/${book._id}`)
+  .then(res => res.json())
+  .then(data => {
+    if (data && data.views != null) {
+      document.getElementById("bookViews").textContent = data.views;
+    }
+  })
+  .catch(err => console.error("View count fetch error:", err));
+
 
 /* --------------- fetch user points --------------- */
 async function refreshPoints() {
