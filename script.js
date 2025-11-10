@@ -158,21 +158,28 @@ const overlaySearchInput = document.getElementById("overlaySearchInput");
 const searchResults = document.getElementById("searchResults");
 
 let searchTimeout = null;
+let allBooks = [];
 
-// Loader
+// ✅ Gradient Circle Loader
 const loader = document.createElement("div");
 loader.className = "loader";
-loader.innerHTML = `<div class="spinner spinner-dots"><div></div><div></div><div></div></div>`;
+loader.innerHTML = `
+  <div class="spinner-box">
+    <div class="leo-border-1"><div class="leo-core-1"></div></div>
+    <div class="leo-border-2"><div class="leo-core-2"></div></div>
+  </div>
+`;
 searchResults.parentElement.appendChild(loader);
 loader.style.display = "none";
 
-// Open search overlay
+
+// 🟢 Open search overlay
 openSearch.addEventListener("click", () => {
   document.getElementById("mainContent").style.display = "none";
   searchOverlay.classList.remove("hidden");
 });
 
-// Close overlay
+// 🔴 Close overlay
 closeOverlay.addEventListener("click", () => {
   searchOverlay.classList.add("hidden");
   document.getElementById("mainContent").style.display = "block";
@@ -181,7 +188,7 @@ closeOverlay.addEventListener("click", () => {
   loader.style.display = "none";
 });
 
-// Debounced search
+// ⌛ Debounced search
 overlaySearchInput.addEventListener("input", (e) => {
   clearTimeout(searchTimeout);
   const query = e.target.value.toLowerCase().trim();
@@ -198,6 +205,8 @@ overlaySearchInput.addEventListener("input", (e) => {
   searchTimeout = setTimeout(() => performSearch(query), 250);
 });
 
+
+// 🔍 Perform local search
 function performSearch(query) {
   if (!allBooks.length) return;
 
@@ -235,8 +244,30 @@ function performSearch(query) {
   });
 }
 
+
+// 📘 Fetch all books initially (with loader)
+function loadAllBooks() {
+  const BOOKS_API = "https://notoraadminbackend-1.onrender.com/api/books"; // ✅ your backend URL
+
+  loader.style.display = "flex"; // show loader before fetch
+
+  fetch(BOOKS_API)
+    .then(res => res.json())
+    .then(data => {
+      allBooks = data;
+      loader.style.display = "none"; // hide loader after load
+      console.log(`✅ Loaded ${data.length} books`);
+    })
+    .catch(err => {
+      loader.style.display = "none";
+      console.error("Error loading books:", err);
+    });
+}
+
 // ✅ Run on load
 loadAllBooks();
+
+
 
 
 const profileIcon = document.getElementById("profileIcon");
@@ -446,6 +477,7 @@ if (top10Slider) {
     }
   });
 }
+
 
 
 
