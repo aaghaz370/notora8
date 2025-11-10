@@ -166,6 +166,7 @@ let searchTimeout = null;
 // searchResults.parentElement.appendChild(loader);
 // loader.style.display = "none";
 // Loader
+// Loader
 const loader = document.createElement("div");
 loader.className = "loader";
 loader.innerHTML = `
@@ -174,8 +175,72 @@ loader.innerHTML = `
     <div class="leo-border-2"><div class="leo-core-2"></div></div>
   </div>
 `;
+
+// ✅ Inject loader-specific CSS into <head> (isolated)
+const loaderStyle = document.createElement("style");
+loaderStyle.textContent = `
+.loader {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100px;
+  margin-top: 20px;
+}
+.spinner-box {
+  width: 120px;
+  height: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+  position: relative;
+}
+.leo-border-1, .leo-border-2 {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  padding: 3px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+}
+.leo-border-1 {
+  background: linear-gradient(0deg, rgba(63,249,220,0.1) 33%, rgba(63,249,220,1) 100%);
+  animation: spin3D1 1.8s linear infinite;
+}
+.leo-core-1 {
+  width: 100%;
+  height: 100%;
+  background-color: #222a2faa;
+  border-radius: 50%;
+}
+.leo-border-2 {
+  background: linear-gradient(0deg, rgba(251,91,83,0.1) 33%, rgba(251,91,83,1) 100%);
+  animation: spin3D2 2.2s linear infinite;
+}
+.leo-core-2 {
+  width: 100%;
+  height: 100%;
+  background-color: #1d2630aa;
+  border-radius: 50%;
+}
+@keyframes spin3D1 {
+  0% { transform: rotate3d(0, 0, 0, 0deg); }
+  100% { transform: rotate3d(1, 1, 1, 360deg); }
+}
+@keyframes spin3D2 {
+  0% { transform: rotate3d(1, 1, 0, 0deg); }
+  100% { transform: rotate3d(1, 1, 0, 360deg); }
+}
+`;
+document.head.appendChild(loaderStyle);
+
+// ✅ Add loader to DOM
 searchResults.parentElement.appendChild(loader);
 loader.style.display = "none";
+
 
 // Open search overlay
 openSearch.addEventListener("click", () => {
@@ -457,6 +522,7 @@ if (top10Slider) {
     }
   });
 }
+
 
 
 
