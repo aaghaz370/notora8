@@ -160,11 +160,22 @@ const searchResults = document.getElementById("searchResults");
 let searchTimeout = null;
 
 // Loader
+// const loader = document.createElement("div");
+// loader.className = "loader";
+// loader.innerHTML = `<div class="spinner spinner-dots"><div></div><div></div><div></div></div>`;
+// searchResults.parentElement.appendChild(loader);
+// loader.style.display = "none";
 const loader = document.createElement("div");
 loader.className = "loader";
-loader.innerHTML = `<div class="spinner spinner-dots"><div></div><div></div><div></div></div>`;
+loader.innerHTML = `
+  <div class="spinner-box">
+    <div class="leo-border-1"><div class="leo-core-1"></div></div>
+    <div class="leo-border-2"><div class="leo-core-2"></div></div>
+  </div>
+`;
 searchResults.parentElement.appendChild(loader);
 loader.style.display = "none";
+
 
 // Open search overlay
 openSearch.addEventListener("click", () => {
@@ -446,6 +457,7 @@ if (top10Slider) {
     }
   });
 }
+
 
 
 
