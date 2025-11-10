@@ -176,7 +176,7 @@ loader.innerHTML = `
   </div>
 `;
 
-// ✅ Inject loader-specific CSS into <head> (isolated)
+// ✅ Inject loader-specific CSS into <head> (Notora Red-Black Theme)
 const loaderStyle = document.createElement("style");
 loaderStyle.textContent = `
 .loader {
@@ -184,8 +184,8 @@ loaderStyle.textContent = `
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100px;
-  margin-top: 20px;
+  min-height: 120px;
+  margin-top: 30px;
 }
 .spinner-box {
   width: 120px;
@@ -196,6 +196,8 @@ loaderStyle.textContent = `
   background-color: transparent;
   position: relative;
 }
+
+/* === RINGS === */
 .leo-border-1, .leo-border-2 {
   position: absolute;
   width: 80px;
@@ -205,34 +207,55 @@ loaderStyle.textContent = `
   justify-content: center;
   align-items: center;
   border-radius: 50%;
+  box-shadow: 0 0 25px rgba(229, 9, 20, 0.25);
 }
+
+/* 🔴 Outer ring – Red gradient glow */
 .leo-border-1 {
-  background: linear-gradient(0deg, rgba(63,249,220,0.1) 33%, rgba(63,249,220,1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(229, 9, 20, 0.15) 20%,
+    rgba(229, 9, 20, 0.9) 100%
+  );
   animation: spin3D1 1.8s linear infinite;
 }
+
+/* 🔴 Inner core (dark red center) */
 .leo-core-1 {
   width: 100%;
   height: 100%;
-  background-color: #222a2faa;
+  background-color: rgba(20, 20, 20, 0.9);
   border-radius: 50%;
+  box-shadow: inset 0 0 10px rgba(229, 9, 20, 0.6);
 }
+
+/* ⚫ Inner ring – subtle grey metallic spin */
 .leo-border-2 {
-  background: linear-gradient(0deg, rgba(251,91,83,0.1) 33%, rgba(251,91,83,1) 100%);
-  animation: spin3D2 2.2s linear infinite;
+  background: linear-gradient(
+    135deg,
+    rgba(40, 40, 40, 0.3) 20%,
+    rgba(255, 255, 255, 0.15) 100%
+  );
+  animation: spin3D2 2.3s linear infinite reverse;
+  box-shadow: 0 0 25px rgba(255, 0, 0, 0.2);
 }
+
+/* ⚫ Inner grey core */
 .leo-core-2 {
   width: 100%;
   height: 100%;
-  background-color: #1d2630aa;
+  background-color: rgba(15, 15, 15, 0.95);
   border-radius: 50%;
 }
+
+/* === Animations === */
 @keyframes spin3D1 {
-  0% { transform: rotate3d(0, 0, 0, 0deg); }
-  100% { transform: rotate3d(1, 1, 1, 360deg); }
+  0% { transform: rotate3d(1, 0, 0, 0deg); }
+  100% { transform: rotate3d(1, 0, 0, 360deg); }
 }
 @keyframes spin3D2 {
-  0% { transform: rotate3d(1, 1, 0, 0deg); }
-  100% { transform: rotate3d(1, 1, 0, 360deg); }
+  0% { transform: rotate3d(0, 1, 1, 0deg); }
+  100% { transform: rotate3d(0, 1, 1, 360deg); }
 }
 `;
 document.head.appendChild(loaderStyle);
@@ -522,6 +545,7 @@ if (top10Slider) {
     }
   });
 }
+
 
 
 
