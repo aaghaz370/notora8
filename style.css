@@ -1231,7 +1231,7 @@ footer small {
 
 } */
 
-
+}
 #continue-section {
   transform: translateY(10px);
   transition: all 0.5s ease;
@@ -1398,6 +1398,7 @@ footer small {
 }
 .arrow-left { left: -10px; }
 .arrow-right { right: -10px; }
+
 
 
 
