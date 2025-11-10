@@ -185,7 +185,8 @@ function populate(d) {
 
     div.innerHTML = `
       <div>
-        <div style="font-weight:600;color:#fff">${e.type.toUpperCase()} <span style="color:#ff4141">(${points})</span></div>
+         <div style="font-weight:600;color:#fff">${e.type === "admin_bonus" ? "DONATE" : e.type.toUpperCase()} <span style="color:#ff4141">(${points})</span></div>
+
         <div class="muted" style="font-size:0.85rem">${e.bookId ? (e.bookId.name || e.bookId) : ""}</div>
       </div>
       <div class="muted">${new Date(e.createdAt).toLocaleString()}</div>`;
