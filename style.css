@@ -1137,7 +1137,7 @@ footer small {
 } */ 
 
 /* === GRADIENT CIRCLE PLANES LOADER === */
-.loader {
+/* .loader {
   position: relative;
   display: flex;
   justify-content: center;
@@ -1229,7 +1229,7 @@ footer small {
 
 
 
-}
+} */
 
 
 #continue-section {
@@ -1398,6 +1398,7 @@ footer small {
 }
 .arrow-left { left: -10px; }
 .arrow-right { right: -10px; }
+
 
 
 
