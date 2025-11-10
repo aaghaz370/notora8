@@ -1050,7 +1050,7 @@ footer small {
   backdrop-filter: blur(4px);
 } * */
 
-/* .show-all-btn {
+.show-all-btn {
   display: block;
   margin: 20px auto 40px;
   padding: 10px 25px;
@@ -1067,7 +1067,7 @@ footer small {
 .show-all-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(0, 200, 255, 0.3);
-} */
+} 
  /* .loader {
   display: flex;
   justify-content: center;
@@ -1231,7 +1231,7 @@ footer small {
 
 } */
 
-}
+
 #continue-section {
   transform: translateY(10px);
   transition: all 0.5s ease;
@@ -1398,6 +1398,7 @@ footer small {
 }
 .arrow-left { left: -10px; }
 .arrow-right { right: -10px; }
+
 
 
 
