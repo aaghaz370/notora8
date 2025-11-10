@@ -385,10 +385,10 @@ fetch(`${BOOKS_API}/top10`)
     if (!Array.isArray(list)) return;
     const found = list.find(b => b._id === book._id);
     if (found && found.views != null) {
-      document.getElementById("bookViews").textContent = found.views;
-    } else {
-      document.getElementById("bookViews").textContent = "N/A";
-    }
+   else {
+  document.getElementById("bookViews").textContent = book.views || 0;
+}
+
   })
   .catch(err => console.error("View count fetch error:", err));
 
