@@ -1091,7 +1091,7 @@ footer small {
 } */
  /* === Loader 2: Bouncing Dots === */
 /* Loader container */
-.loader {
+/* .loader {
   position: relative;
   display: flex;
   justify-content: center;
@@ -1101,7 +1101,7 @@ footer small {
 }
 
 /* Spinner fix */
-.spinner.spinner-dots {
+/* .spinner.spinner-dots {
   position: relative;
   display: flex;
   justify-content: center;
@@ -1134,8 +1134,67 @@ footer small {
   40% {
     transform: translateY(-10px);
   }
+} */ 
+
+/* === GRADIENT CIRCLE PLANES LOADER === */
+.loader {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100px;
+  margin-top: 20px;
 }
 
+.spinner-box {
+  width: 120px;
+  height: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+  position: relative;
+}
+
+.leo-border-1, .leo-border-2 {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  padding: 3px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+}
+
+.leo-border-1 {
+  background: linear-gradient(0deg, rgba(63,249,220,0.1) 33%, rgba(63,249,220,1) 100%);
+  animation: spin3D 1.8s linear infinite;
+}
+
+.leo-core-1 {
+  width: 100%;
+  height: 100%;
+  background-color: #222a2faa;
+  border-radius: 50%;
+}
+
+.leo-border-2 {
+  background: linear-gradient(0deg, rgba(251,91,83,0.1) 33%, rgba(251,91,83,1) 100%);
+  animation: spin3D 2.2s linear infinite;
+}
+
+.leo-core-2 {
+  width: 100%;
+  height: 100%;
+  background-color: #1d2630aa;
+  border-radius: 50%;
+}
+
+@keyframes spin3D {
+  from { transform: rotate3d(.5, .5, .5, 360deg); }
+  to { transform: rotate3d(0deg); }
+}
 
 
 .show-all-card {
@@ -1339,6 +1398,7 @@ footer small {
 }
 .arrow-left { left: -10px; }
 .arrow-right { right: -10px; }
+
 
 
 
