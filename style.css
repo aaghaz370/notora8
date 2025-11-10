@@ -278,7 +278,7 @@
 
       .book-card {
   position: relative;
-  width: 180px;
+  width: 150px;
   height: 300px;
   flex: 0 0 auto;
   background: #1f1f1f;
@@ -1322,6 +1322,7 @@ footer small {
 }
 .arrow-left { left: -10px; }
 .arrow-right { right: -10px; }
+
 
 
 
