@@ -378,18 +378,20 @@ shareBtn.addEventListener("click", async () => {
 fetch(`${BOOKS_API}/${book._id}/view`, { method:"POST" }).catch(()=>{});
 
 
-// ✅ Fetch updated view count (safe for both array or object response)
-fetch(`${BOOKS_API}/${book._id}`)
+// ✅ Safely fetch view count using top10 list (no backend change)
+fetch(`${BOOKS_API}/top10`)
   .then(res => res.json())
-  .then(data => {
-    const bookData = Array.isArray(data) ? data[0] : (data.book || data);
-    if (bookData && bookData.views != null) {
-      document.getElementById("bookViews").textContent = bookData.views;
+  .then(list => {
+    if (!Array.isArray(list)) return;
+    const found = list.find(b => b._id === book._id);
+    if (found && found.views != null) {
+      document.getElementById("bookViews").textContent = found.views;
     } else {
       document.getElementById("bookViews").textContent = "N/A";
     }
   })
   .catch(err => console.error("View count fetch error:", err));
+
 
 
 
