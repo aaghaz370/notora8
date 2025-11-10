@@ -172,10 +172,17 @@ function populate(d) {
   (d.recent || []).forEach((e) => {
     const div = document.createElement("div");
     div.className = "event";
+    // const points =
+    //   e.type === "read" ? "+1NT" :
+    //   e.type === "share" ? "+2NT" :
+    //   e.type === "donate" ? "+5NT" : "+0NT";
     const points =
-      e.type === "read" ? "+1NT" :
-      e.type === "share" ? "+2NT" :
-      e.type === "donate" ? "+5NT" : "+0NT";
+  e.type === "read" ? "+1NT" :
+  e.type === "share" ? "+2NT" :
+  e.type === "donate" ? "+5NT" :
+  e.type === "admin_bonus" ? `+${e.points || 0}NT` :
+  "+0NT";
+
     div.innerHTML = `
       <div>
         <div style="font-weight:600;color:#fff">${e.type.toUpperCase()} <span style="color:#ff4141">(${points})</span></div>
