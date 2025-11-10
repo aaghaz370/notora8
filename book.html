@@ -379,16 +379,32 @@ fetch(`${BOOKS_API}/${book._id}/view`, { method:"POST" }).catch(()=>{});
 
 
 // ✅ Safely fetch view count using top10 list (no backend change)
+// fetch(`${BOOKS_API}/top10`)
+//   .then(res => res.json())
+//   .then(list => {
+//     if (!Array.isArray(list)) return;
+//     const found = list.find(b => b._id === book._id);
+//     if (found && found.views != null) {
+//    else {
+//   document.getElementById("bookViews").textContent = book.views || 0;
+// }
+
+//   })
+//   .catch(err => console.error("View count fetch error:", err));
+// ✅ Safely fetch view count (works for both top10 & normal books)
 fetch(`${BOOKS_API}/top10`)
   .then(res => res.json())
   .then(list => {
     if (!Array.isArray(list)) return;
+
     const found = list.find(b => b._id === book._id);
     if (found && found.views != null) {
-   else {
-  document.getElementById("bookViews").textContent = book.views || 0;
-}
-
+      // ✅ Book found in top10 → show its actual views
+      document.getElementById("bookViews").textContent = found.views;
+    } else {
+      // ✅ Not in top10 → fallback to book.views or 0
+      document.getElementById("bookViews").textContent = book.views || 0;
+    }
   })
   .catch(err => console.error("View count fetch error:", err));
 
