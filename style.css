@@ -1050,7 +1050,7 @@ footer small {
   backdrop-filter: blur(4px);
 } * */
 
-.show-all-btn {
+/* .show-all-btn {
   display: block;
   margin: 20px auto 40px;
   padding: 10px 25px;
@@ -1067,7 +1067,7 @@ footer small {
 .show-all-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(0, 200, 255, 0.3);
-} 
+}  */
  /* .loader {
   display: flex;
   justify-content: center;
@@ -1400,6 +1400,27 @@ footer small {
 .arrow-right { right: -10px; }
 
 
+
+.show-all-btn {
+  display: block;
+  margin: 20px auto 40px;
+  padding: 10px 25px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #e50914, #ff3c3c);
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+  box-shadow: 0 0 10px rgba(229, 9, 20, 0.25);
+}
+
+.show-all-btn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #ff1a1a, #e50914);
+  box-shadow: 0 0 20px rgba(229, 9, 20, 0.5);
+}
 
 
 
