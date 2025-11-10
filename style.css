@@ -406,7 +406,7 @@
   transform: rotate(90deg);
 }
 
-#searchResults {
+/* #searchResults {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 1.3rem;
@@ -414,6 +414,23 @@
   margin-right: 5px;
   padding-bottom: 2rem;
   animation: fadeIn 0.4s ease-in;
+} */
+#searchResults {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* 💪 better column balance */
+  gap: 1.5rem; /* equal space between cards */
+  padding: 1.5rem clamp(1rem, 5vw, 3rem); /* left-right equal responsive padding */
+  justify-items: center; /* ✅ centers all cards horizontally */
+  align-items: start;
+  animation: fadeIn 0.4s ease-in;
+}
+
+      @media (max-width: 768px) {
+  #searchResults {
+    grid-template-columns: repeat(2, 1fr); /* exactly 2 cards per row */
+    gap: 1rem;
+    padding: 1rem 1rem; /* equal left-right margin */
+  }
 }
 
 
@@ -1322,6 +1339,7 @@ footer small {
 }
 .arrow-left { left: -10px; }
 .arrow-right { right: -10px; }
+
 
 
 
