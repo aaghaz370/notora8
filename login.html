@@ -1,418 +1,312 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Profile | Notora</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Notora — Login</title>
   <link rel="icon" href="images/logo.png" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://kit.fontawesome.com/1c020da525.js" crossorigin="anonymous"></script>
 
   <style>
-    body {
-      font-family: "Poppins", sans-serif;
-      margin: 0;
-      padding: 0;
-      background: radial-gradient(circle at top, #111 0%, #000 100%);
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      overflow: hidden;
-      transition: background 0.4s ease;
+    :root{
+      --bg:#070707;
+      --card:#121212;
+      --muted:#bdbdbd;
+      --accent:#e50914;
+      --accent-2:#ff3c3c;
+      --glass: rgba(255,255,255,0.03);
+      --radius:16px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{
+      font-family:"Poppins",sans-serif;
+      background: radial-gradient(ellipse at 10% 10%, rgba(229,9,20,0.06), transparent 10%), 
+                  radial-gradient(ellipse at 90% 90%, rgba(255,60,60,0.03), transparent 10%), 
+                  linear-gradient(180deg,#080808,#0b0b0b 30%);
+      color:#fff;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:28px;
     }
 
-    header {
-      position: absolute;
-      top: 20px;
-      left: 20px;
+    .wrap{
+      width:100%;
+      max-width:980px;
+      display:grid;
+      grid-template-columns: 1fr 420px;
+      gap:28px;
+      align-items:center;
     }
 
-    .back-arrow {
-      font-size: 1.8rem;
-      color: #fff;
-      cursor: pointer;
-      transition: transform 0.3s;
+    /* left hero */
+    .left {
+      padding:48px;
+      border-radius:var(--radius);
+      background: linear-gradient(180deg, rgba(255,0,0,0.02), transparent 30%);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+      position:relative;
+      overflow:hidden;
+    }
+    .logo-row{display:flex;align-items:center;gap:14px;margin-bottom:26px}
+    .logo-row img{height:44px; width:44px; object-fit:contain; filter: drop-shadow(0 2px 6px rgba(229,9,20,0.25))}
+    .brand { font-weight:800; font-size:1.8rem; color:var(--accent);}
+    .hero-title{ font-size:2.4rem; font-weight:800; letter-spacing: -0.02em; margin-bottom:12px; color:#fff; text-shadow:0 6px 24px rgba(229,9,20,0.08)}
+    .hero-sub{color:var(--muted); margin-bottom:26px; max-width:60%}
+
+    .features{
+      display:flex; gap:14px; flex-wrap:wrap;
+    }
+    .feature{
+      background:var(--glass);
+      border-radius:12px;
+      padding:14px 16px;
+      min-width:150px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+      display:flex; gap:10px; align-items:center;
+    }
+    .feature i{color:var(--accent); font-size:1.2rem}
+    .feature small{color:var(--muted); font-weight:600}
+
+    /* right card */
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:var(--radius);
+      padding:26px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+      width:100%;
+      max-width:420px;
+    }
+    .mode-toggle{
+      display:flex; gap:10px; justify-content:center; margin-bottom:18px;
+    }
+    .switch {
+      display:inline-flex; gap:8px; align-items:center; background:transparent; border-radius:999px; padding:6px; border:1px solid rgba(255,255,255,0.03);
+    }
+    .switch button{
+      background:transparent; color:var(--muted); border:none; padding:8px 12px; border-radius:12px; cursor:pointer; font-weight:700;
+    }
+    .switch .active{
+      background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:white; box-shadow: 0 6px 18px rgba(229,9,20,0.2);
     }
 
-    .back-arrow:hover {
-      transform: translateX(-5px);
-      color: #ff4141;
+    .form-row{display:flex; flex-direction:column; gap:12px;}
+    .input{
+      background: rgba(255,255,255,0.02);
+      border:1px solid rgba(255,255,255,0.03);
+      padding:12px 14px;
+      color:#fff;
+      border-radius:10px;
+      outline:none;
+      transition: box-shadow .18s, transform .12s;
+    }
+    .input:focus{ box-shadow: 0 8px 28px rgba(229,9,20,0.12); transform:translateY(-2px) }
+    .cta{
+      background: linear-gradient(90deg,var(--accent),var(--accent-2));
+      border:none;
+      padding:12px 14px;
+      border-radius:10px;
+      color:white;
+      font-weight:700;
+      cursor:pointer;
+      margin-top:6px;
+      box-shadow: 0 10px 26px rgba(229,9,20,0.16);
+    }
+    .muted{ color:var(--muted); font-size:0.92rem; margin-top:8px; text-align:center}
+    .row-between{ display:flex; justify-content:space-between; align-items:center; gap:12px}
+
+    .link{
+      color:var(--accent);
+      text-decoration:none;
+      font-weight:700;
+      cursor:pointer;
     }
 
-    .auth-container, #profileSection {
-      width: 350px;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 15px;
-      padding: 2rem;
-      text-align: center;
-      box-shadow: 0 0 20px rgba(255, 65, 108, 0.3);
-      backdrop-filter: blur(10px);
-      transition: all 0.3s ease;
+    .small-note{font-size:.9rem;color:var(--muted); margin-top:10px}
+
+    .socials{display:flex; gap:12px; margin-top:14px; justify-content:center;}
+    .socials a{width:44px;height:44px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.02); color:var(--muted); text-decoration:none}
+    .err{color:#ff8b8b; margin-top:8px; text-align:center}
+
+    footer{ margin-top:16px; text-align:center; color:var(--muted); font-size:0.85rem}
+
+    /* responsive */
+    @media (max-width:920px){
+      .wrap{ grid-template-columns: 1fr; }
+      .hero-sub{ max-width:100%}
     }
 
-    h2 {
-      color: #ff4141;
-      font-weight: 700;
-      margin-bottom: 1.5rem;
-    }
-
-    input {
-      width: 100%;
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
-      margin-bottom: 10px;
-      font-size: 0.95rem;
-      outline: none;
-      transition: 0.3s;
-    }
-
-    input:focus {
-      box-shadow: 0 0 10px #ff4141;
-    }
-
-    button {
-      width: 100%;
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      background: linear-gradient(135deg, #ff4141, #e50914);
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.3s;
-    }
-
-    button:hover {
-      transform: scale(1.03);
-    }
-
-    .user-detail {
-      font-size: 1rem;
-      margin: 10px 0;
-    }
-
-    .user-detail i {
-      margin-right: 10px;
-      color: #ff4141;
-    }
-
-    .message {
-      margin-top: 10px;
-      font-size: 0.85rem;
-      color: #ff5252;
-      min-height: 18px;
-    }
-
-    .extras {
-      margin-top: 25px;
-      font-size: 0.9rem;
-      color: #bbb;
-    }
-
-    .theme-toggle {
-      background: none;
-      border: 1px solid rgba(255,255,255,0.2);
-      color: #fff;
-      border-radius: 8px;
-      padding: 8px 12px;
-      margin-top: 15px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      transition: 0.3s;
-    }
-
-    .theme-toggle:hover {
-      background: rgba(255,255,255,0.1);
-    }
-
-    .light-mode {
-      background: radial-gradient(circle at top, #eee 0%, #ddd 100%);
-      color: #111;
-    }
   </style>
 </head>
-
 <body>
-  <header>
-    <i class="fa-solid fa-arrow-left back-arrow" onclick="window.history.back()"></i>
-  </header>
 
-  <!-- AUTH BOX (LOGIN/REGISTER) -->
-  <div class="auth-container fade" id="authBox">
-    <h2 id="formTitle">Login to Notora</h2>
+  <div class="wrap">
+    <div class="left">
+      <div class="logo-row">
+        <img src="images/logo.png" alt="Notora logo" />
+        <div class="brand">Notora</div>
+      </div>
 
-    <input type="email" id="email" placeholder="Email" required />
-    <input type="password" id="password" placeholder="Password" required />
-    <input type="text" id="name" placeholder="Full Name" style="display:none;" />
+      <h1 class="hero-title">Unlock a world of free books</h1>
+      <p class="hero-sub">Search, read and download — community-driven library with curated lists, top picks and personalized recommendations.</p>
 
-    <button id="authBtn">Login</button>
-    <div class="message" id="message"></div>
+      <div class="features">
+        <div class="feature"><i class="fa-solid fa-magnifying-glass"></i><small>Smart search</small></div>
+        <div class="feature"><i class="fa-solid fa-star"></i><small>Top curated</small></div>
+        <div class="feature"><i class="fa-solid fa-user-friends"></i><small>Community uploads</small></div>
+        <div class="feature"><i class="fa-solid fa-shield-halved"></i><small>Secure accounts</small></div>
+      </div>
 
-    <div class="toggle">
-      <span id="toggleMode" style="color:#ff4141;cursor:pointer;">New here? Register</span>
+      <div style="height:16px"></div>
+      <div class="small-note">By logging in you agree to Notora's Terms & Privacy. Your password is hashed securely on our backend.</div>
+
     </div>
+
+    <!-- Card: Login/Register -->
+    <div class="card" id="authCard">
+      <div class="mode-toggle">
+        <div class="switch" role="tablist">
+          <button id="btnLogin" class="active">Login</button>
+          <button id="btnRegister">Register</button>
+        </div>
+      </div>
+
+      <div id="formContainer">
+        <!-- LOGIN / REGISTER FORMS -->
+        <div id="loginForm" style="display:block">
+          <div class="form-row">
+            <input id="email" class="input" type="email" placeholder="Email address" />
+            <input id="password" class="input" type="password" placeholder="Password" />
+            <div class="row-between">
+              <label style="font-size:.9rem;color:var(--muted)"><input id="remember" type="checkbox" /> Remember</label>
+              <a id="forgotLink" class="link">Forgot password?</a>
+            </div>
+            <button id="loginBtn" class="cta">Login</button>
+            <div id="loginErr" class="err"></div>
+            <div class="muted">Don't have an account? <span id="gotoRegister" class="link">Register</span></div>
+          </div>
+        </div>
+
+        <div id="registerForm" style="display:none">
+          <div class="form-row">
+            <input id="regName" class="input" type="text" placeholder="Enter username (3-10 chars)" />
+            <input id="regEmail" class="input" type="email" placeholder="Email address" />
+            <input id="regPass" class="input" type="password" placeholder="Create password (min 6)" />
+            <button id="registerBtn" class="cta">Create account</button>
+            <div id="regErr" class="err"></div>
+            <div class="muted">Already registered? <span id="gotoLogin" class="link">Login</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="socials">
+        <a href="#" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+        <a href="#" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" title="Telegram"><i class="fa-brands fa-telegram"></i></a>
+      </div>
+
+      <footer>© Notora — Free learning library</footer>
+    </div>
+
   </div>
 
-  <!-- PROFILE SECTION -->
-  <div id="profileSection" style="display:none;">
-    <h2>Your Profile</h2>
-    <div class="user-detail"><i class="fa-solid fa-user"></i> <span id="profileName">Loading...</span></div>
-    <div class="user-detail"><i class="fa-solid fa-envelope"></i> <span id="profileEmail"></span></div>
-    <div class="extras">
-      <p id="bookmarkCount">Bookmarks: --</p>
-    </div>
-    <button id="logoutBtn">Logout</button>
-    <button class="theme-toggle" id="themeToggle"><i class="fa-solid fa-sun"></i> Toggle Theme</button>
-  </div>
-
-  <!-- SCRIPT -->
- 
 <script>
-const API_BASE = "https://notoraadminbackend-1.onrender.com/api/users";
-const BOOKMARK_API = "https://notoraadminbackend-1.onrender.com/api/bookmarks";
+  // ======== CONFIG ========
+  const API_BASE = "https://notoraadminbackend-1.onrender.com/api/users"; // change if needed
 
-const authBox = document.getElementById("authBox");
-const profileSection = document.getElementById("profileSection");
-const nameInput = document.getElementById("name");
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
-const message = document.getElementById("message");
-const authBtn = document.getElementById("authBtn");
-const toggleMode = document.getElementById("toggleMode");
-const formTitle = document.getElementById("formTitle");
-const profileName = document.getElementById("profileName");
-const profileEmail = document.getElementById("profileEmail");
-const logoutBtn = document.getElementById("logoutBtn");
-const themeToggle = document.getElementById("themeToggle");
-const bookmarkCount = document.getElementById("bookmarkCount");
+  // ======== UI ========
+  const btnLogin = document.getElementById('btnLogin');
+  const btnRegister = document.getElementById('btnRegister');
+  const loginForm = document.getElementById('loginForm');
+  const registerForm = document.getElementById('registerForm');
+  const gotoRegister = document.getElementById('gotoRegister');
+  const gotoLogin = document.getElementById('gotoLogin');
+  const forgotLink = document.getElementById('forgotLink');
 
-let mode = "login";
+  btnLogin.onclick = () => { showLogin(); }
+  btnRegister.onclick = () => { showRegister(); }
+  gotoRegister.onclick = () => showRegister();
+  gotoLogin.onclick = () => showLogin();
+  forgotLink.onclick = () => { window.location.href = 'forgot-password.html'; }
 
-/* ==========================================================
-   0️⃣  Auto Restore Session (from cookies or IndexedDB)
-========================================================== */
-(async function restoreSession() {
-  try {
-    let user = localStorage.getItem("notoraUser");
-    let token = localStorage.getItem("notoraToken");
+  function showLogin(){
+    btnLogin.classList.add('active');
+    btnRegister.classList.remove('active');
+    loginForm.style.display='block';
+    registerForm.style.display='none';
+  }
+  function showRegister(){
+    btnRegister.classList.add('active');
+    btnLogin.classList.remove('active');
+    registerForm.style.display='block';
+    loginForm.style.display='none';
+  }
 
-    // 🧠 Try cookies first
-    if (!user || !token) {
-      const cookies = Object.fromEntries(document.cookie.split("; ").map(c => c.split("=")));
-      if (cookies.notoraUser && cookies.notoraToken) {
-        localStorage.setItem("notoraUser", decodeURIComponent(cookies.notoraUser));
-        localStorage.setItem("notoraToken", cookies.notoraToken);
-        user = localStorage.getItem("notoraUser");
-        token = localStorage.getItem("notoraToken");
-      }
-    }
-
-    // 🧠 Try IndexedDB as backup
-    if ((!user || !token) && "indexedDB" in window) {
-      const db = await new Promise((res, rej) => {
-        const open = indexedDB.open("NotoraDB", 1);
-        open.onupgradeneeded = () => open.result.createObjectStore("session");
-        open.onsuccess = () => res(open.result);
-        open.onerror = rej;
+  // ======== AUTH LOGIC (safe, non-invasive) ========
+  // login
+  document.getElementById('loginBtn').addEventListener('click', async () => {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const errNode = document.getElementById('loginErr');
+    errNode.textContent='';
+    if(!email || !password){ errNode.textContent='Please fill both fields.'; return; }
+    try{
+      const res = await fetch(`${API_BASE}/login`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ email, password })
       });
-      const tx = db.transaction("session", "readonly");
-      const store = tx.objectStore("session");
-      const getUser = store.get("notoraUser");
-      const getToken = store.get("notoraToken");
-      await new Promise(r => (getUser.onsuccess = getToken.onsuccess = r));
-      if (getUser.result && getToken.result) {
-        localStorage.setItem("notoraUser", getUser.result);
-        localStorage.setItem("notoraToken", getToken.result);
-      }
+      const data = await res.json();
+      if(!res.ok) throw new Error(data.message || 'Login failed');
+      localStorage.setItem('notoraUser', JSON.stringify(data.user));
+      localStorage.setItem('notoraToken', data.token);
+      // redirect to profile or main
+      window.location.href = 'profile.html';
+    }catch(e){
+      console.error(e);
+      errNode.textContent = e.message || 'Login error';
     }
-  } catch (err) {
-    console.warn("Restore session failed:", err);
-  }
-})();
+  });
 
-/* ==========================================================
-   1️⃣  Check Login Status Immediately (Stay Logged In)
-========================================================== */
-document.addEventListener("DOMContentLoaded", async () => {
-  const user = safeParse(localStorage.getItem("notoraUser"));
-  const token = localStorage.getItem("notoraToken");
-  const theme = localStorage.getItem("notoraTheme");
-
-  if (theme === "light") document.body.classList.add("light-mode");
-
-  if (!user || !token) return showLogin();
-
-  try {
-    const res = await fetch(`${API_BASE}/profile`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!res.ok) throw new Error("Invalid token");
-    const data = await res.json();
-    showProfile(data);
-  } catch {
-    localStorage.clear();
-    showLogin();
-  }
-});
-
-/* ==========================================================
-   2️⃣  Login/Register Toggle
-========================================================== */
-toggleMode.onclick = () => {
-  if (mode === "login") {
-    mode = "register";
-    nameInput.style.display = "block";
-    formTitle.textContent = "Create Your Notora Account";
-    authBtn.textContent = "Register";
-    toggleMode.textContent = "Already have an account? Login";
-  } else {
-    mode = "login";
-    nameInput.style.display = "none";
-    formTitle.textContent = "Login to Notora";
-    authBtn.textContent = "Login";
-    toggleMode.textContent = "New here? Register";
-  }
-  message.textContent = "";
-};
-
-/* ==========================================================
-   3️⃣  Login/Register Functionality (with permanent save)
-========================================================== */
-authBtn.onclick = async () => {
-  const email = emailInput.value.trim();
-  const password = passwordInput.value.trim();
-  const name = nameInput.value.trim();
-
-  if (!email || !password || (mode === "register" && !name)) {
-    message.textContent = "Please fill all fields.";
-    return;
-  }
-
-  message.textContent = "Processing...";
-  const endpoint = mode === "login" ? `${API_BASE}/login` : `${API_BASE}/register`;
-
-  try {
-    const res = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
-    });
-
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed");
-
-    const user = data.user;
-    const token = data.token;
-
-    // ✅ Save permanently
-    persistLogin(user, token);
-
-    showProfile(user);
-  } catch (err) {
-    message.textContent = err.message;
-  }
-};
-
-/* ==========================================================
-   💾 Persist Login Forever (until manual logout)
-========================================================== */
-function persistLogin(user, token) {
-  // LocalStorage
-  localStorage.setItem("notoraUser", JSON.stringify(user));
-  localStorage.setItem("notoraToken", token);
-
-  // Cookie backup (7 days)
-  document.cookie = `notoraUser=${encodeURIComponent(JSON.stringify(user))}; path=/; max-age=${60 * 60 * 24 * 7}`;
-  document.cookie = `notoraToken=${token}; path=/; max-age=${60 * 60 * 24 * 7}`;
-
-  // IndexedDB backup
-  if ("indexedDB" in window) {
-    const open = indexedDB.open("NotoraDB", 1);
-    open.onupgradeneeded = () => open.result.createObjectStore("session");
-    open.onsuccess = () => {
-      const db = open.result;
-      const tx = db.transaction("session", "readwrite");
-      const store = tx.objectStore("session");
-      store.put(JSON.stringify(user), "notoraUser");
-      store.put(token, "notoraToken");
-    };
-  }
-}
-
-/* ==========================================================
-   4️⃣  Logout Functionality
-========================================================== */
-logoutBtn.onclick = () => {
-  localStorage.removeItem("notoraUser");
-  localStorage.removeItem("notoraToken");
-  document.cookie = "notoraUser=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-  document.cookie = "notoraToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-  if ("indexedDB" in window) indexedDB.deleteDatabase("NotoraDB");
-  showLogin();
-};
-
-/* ==========================================================
-   5️⃣  Theme Toggle
-========================================================== */
-themeToggle.onclick = () => {
-  document.body.classList.toggle("light-mode");
-  const theme = document.body.classList.contains("light-mode") ? "light" : "dark";
-  localStorage.setItem("notoraTheme", theme);
-};
-
-/* ==========================================================
-   6️⃣  Show Profile + Correct Bookmark Count
-========================================================== */
-async function showProfile(user) {
-  authBox.style.display = "none";
-  profileSection.style.display = "block";
-  profileName.textContent = user.name || "Unknown";
-  profileEmail.textContent = user.email || "Not provided";
-
-  try {
-    const token = localStorage.getItem("notoraToken");
-    let count = 0;
-    if (token) {
-      const res = await fetch(BOOKMARK_API, {
-        headers: { Authorization: `Bearer ${token}` },
+  // register
+  document.getElementById('registerBtn').addEventListener('click', async () => {
+    const name = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPass').value.trim();
+    const errNode = document.getElementById('regErr');
+    errNode.textContent='';
+    if(!name || !email || !password){ errNode.textContent='Please fill all fields.'; return; }
+    const nameRegex = /^[A-Za-z0-9 ]{3,10}$/;
+    if(!nameRegex.test(name)){ errNode.textContent='Name must be 3–10 chars, no special symbols.'; return; }
+    try{
+      const res = await fetch(`${API_BASE}/register`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ name, email, password })
       });
-      if (res.ok) {
-        const bookmarks = await res.json();
-        count = bookmarks.length || 0;
-      }
-    } else {
-      const guestBookmarks = safeParse(localStorage.getItem("guestBookmarks")) || [];
-      count = guestBookmarks.length;
+      const data = await res.json();
+      if(!res.ok) throw new Error(data.message || 'Register failed');
+      localStorage.setItem('notoraUser', JSON.stringify(data.user));
+      localStorage.setItem('notoraToken', data.token);
+      window.location.href = 'profile.html';
+    }catch(e){
+      console.error(e);
+      errNode.textContent = e.message || 'Register error';
     }
-    bookmarkCount.textContent = `Bookmarks: ${count}`;
-  } catch (err) {
-    console.error("Bookmark count error:", err);
-    bookmarkCount.textContent = "Bookmarks: --";
-  }
-}
+  });
 
-/* ==========================================================
-   7️⃣  Show Login Form
-========================================================== */
-function showLogin() {
-  authBox.style.display = "block";
-  profileSection.style.display = "none";
-}
-
-/* ==========================================================
-   🔹 Utility: Safe JSON Parse
-========================================================== */
-function safeParse(val) {
-  try { return JSON.parse(val); } catch { return null; }
-}
+  // pre-fill when already logged in
+  (function checkLogged(){
+    const token = localStorage.getItem('notoraToken');
+    if(token) {
+      // quick attempt to open profile view
+      // but we will not call backend here to avoid extra errors
+    }
+  })();
 </script>
-
 
 </body>
 </html>
