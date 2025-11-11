@@ -647,11 +647,11 @@ slides.forEach(slide => observer.observe(slide));
 </script>
 
 <!-- Gradient Glow Divider -->
-<div class="glow-divider"></div>
+<!-- <div class="glow-divider"></div> -->
 
 
 <!-- ========== STATS SECTION ========== -->
-<section class="stats-section">
+<!-- <section class="stats-section">
   <div class="stats-overlay"></div>
   <div class="stats-container">
     <h2 class="stats-heading">Our Impact</h2>
@@ -676,12 +676,60 @@ slides.forEach(slide => observer.observe(slide));
       </div>
     </div>
   </div>
+</section> -->
+<!-- 🔥 Seamless Gradient Divider -->
+<div class="nt-impact-divider"></div>
+
+<!-- === OUR IMPACT SECTION === -->
+<section id="nt-impact-zone">
+  <div class="nt-impact-bg"></div>
+  <div class="nt-impact-container">
+    <h2 class="nt-impact-heading">Our Impact</h2>
+    <p class="nt-impact-subtext">
+      Empowering learners worldwide with <strong>free, high-quality, and inspiring resources.</strong>
+    </p>
+
+    <div class="nt-impact-stats">
+      <div class="nt-stat-card">
+        <div class="nt-stat-glow"></div>
+        <i class="fa-solid fa-book-open-reader"></i>
+        <h3 class="nt-stat-number" data-target="50000">50k+</h3>
+        <p>Free Books</p>
+      </div>
+
+      <div class="nt-stat-card">
+        <div class="nt-stat-glow"></div>
+        <i class="fa-solid fa-users"></i>
+        <h3 class="nt-stat-number" data-target="15000">15k+</h3>
+        <p>Active Readers</p>
+      </div>
+
+      <div class="nt-stat-card">
+        <div class="nt-stat-glow"></div>
+        <i class="fa-solid fa-globe"></i>
+        <h3 class="nt-stat-number" data-target="75">75+</h3>
+        <p>Countries Reached</p>
+      </div>
+
+      <div class="nt-stat-card">
+        <div class="nt-stat-glow"></div>
+        <i class="fa-solid fa-clock"></i>
+        <h3 class="nt-stat-number">24/7</h3>
+        <p>Study Support</p>
+      </div>
+    </div>
+
+    <div class="nt-impact-extra">
+      <p>💡 Every page read builds a stronger world of open education.</p>
+      <button class="nt-impact-btn">Join the Mission</button>
+    </div>
+  </div>
 </section>
 
-<script src="https://kit.fontawesome.com/a81368914c.js" crossorigin="anonymous"></script>
+<!-- <script src="https://kit.fontawesome.com/a81368914c.js" crossorigin="anonymous"></script> -->
 <!-- Glow Hover Effects -->
 <style>
-@keyframes fadeInDown {
+/* @keyframes fadeInDown {
   from { opacity: 0; transform: translateY(-20px); }
   to { opacity: 1; transform: translateY(0); }
 }
@@ -767,23 +815,202 @@ slides.forEach(slide => observer.observe(slide));
 @keyframes glowMove {
   0% { background-position: 0% 50%; }
   100% { background-position: 100% 50%; }
+} */
+
+/* === Transition Divider === */
+.nt-impact-divider {
+  height: 80px;
+  background: linear-gradient(to bottom, rgba(17,17,17,0) 0%, #0a0a0a 60%, #111 100%);
 }
 
+/* === OUR IMPACT SECTION === */
+#nt-impact-zone {
+  position: relative;
+  padding: 100px 20px 120px;
+  background: linear-gradient(180deg, #0a0a0a 0%, #111 100%);
+  color: #fff;
+  overflow: hidden;
+  text-align: center;
+}
+
+.nt-impact-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(229, 9, 20, 0.3), transparent 70%),
+              radial-gradient(circle at 0% 80%, rgba(255, 0, 100, 0.2), transparent 70%);
+  filter: blur(100px);
+  animation: ntImpactGlow 10s ease-in-out infinite alternate;
+  z-index: 0;
+}
+@keyframes ntImpactGlow {
+  0% { transform: scale(1); opacity: 0.7; }
+  100% { transform: scale(1.3); opacity: 1; }
+}
+
+.nt-impact-container {
+  position: relative;
+  z-index: 2;
+  max-width: 1100px;
+  margin: auto;
+}
+
+.nt-impact-heading {
+  font-size: 2.8rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #ff3c3c, #e50914, #ff3c3c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 25px rgba(229, 9, 20, 0.3);
+  animation: gradientMove 6s ease-in-out infinite alternate;
+}
+@keyframes gradientMove {
+  0% { background-position: 0%; }
+  100% { background-position: 200%; }
+}
+
+.nt-impact-subtext {
+  color: #aaa;
+  font-size: 1rem;
+  max-width: 650px;
+  margin: 15px auto 70px;
+  letter-spacing: 0.5px;
+}
+
+/* === Stats Grid === */
+.nt-impact-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+}
+
+.nt-stat-card {
+  position: relative;
+  width: 220px;
+  height: 160px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.4s ease;
+  overflow: hidden;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.nt-stat-card i {
+  font-size: 2.2rem;
+  color: #e50914;
+  margin-bottom: 10px;
+  transition: transform 0.4s ease, color 0.4s ease;
+}
+
+.nt-stat-number {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.nt-stat-card p {
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+/* Hover Effects */
+.nt-stat-card:hover {
+  transform: translateY(-10px) scale(1.05);
+  border-color: rgba(229, 9, 20, 0.4);
+  box-shadow: 0 0 25px rgba(229, 9, 20, 0.25);
+}
+.nt-stat-card:hover i {
+  color: #ff4040;
+  transform: scale(1.2) rotate(8deg);
+}
+
+/* Pulse Glow inside cards */
+.nt-stat-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  background: radial-gradient(circle, rgba(229,9,20,0.25), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+.nt-stat-card:hover .nt-stat-glow {
+  opacity: 1;
+  animation: pulseIn 2s ease-in-out infinite;
+}
+@keyframes pulseIn {
+  0% { opacity: 0.4; transform: scale(1); }
+  100% { opacity: 0.1; transform: scale(1.4); }
+}
+
+/* === Bottom CTA === */
+.nt-impact-extra {
+  margin-top: 80px;
+}
+
+.nt-impact-extra p {
+  color: #bbb;
+  font-size: 1rem;
+  margin-bottom: 20px;
+  letter-spacing: 0.3px;
+}
+
+.nt-impact-btn {
+  background: linear-gradient(90deg, #e50914, #ff3c3c);
+  color: #fff;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  box-shadow: 0 0 15px rgba(229, 9, 20, 0.3);
+}
+.nt-impact-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 0 25px rgba(229, 9, 20, 0.6);
+  background: linear-gradient(90deg, #ff3c3c, #e50914);
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  .nt-impact-heading { font-size: 2.2rem; }
+  .nt-stat-card { width: 170px; height: 130px; }
+  .nt-stat-number { font-size: 1.4rem; }
+}
 
 </style>
 
 <!-- Cursor Position Glow Script -->
 <script>
-document.querySelectorAll('.why-box').forEach(box => {
-  box.addEventListener('mousemove', e => {
-    const rect = box.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    box.style.setProperty('--x', `${x}px`);
-    box.style.setProperty('--y', `${y}px`);
+document.addEventListener("DOMContentLoaded", () => {
+  const counters = document.querySelectorAll(".nt-stat-number");
+  counters.forEach(counter => {
+    const target = +counter.getAttribute("data-target");
+    if (!target) return;
+    let count = 0;
+    const update = () => {
+      const speed = target / 100;
+      if (count < target) {
+        count += speed;
+        counter.innerText = Math.ceil(count) + "+";
+        requestAnimationFrame(update);
+      } else {
+        counter.innerText = target.toLocaleString() + "+";
+      }
+    };
+    update();
   });
 });
 </script>
+
 
 
 
@@ -1506,6 +1733,7 @@ document.addEventListener("DOMContentLoaded", () => {
  
 
 </script>
+
 
 
 
