@@ -1292,6 +1292,7 @@ footer small {
 } */
       #top10-section .category-title {
   margin-left: 15px;
+            margin-bottom: -15px;
 }
 
       
@@ -1447,6 +1448,7 @@ footer small {
   background: linear-gradient(135deg, #ff1a1a, #e50914);
   box-shadow: 0 0 20px rgba(229, 9, 20, 0.5);
 } */
+
 
 
 
