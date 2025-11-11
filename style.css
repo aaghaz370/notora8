@@ -49,7 +49,7 @@
   text-shadow: 0 0 10px #e50914aa;
 }
 
-.icon-btn {
+/* .icon-btn {
   background: transparent;
   border: none;
   font-size: 1.5rem;
@@ -60,7 +60,15 @@
 .icon-btn:hover {
   transform: scale(1.2);
   color: #e50914;
+} */
+      .icon-btn {
+  margin-right: 12px; /* search icon aur bars ke beech thoda space */
 }
+
+.profile-icon {
+  margin-left: 12px; /* bar icon thoda side se hatt kar aaye */
+}
+
 
 .search-box {
   display: flex;
@@ -132,7 +140,7 @@
   transform: scale(1.1);
   box-shadow: 0 0 10px rgba(229, 9, 20, 0.6);
 } */
-      .profile-icon {
+      /* .profile-icon {
   position: absolute;
   right: 25px;
   top: 20px;
@@ -153,7 +161,18 @@
 .profile-icon img:hover {
   transform: scale(1.05);
   box-shadow: 0 0 10px rgba(255,255,255,0.4);
+} */
+      .header .icon-btn,
+.header .profile-icon i {
+  vertical-align: middle;
 }
+.icon-btn:hover i,
+.profile-icon i:hover {
+  color: #ff3c3c;
+  transform: scale(1.1);
+  transition: all 0.2s ease;
+}
+
 
 /* Dropdown Menu */
 .profile-menu {
@@ -1421,6 +1440,7 @@ footer small {
   background: linear-gradient(135deg, #ff1a1a, #e50914);
   box-shadow: 0 0 20px rgba(229, 9, 20, 0.5);
 } */
+
 
 
 
