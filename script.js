@@ -89,35 +89,39 @@ function loadCategory(category) {
   // });
   // slider.appendChild(showAllCard);
   // ✅ Inject Show All Button CSS (Notora red-black theme)
+// ✅ Force-inject Show All button CSS with override priority
 const showAllBtnStyle = document.createElement("style");
 showAllBtnStyle.textContent = `
-.show-all-card {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 1rem;
-  color: #fff;
-  background: linear-gradient(135deg, #e50914, #ff3c3c);
-  border: none;
-  border-radius: 30px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 0 10px rgba(229, 9, 20, 0.25);
-  height: 220px;
-  width: 150px;
-  text-align: center;
+.book-card.show-all-card {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+  color: #fff !important;
+  background: linear-gradient(135deg, #e50914, #ff3c3c) !important;
+  border: none !important;
+  border-radius: 30px !important;
+  cursor: pointer !important;
+  transition: all 0.25s ease !important;
+  box-shadow: 0 0 10px rgba(229, 9, 20, 0.25) !important;
+  height: 230px !important;
+  width: 160px !important;
+  text-align: center !important;
+  overflow: hidden;
 }
-.show-all-card:hover {
-  transform: translateY(-3px) scale(1.03);
-  background: linear-gradient(135deg, #ff1a1a, #e50914);
-  box-shadow: 0 0 20px rgba(229, 9, 20, 0.5);
+
+.book-card.show-all-card:hover {
+  transform: translateY(-3px) scale(1.03) !important;
+  background: linear-gradient(135deg, #ff1a1a, #e50914) !important;
+  box-shadow: 0 0 20px rgba(229, 9, 20, 0.5) !important;
 }
-.show-all-card span {
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+
+.book-card.show-all-card span {
+  color: #fff !important;
+  font-size: 1.05rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.6px !important;
 }
 `;
 document.head.appendChild(showAllBtnStyle);
@@ -130,6 +134,7 @@ showAllCard.addEventListener("click", () => {
   window.location.href = `category.html?genre=${encodeURIComponent(category)}`;
 });
 slider.appendChild(showAllCard);
+
 
 
   // ✅ Desktop arrows only
@@ -588,6 +593,7 @@ if (top10Slider) {
     }
   });
 }
+
 
 
 
