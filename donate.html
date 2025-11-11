@@ -80,7 +80,46 @@
     <button id="donateBtn">Donate Book</button>
     <div class="msg" id="msg"></div>
   </div>
+ <footer id="nt-footer">
+  <div class="nt-footer-content">
+    <div class="nt-footer-left">
+      <div class="nt-footer-logo">
+        <img src="Lucid_Realism_Create_a_modern_flat_educational_logo_with_the_b_1.png" alt="Notora Logo">
+        <h2><span></span> Notora</h2>
+      </div>
+      <p class="nt-footer-desc">
+        A collaborative platform dedicated to accessible and open education.<br>
+        Empowering readers to <strong>share, learn, and grow together.</strong>
+      </p>
+    </div>
 
+    <div class="nt-footer-links">
+      <h3>Quick Links</h3>
+      <ul>
+        <li><a href="profile.html"><i class="fa-solid fa-user"></i> Profile</a></li>
+        <li><a href="bookmark.html"><i class="fa-solid fa-bookmark"></i> Bookmarks</a></li>
+        <li><a href="achievements.html"><i class="fa-solid fa-medal"></i> Rewards</a></li>
+        <li><a href="donate.html"><i class="fa-solid fa-hand-holding-heart"></i> Donate</a></li>
+        <li><a href="about.html"><i class="fa-solid fa-circle-info"></i> About</a></li>
+      </ul>
+    </div>
+
+    <div class="nt-footer-social">
+      <h3>Connect with Us</h3>
+      <div class="nt-social-icons">
+        <a href="#" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+        <a href="#" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" title="Telegram"><i class="fa-brands fa-telegram"></i></a>
+        <a href="mailto:univora8@gmail.com" title="Email"><i class="fa-solid fa-envelope"></i></a>
+      </div>
+      <p class="nt-footer-mail">📩 univora8@gmail.com</p>
+    </div>
+  </div>
+
+  <div class="nt-footer-bottom">
+    <p>© 2024 <strong>Notora</strong>. All Rights Reserved. | A part of <strong>Univora</strong></p>
+  </div>
+</footer>
   <script>
     const BACKEND = "https://notoraadminbackend-1.onrender.com/api/donations";
     const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
