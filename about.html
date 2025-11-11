@@ -162,6 +162,8 @@
   <!-- 🔥 Transition Divider (smoothly connects previous section) -->
 <!-- <div class="nt-transition-divider"></div> -->
 
+  
+<div class="electric-divider"></div>
 <!-- === DISCOVER CONNECTED SECTION === -->
 <section id="nt-discover-connected">
   <div class="nt-discover-glow"></div>
@@ -356,6 +358,19 @@
   .nt-discover-title { font-size: 2.2rem; }
   .nt-feature-card { width: 170px; height: 110px; }
 }
+
+  .electric-divider {
+  position: relative;
+  height: 4px;
+  background: linear-gradient(90deg, #ff0000, #ffffff, #ff0000);
+  box-shadow: 0 0 15px #ff0000, 0 0 30px #ff0000;
+  animation: electricMove 2s linear infinite;
+}
+
+@keyframes electricMove {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+} */
 
 /* #discover-section-unique {
   position: relative;
@@ -1734,6 +1749,7 @@ document.addEventListener("DOMContentLoaded", () => {
  
 
 </script>
+
 
 
 
