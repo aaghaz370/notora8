@@ -507,7 +507,7 @@ async function loadTop10Books() {
   const container = document.createElement("div"); // fresh container
   container.className = "top10-wrapper";
   section.innerHTML = `
-    <h2 class="category-title">🏆 TOP 10 BOOKS TODAY</h2>
+    <h2 class="category-title"> <i class='fa-solid fa-trophy' style='color: red'></i>TOP 10 TODAY</h2>
   `;
 
   try {
@@ -603,6 +603,7 @@ document.addEventListener("DOMContentLoaded", () => {
     el.textContent = el.textContent.replace(/[^\x00-\x7F]/g, "").trim();
   });
 });
+
 
 
 
