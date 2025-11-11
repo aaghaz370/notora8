@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Notora — Profile</title>
+  <link rel="icon" href="images/logo.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/1c020da525.js" crossorigin="anonymous"></script>
+
+  <style>
+    :root{--bg:#070707;--card:#111215;--accent:#e50914;--accent-2:#ff3c3c;--muted:#bdbdbd}
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,#070707,#0b0b0b);font-family:Poppins,system-ui;color:#fff;min-height:100vh}
+    .container{max-width:1100px;margin:28px auto;padding:18px}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:18px}
+    .logo{display:flex;align-items:center;gap:12px}
+    .logo img{height:44px}
+    .top-actions{display:flex;gap:12px;align-items:center}
+    .btn{background:transparent;border:1px solid rgba(255,255,255,0.04);color:#fff;padding:10px 14px;border-radius:10px;cursor:pointer}
+    .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));border:none}
+
+    .profile-grid{display:grid;grid-template-columns:320px 1fr;gap:28px;align-items:start}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:22px;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,0.6)}
+    .avatar{height:120px;width:120px;border-radius:18px;background:linear-gradient(135deg,var(--accent),#ff6b6b);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:40px;color:#fff;margin-bottom:12px}
+    .name{font-size:1.4rem;font-weight:800;color:#fff}
+    .email{color:var(--muted);margin-bottom:12px}
+    .stats{display:flex;gap:12px;margin-top:12px}
+    .stat{background:rgba(255,255,255,0.02);padding:12px;border-radius:10px;flex:1;text-align:center}
+    .stat .num{font-weight:800;font-size:1.2rem;color:var(--accent)}
+
+    .right .section{margin-bottom:18px}
+    .section h3{margin-bottom:12px;color:#fff}
+    .field{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+    input.input, textarea.input{padding:12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);color:#fff}
+    textarea.input{min-height:120px;resize:vertical}
+    .row{display:flex;gap:10px}
+    .tiny{font-size:.9rem;color:var(--muted)}
+
+    .edit-area{display:none;margin-top:12px}
+    .actions{display:flex;gap:10px;margin-top:8px}
+
+    /* responsive */
+    @media (max-width:880px){
+      .profile-grid{grid-template-columns:1fr; }
+      .avatar{height:96px;width:96px}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="topbar">
+      <div class="logo">
+        <img src="images/logo.png" alt="logo">
+        <div style="font-weight:800;color:var(--accent)">Notora</div>
+      </div>
+      <div class="top-actions">
+        <button id="backBtn" class="btn"><i class="fa-solid fa-arrow-left"></i></button>
+        <button id="logout" class="btn">Logout</button>
+      </div>
+    </div>
+
+    <div class="profile-grid">
+      <!-- left -->
+      <div class="card">
+        <div id="avatar" class="avatar">NT</div>
+        <div class="name" id="profileName">Loading...</div>
+        <div class="email" id="profileEmail">—</div>
+
+        <div style="margin-top:14px">
+          <button id="editProfileBtn" class="btn">Edit profile</button>
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="num" id="booksRead">0</div>
+            <div class="tiny">Books read</div>
+          </div>
+          <div class="stat">
+            <div class="num" id="bookmarkCount">0</div>
+            <div class="tiny">Bookmarks</div>
+          </div>
+          <div class="stat">
+            <div class="num" id="level">1</div>
+            <div class="tiny">Level</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- right -->
+      <div class="right">
+        <div class="card section">
+          <h3>Account</h3>
+          <div class="field"><label class="tiny">Username</label><div id="displayName" style="font-weight:700"></div></div>
+          <div class="field"><label class="tiny">Email</label><div id="displayEmail" class="tiny"></div></div>
+
+          <div class="edit-area" id="editArea">
+            <div class="field"><label class="tiny">Change display name</label><input id="editName" class="input" placeholder="New name (3-10 chars)"></div>
+            <div class="field"><label class="tiny">New password</label><input id="editPassword" class="input" type="password" placeholder="Leave blank to keep current"></div>
+            <div class="actions">
+              <button id="saveBtn" class="btn primary">Save changes</button>
+              <button id="cancelBtn" class="btn">Cancel</button>
+            </div>
+            <div id="saveMsg" class="tiny" style="margin-top:8px"></div>
+          </div>
+
+        </div>
+
+        <div class="card section">
+          <h3>Security</h3>
+          <div class="tiny">For account recovery we recommend setting a valid email. If you forget your password use the <a href="forgot-password.html" class="link">Forgot password</a> flow.</div>
+        </div>
+
+        <div class="card section">
+          <h3>Quick actions</h3>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button id="goHome" class="btn">Go to home</button>
+            <button id="manageBookmarks" class="btn">Manage bookmarks</button>
+            <button id="deleteAccount" class="btn" style="border-color:rgba(255,0,0,0.2)">Delete account</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+<script>
+  const API_BASE = "https://notoraadminbackend-1.onrender.com/api/users"; // change if needed
+
+  const profileName = document.getElementById('profileName');
+  const profileEmail = document.getElementById('profileEmail');
+  const displayName = document.getElementById('displayName');
+  const displayEmail = document.getElementById('displayEmail');
+  const avatar = document.getElementById('avatar');
+  const editProfileBtn = document.getElementById('editProfileBtn');
+  const editArea = document.getElementById('editArea');
+  const cancelBtn = document.getElementById('cancelBtn');
+  const saveBtn = document.getElementById('saveBtn');
+  const editName = document.getElementById('editName');
+  const editPassword = document.getElementById('editPassword');
+  const saveMsg = document.getElementById('saveMsg');
+  const logoutBtn = document.getElementById('logout');
+
+  const booksReadNode = document.getElementById('booksRead');
+  const bookmarkCountNode = document.getElementById('bookmarkCount');
+  const levelNode = document.getElementById('level');
+
+  function safeParse(v){ try{ return JSON.parse(v) }catch(e){ return null } }
+
+  // show login if not logged
+  document.addEventListener('DOMContentLoaded', async () => {
+    const user = safeParse(localStorage.getItem('notoraUser'));
+    const token = localStorage.getItem('notoraToken');
+    if(!user || !token){ window.location.href = 'login.html'; return; }
+
+    // show cached data quickly
+    profileName.textContent = user.name || 'User';
+    profileEmail.textContent = user.email || '';
+    displayName.textContent = user.name || '';
+    displayEmail.textContent = user.email || '';
+    avatar.textContent = (user.name || 'NT').slice(0,2).toUpperCase();
+
+    // fetch real profile
+    try{
+      const res = await fetch(`${API_BASE}/profile`, { headers: { Authorization: `Bearer ${token}` } });
+      if(!res.ok) throw new Error('Invalid session');
+      const data = await res.json();
+      // update UI
+      profileName.textContent = data.name || displayName.textContent;
+      profileEmail.textContent = data.email || profileEmail.textContent;
+      displayName.textContent = data.name || displayName.textContent;
+      displayEmail.textContent = data.email || displayEmail.textContent;
+      avatar.textContent = (data.name || 'NT').slice(0,2).toUpperCase();
+
+      // optional: show achievements/bookmarks (if provided by API)
+      if(data.achievements && typeof data.achievements.readCount !== 'undefined'){
+        booksReadNode.textContent = data.achievements.readCount;
+        levelNode.textContent = data.achievements.level || 1;
+      }
+      // fetch bookmarks separately
+      try{
+        const bmRes = await fetch('https://notoraadminbackend-1.onrender.com/api/bookmarks', { headers:{ Authorization:`Bearer ${token}` } });
+        if(bmRes.ok){ const bms = await bmRes.json(); bookmarkCountNode.textContent = bms.length || 0; }
+      }catch(e){ console.warn('bookmark fetch failed', e) }
+
+    }catch(err){
+      console.error(err);
+      // if token invalid -> force logout
+      localStorage.removeItem('notoraToken');
+      localStorage.removeItem('notoraUser');
+      window.location.href = 'login.html';
+    }
+  });
+
+  // edit toggle
+  editProfileBtn.addEventListener('click', () => {
+    editArea.style.display = editArea.style.display === 'block' ? 'none' : 'block';
+    editName.value = displayName.textContent || '';
+  });
+  cancelBtn.addEventListener('click', ()=> editArea.style.display='none');
+
+  // save profile
+  saveBtn.addEventListener('click', async () => {
+    const token = localStorage.getItem('notoraToken');
+    if(!token) { window.location.href='login.html'; return; }
+    const newName = editName.value.trim();
+    const newPassword = editPassword.value.trim();
+    if(!newName && !newPassword){ saveMsg.style.color='#ff8b8b'; saveMsg.textContent='Enter a new name or password.'; return; }
+    if(newName && !/^[A-Za-z0-9 ]{3,10}$/.test(newName)){ saveMsg.style.color='#ff8b8b'; saveMsg.textContent='Name 3–10 chars, no special chars.'; return; }
+    saveMsg.style.color='#bdbdbd'; saveMsg.textContent='Updating...';
+    try{
+      const res = await fetch(`${API_BASE}/update`, {
+        method:'PUT',
+        headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}` },
+        body: JSON.stringify({ name: newName || undefined, password: newPassword || undefined })
+      });
+      const data = await res.json();
+      if(!res.ok) throw new Error(data.message || 'Update failed');
+      // update local
+      const localUser = safeParse(localStorage.getItem('notoraUser')) || {};
+      if(newName) { localUser.name = newName; displayName.textContent=newName; profileName.textContent=newName; avatar.textContent=newName.slice(0,2).toUpperCase(); }
+      localStorage.setItem('notoraUser', JSON.stringify(localUser));
+      editPassword.value='';
+      saveMsg.style.color='#9df5c5'; saveMsg.textContent='Profile updated successfully!';
+      setTimeout(()=>{ saveMsg.textContent=''; editArea.style.display='none'; },1400);
+    }catch(e){
+      console.error(e);
+      saveMsg.style.color='#ff8b8b'; saveMsg.textContent = e.message || 'Update error';
+    }
+  });
+
+  // logout
+  logoutBtn.addEventListener('click', ()=> {
+    localStorage.removeItem('notoraUser');
+    localStorage.removeItem('notoraToken');
+    window.location.href = 'login.html';
+  });
+
+  // quick action hooks (non destructive)
+  document.getElementById('goHome').addEventListener('click', ()=> window.location.href='index.html');
+  document.getElementById('manageBookmarks').addEventListener('click', ()=> window.location.href='bookmark.html');
+  document.getElementById('deleteAccount').addEventListener('click', ()=> {
+    // only a front-end confirmation here. backend deletion must be implemented server-side.
+    if(confirm('This will permanently delete your account (not implemented client-side). Are you sure?')){
+      alert('If you want this enabled, implement DELETE /api/users/me on server and call it here.');
+    }
+  });
+</script>
+</body>
+</html>
