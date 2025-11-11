@@ -101,12 +101,12 @@ showAllBtnStyle.textContent = `
   color: #fff !important;
   background: linear-gradient(135deg, #e50914, #ff3c3c) !important;
   border: none !important;
-  border-radius: 30px !important;
+  border-radius: 20px !important;
   cursor: pointer !important;
   transition: all 0.25s ease !important;
   box-shadow: 0 0 10px rgba(229, 9, 20, 0.25) !important;
-  height: 230px !important;
-  width: 160px !important;
+  height: 300px !important;
+  width: 150px !important;
   text-align: center !important;
   overflow: hidden;
 }
@@ -593,6 +593,7 @@ if (top10Slider) {
     }
   });
 }
+
 
 
 
