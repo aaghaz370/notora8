@@ -597,12 +597,13 @@ if (top10Slider) {
 
 
 // 🧹 Force remove hidden emoji from category titles
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".category-title").forEach(el => {
-    // Replace any emoji or unicode characters outside ASCII range
-    el.textContent = el.textContent.replace(/[^\x00-\x7F]/g, "").trim();
-  });
-});
+// document.addEventListener("DOMContentLoaded", () => {
+//   document.querySelectorAll(".category-title").forEach(el => {
+//     // Replace any emoji or unicode characters outside ASCII range
+//     el.textContent = el.textContent.replace(/[^\x00-\x7F]/g, "").trim();
+//   });
+// });
+
 
 
 
