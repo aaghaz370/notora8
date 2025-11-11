@@ -1290,6 +1290,15 @@ footer small {
 .top10-wrapper::-webkit-scrollbar {
   display: none;
 } */
+      .category-title {
+  font-size: 1.4rem;
+  margin-bottom: 0.7rem;
+  color: #e50914;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+      
 .top10-wrapper {
   position: relative;
   display: flex;
@@ -1300,7 +1309,7 @@ footer small {
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
   padding-bottom: 1rem;
-  margin-left:20px ;    
+   
 }
 
 
@@ -1311,6 +1320,7 @@ footer small {
   width: 180px;
   height: 340px;
   scroll-snap-align: start;
+      
 }
 
 /* Big Number Background — 75% visible */
@@ -1441,6 +1451,7 @@ footer small {
   background: linear-gradient(135deg, #ff1a1a, #e50914);
   box-shadow: 0 0 20px rgba(229, 9, 20, 0.5);
 } */
+
 
 
 
