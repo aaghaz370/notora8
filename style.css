@@ -1291,12 +1291,13 @@ footer small {
   display: none;
 } */
       .top10-title {
-  font-size: 3.4rem;
+  font-size: 1.4rem;
   margin-bottom: 0.7rem;
   color: #e50914;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
+  margin-left:20px;          
 }
       
 .top10-wrapper {
@@ -1451,6 +1452,7 @@ footer small {
   background: linear-gradient(135deg, #ff1a1a, #e50914);
   box-shadow: 0 0 20px rgba(229, 9, 20, 0.5);
 } */
+
 
 
 
