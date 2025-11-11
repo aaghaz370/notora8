@@ -1290,8 +1290,8 @@ footer small {
 .top10-wrapper::-webkit-scrollbar {
   display: none;
 } */
-      .category-title {
-  font-size: 1.4rem;
+      .top10-title {
+  font-size: 3.4rem;
   margin-bottom: 0.7rem;
   color: #e50914;
   font-weight: 700;
@@ -1451,6 +1451,7 @@ footer small {
   background: linear-gradient(135deg, #ff1a1a, #e50914);
   box-shadow: 0 0 20px rgba(229, 9, 20, 0.5);
 } */
+
 
 
 
