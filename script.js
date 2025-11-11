@@ -81,13 +81,56 @@ function loadCategory(category) {
   });
 
   // ✅ Add "Show All" card
-  const showAllCard = document.createElement("div");
-  showAllCard.className = "book-card show-all-card";
-  showAllCard.innerHTML = `<span>Show All →</span>`;
-  showAllCard.addEventListener("click", () => {
-    window.location.href = `category.html?genre=${encodeURIComponent(category)}`;
-  });
-  slider.appendChild(showAllCard);
+  // const showAllCard = document.createElement("div");
+  // showAllCard.className = "book-card show-all-card";
+  // showAllCard.innerHTML = `<span>Show All →</span>`;
+  // showAllCard.addEventListener("click", () => {
+  //   window.location.href = `category.html?genre=${encodeURIComponent(category)}`;
+  // });
+  // slider.appendChild(showAllCard);
+  // ✅ Inject Show All Button CSS (Notora red-black theme)
+const showAllBtnStyle = document.createElement("style");
+showAllBtnStyle.textContent = `
+.show-all-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #fff;
+  background: linear-gradient(135deg, #e50914, #ff3c3c);
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 0 10px rgba(229, 9, 20, 0.25);
+  height: 220px;
+  width: 150px;
+  text-align: center;
+}
+.show-all-card:hover {
+  transform: translateY(-3px) scale(1.03);
+  background: linear-gradient(135deg, #ff1a1a, #e50914);
+  box-shadow: 0 0 20px rgba(229, 9, 20, 0.5);
+}
+.show-all-card span {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+`;
+document.head.appendChild(showAllBtnStyle);
+
+// ✅ Add "Show All" card
+const showAllCard = document.createElement("div");
+showAllCard.className = "book-card show-all-card";
+showAllCard.innerHTML = `<span>Show All →</span>`;
+showAllCard.addEventListener("click", () => {
+  window.location.href = `category.html?genre=${encodeURIComponent(category)}`;
+});
+slider.appendChild(showAllCard);
+
 
   // ✅ Desktop arrows only
   if (window.innerWidth > 768) {
@@ -545,6 +588,7 @@ if (top10Slider) {
     }
   });
 }
+
 
 
 
