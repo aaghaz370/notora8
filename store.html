@@ -231,24 +231,50 @@
 
 
   // LOAD USER POINTS
-  let userPoints = 0;
+  // let userPoints = 0;
 
-  async function loadUserPoints() {
-    if (!user || !token) return;
-    try {
-      const res = await fetch(`https://notoraadminbackend-1.onrender.com/api/userstats/${user._id}/achievements`, {
-        headers: { "Authorization": `Bearer ${token}` }
-      });
-      const data = await res.json();
-      userPoints = data.points || 0;
-      ntPointsEl.textContent = `NT: ${userPoints}`;
-    } catch (err) {
-      console.error("Point fetch error:", err);
-    }
+  // async function loadUserPoints() {
+  //   if (!user || !token) return;
+  //   try {
+  //     const res = await fetch(`https://notoraadminbackend-1.onrender.com/api/userstats/${user._id}/achievements`, {
+  //       headers: { "Authorization": `Bearer ${token}` }
+  //     });
+  //     const data = await res.json();
+  //     userPoints = data.points || 0;
+  //     ntPointsEl.textContent = `NT: ${userPoints}`;
+  //   } catch (err) {
+  //     console.error("Point fetch error:", err);
+  //   }
+  // }
+
+  // loadUserPoints();
+  // LOAD USER POINTS + DISABLE BUTTONS BASED ON COST
+let userPoints = 0;
+
+async function loadUserPoints() {
+  if (!user || !token) return;
+  try {
+    const res = await fetch(`https://notoraadminbackend-1.onrender.com/api/userstats/${user._id}/achievements`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+
+    const data = await res.json();
+    userPoints = data.points || 0;
+
+    // Show points in header
+    ntPointsEl.textContent = `NT: ${userPoints}`;
+
+    // 🔥 Disable buy buttons if points are insufficient
+    updateBuyButtons();
+
+  } catch (err) {
+    console.error("Point fetch error:", err);
   }
+}
 
-  loadUserPoints();
+loadUserPoints();
 
+  
 
   // BUY BUTTON HANDLER
   document.addEventListener("click", async (e) => {
