@@ -127,6 +127,14 @@
   document.addEventListener("click", async (e) => {
     if (!e.target.closest(".buyBtn")) return;
     const btn = e.target.closest(".buyBtn");
+        const cost = Number(btn.dataset.cost);
+
+    // ❗ Check NT points before allowing purchase
+    if (userPoints < cost) {
+      showToast(`Not enough NT points. You need ${cost} NT`, false);
+      return;
+    }
+
     if (!token || !user) return showToast("Please login to make a request");
 
     const itemId = btn.dataset.id;
@@ -169,6 +177,28 @@
     toast.style.borderColor = ok ? "rgba(0,200,0,0.12)" : "rgba(229,9,20,0.12)";
     setTimeout(()=> toast.style.display = "none", 4000);
   }
+
+
+
+  
+  let userPoints = 0;
+
+// Fetch user points from achievements (safe API)
+async function loadUserPoints() {
+  if (!user || !token) return;
+  try {
+    const res = await fetch(`https://notoraadminbackend-1.onrender.com/api/userstats/${user._id}/achievements`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    const data = await res.json();
+    userPoints = data.points || 0;
+  } catch (err) {
+    console.error("Point fetch error:", err);
+  }
+}
+
+loadUserPoints();
+
 </script>
 </body>
 </html>
