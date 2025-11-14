@@ -56,11 +56,39 @@
 <script>
   // Hardcoded store items — edit/add as you like
   const STORE_ITEMS = [
-    { id: "badge_redflame", name: "Red Flame Badge", desc: "Exclusive profile badge with red flame.", cost: 25, img: "https://images.unsplash.com/photo-1524499982521-1ffd58dd89ea?w=800&q=60" },
-    { id: "username_glow", name: "Username Glow", desc: "Red glow effect for your username.", cost: 50, img: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&q=60" },
-    { id: "premium_theme", name: "Premium Theme", desc: "Unlock advanced UI theme.", cost: 75, img: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=60" },
-    { id: "profile_frame", name: "Profile Frame", desc: "Limited edition profile frame.", cost: 40, img: "https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?w=800&q=60" }
-  ];
+  {
+    id: "tg_access_7days",
+    name: "7-Day Telegram Bot Access",
+    desc: "Get full access to the official Telegram bot for 7 days — no ads, no shorteners, direct premium experience.",
+    cost: 30,
+    img: "https://images.unsplash.com/photo-1600267185393-e158a98703de?w=800&q=60"
+  },
+
+  {
+    id: "password_access_2days",
+    name: "2-Day Password Access",
+    desc: "Unlock the private password-protected section of the website for 48 hours. Premium access, instantly delivered.",
+    cost: 20,
+    img: "https://images.unsplash.com/photo-1557683304-673a23048d34?w=800&q=60"
+  },
+
+  {
+    id: "yt_subscription_1month",
+    name: "1-Month YouTube Subscription",
+    desc: "Get a 30-day YouTube channel subscription from us. Delivered manually after request approval.",
+    cost: 60,
+    img: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=800&q=60"
+  },
+
+  {
+    id: "direct_download",
+    name: "Direct Book Download (Telegram)",
+    desc: "Skip all interruptions — get instant direct download links for any book via Telegram without delays.",
+    cost: 15,
+    img: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=800&q=60"
+  }
+];
+
 
   const grid = document.getElementById("grid");
   const toast = document.getElementById("toast");
