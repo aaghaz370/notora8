@@ -109,7 +109,8 @@
     btn.textContent = "Sending...";
 
     try {
-      const res = await fetch("/api/store/request", {
+      const res = await fetch("https://notoraadminbackend-1.onrender.com/api/store/request", {
+
         method: "POST",
         headers: {
           "Content-Type": "application/json",
