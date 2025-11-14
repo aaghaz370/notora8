@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Notora Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://kit.fontawesome.com/1c020da525.js" crossorigin="anonymous"></script>
+<style>
+  :root{
+    --bg:#070707;
+    --card:#121212;
+    --muted:#bdbdbd;
+    --accent:#e50914;
+    --accent-2:#ff3c3c;
+    --glass: rgba(255,255,255,0.03);
+    --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Poppins",sans-serif;background:linear-gradient(180deg,#080808,#0b0b0b);color:#fff;padding:24px}
+  .wrap{max-width:1100px;margin:0 auto}
+  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+  h1{color:var(--accent);font-size:1.6rem}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+  .card{background:var(--card);border-radius:var(--radius);padding:14px;border:1px solid rgba(255,255,255,0.02);box-shadow:0 8px 30px rgba(0,0,0,.6);display:flex;flex-direction:column;gap:10px}
+  .thumb{height:140px;border-radius:10px;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center}
+  .thumb img{width:100%;height:100%;object-fit:cover}
+  .name{font-weight:700;color:#fff}
+  .desc{color:var(--muted);font-size:.92rem}
+  .cost{font-weight:800;color:var(--accent);font-size:1.1rem}
+  .buy{margin-top:auto;display:flex;gap:8px;align-items:center;justify-content:space-between}
+  .btn{background:linear-gradient(90deg,var(--accent),var(--accent-2));padding:10px 12px;border-radius:10px;border:none;color:#fff;font-weight:700;cursor:pointer}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .userEmail{font-size:.9rem;color:var(--muted)}
+  .note{margin-top:12px;color:var(--muted);font-size:.9rem}
+  .toast{position:fixed;right:18px;bottom:18px;background:#111;padding:12px 16px;border-radius:8px;border:1px solid rgba(229,9,20,0.12);box-shadow:0 8px 30px rgba(229,9,20,0.08)}
+  @media(max-width:480px){ .thumb{height:110px} }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1><i class="fa-solid fa-store"></i> Notora Store</h1>
+      <div>
+        <div class="userEmail" id="userEmail">Not signed in</div>
+      </div>
+    </header>
+
+    <div id="grid" class="grid"></div>
+
+    <p class="note">Note: Purchases create a request for admin review. Points will be deducted manually after approval via the NT panel.</p>
+  </div>
+
+  <div id="toast" style="display:none" class="toast"></div>
+
+<script>
+  // Hardcoded store items — edit/add as you like
+  const STORE_ITEMS = [
+    { id: "badge_redflame", name: "Red Flame Badge", desc: "Exclusive profile badge with red flame.", cost: 25, img: "https://images.unsplash.com/photo-1524499982521-1ffd58dd89ea?w=800&q=60" },
+    { id: "username_glow", name: "Username Glow", desc: "Red glow effect for your username.", cost: 50, img: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&q=60" },
+    { id: "premium_theme", name: "Premium Theme", desc: "Unlock advanced UI theme.", cost: 75, img: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=60" },
+    { id: "profile_frame", name: "Profile Frame", desc: "Limited edition profile frame.", cost: 40, img: "https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?w=800&q=60" }
+  ];
+
+  const grid = document.getElementById("grid");
+  const toast = document.getElementById("toast");
+
+  // Render items
+  function renderItems() {
+    grid.innerHTML = "";
+    STORE_ITEMS.forEach(item => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <div class="thumb"><img src="${item.img}" alt="${item.name}"/></div>
+        <div class="name">${item.name}</div>
+        <div class="desc">${item.desc}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div class="cost">${item.cost} <span style="color:#ffb3b3;font-weight:600">NT</span></div>
+        </div>
+        <div class="buy">
+          <button class="btn buyBtn" data-id="${item.id}" data-name="${item.name}" data-cost="${item.cost}"><i class="fa-solid fa-cart-plus"></i> Buy</button>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  renderItems();
+
+  // Auto-fill user email
+  const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
+  const token = localStorage.getItem("notoraToken");
+  const userEmailEl = document.getElementById("userEmail");
+  if (user && user.email) userEmailEl.textContent = user.email;
+  else userEmailEl.textContent = "Not signed in";
+
+  // Buy click
+  document.addEventListener("click", async (e) => {
+    if (!e.target.closest(".buyBtn")) return;
+    const btn = e.target.closest(".buyBtn");
+    if (!token || !user) return showToast("Please login to make a request");
+
+    const itemId = btn.dataset.id;
+    const itemName = btn.dataset.name;
+    const cost = Number(btn.dataset.cost);
+
+    btn.disabled = true;
+    btn.textContent = "Sending...";
+
+    try {
+      const res = await fetch("/api/store/request", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          itemId,
+          itemName,
+          cost,
+          note: `Requested from store page`
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Request failed");
+      showToast("Request sent. Admin will review it.", true);
+    } catch (err) {
+      console.error(err);
+      showToast(err.message || "Error sending request");
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = `<i class="fa-solid fa-cart-plus"></i> Buy`;
+    }
+  });
+
+  function showToast(msg, ok) {
+    toast.style.display = "block";
+    toast.textContent = msg;
+    toast.style.borderColor = ok ? "rgba(0,200,0,0.12)" : "rgba(229,9,20,0.12)";
+    setTimeout(()=> toast.style.display = "none", 4000);
+  }
+</script>
+</body>
+</html>
