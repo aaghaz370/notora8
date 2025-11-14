@@ -6,6 +6,7 @@
 <title>Notora Store</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://kit.fontawesome.com/1c020da525.js" crossorigin="anonymous"></script>
+
 <style>
   :root{
     --bg:#070707;
@@ -16,78 +17,179 @@
     --glass: rgba(255,255,255,0.03);
     --radius:14px;
   }
+
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:"Poppins",sans-serif;background:linear-gradient(180deg,#080808,#0b0b0b);color:#fff;padding:24px}
+
+  body{
+    font-family:"Poppins",sans-serif;
+    background:linear-gradient(180deg,#080808,#0b0b0b);
+    color:#fff;
+    padding:24px;
+  }
+
   .wrap{max-width:1100px;margin:0 auto}
-  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
-  h1{color:var(--accent);font-size:1.6rem}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
-  .card{background:var(--card);border-radius:var(--radius);padding:14px;border:1px solid rgba(255,255,255,0.02);box-shadow:0 8px 30px rgba(0,0,0,.6);display:flex;flex-direction:column;gap:10px}
-  .thumb{height:140px;border-radius:10px;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center}
-  .thumb img{width:100%;height:100%;object-fit:cover}
+
+  header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:18px
+  }
+
+  h1{
+    color:var(--accent);
+    font-size:1.6rem;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+
+  .backBtn{
+    font-size:1.4rem;
+    cursor:pointer;
+    color:#fff;
+    padding:8px 12px;
+    border-radius:10px;
+    background:rgba(255,255,255,0.05);
+    transition:.2s;
+    margin-right:12px;
+  }
+
+  .backBtn:hover{
+    background:rgba(255,255,255,0.10);
+  }
+
+  .ntPoints{
+    font-size:1rem;
+    font-weight:700;
+    color:var(--accent);
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:16px;
+  }
+
+  .card{
+    background:var(--card);
+    border-radius:var(--radius);
+    padding:14px;
+    border:1px solid rgba(255,255,255,0.02);
+    box-shadow:0 8px 30px rgba(0,0,0,.6);
+    display:flex;
+    flex-direction:column;
+    gap:10px
+  }
+
+  .thumb{
+    height:140px;
+    border-radius:10px;
+    overflow:hidden;
+    background:#000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .thumb img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  }
+
   .name{font-weight:700;color:#fff}
   .desc{color:var(--muted);font-size:.92rem}
   .cost{font-weight:800;color:var(--accent);font-size:1.1rem}
-  .buy{margin-top:auto;display:flex;gap:8px;align-items:center;justify-content:space-between}
-  .btn{background:linear-gradient(90deg,var(--accent),var(--accent-2));padding:10px 12px;border-radius:10px;border:none;color:#fff;font-weight:700;cursor:pointer}
-  .btn:disabled{opacity:.5;cursor:not-allowed}
-  .userEmail{font-size:.9rem;color:var(--muted)}
+
+  .btn{
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    padding:10px 12px;
+    border-radius:10px;
+    border:none;
+    color:#fff;
+    font-weight:700;
+    cursor:pointer;
+  }
+
+  .btn:disabled{
+    opacity:.5;
+    cursor:not-allowed;
+  }
+
   .note{margin-top:12px;color:var(--muted);font-size:.9rem}
-  .toast{position:fixed;right:18px;bottom:18px;background:#111;padding:12px 16px;border-radius:8px;border:1px solid rgba(229,9,20,0.12);box-shadow:0 8px 30px rgba(229,9,20,0.08)}
-  @media(max-width:480px){ .thumb{height:110px} }
+
+  .toast{
+    position:fixed;
+    right:18px;
+    bottom:18px;
+    background:#111;
+    padding:12px 16px;
+    border-radius:8px;
+    border:1px solid rgba(229,9,20,0.12);
+    box-shadow:0 8px 30px rgba(229,9,20,0.08);
+  }
+
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <h1><i class="fa-solid fa-store"></i> Notora Store</h1>
-      <div>
-        <div class="userEmail" id="userEmail">Not signed in</div>
+
+<div class="wrap">
+
+  <header>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="backBtn" onclick="history.back()">
+        <i class="fa-solid fa-arrow-left"></i>
       </div>
-    </header>
+      <h1><i class="fa-solid fa-store"></i> Notora Store</h1>
+    </div>
 
-    <div id="grid" class="grid"></div>
+    <div>
+      <div class="ntPoints" id="ntPoints">NT: 0</div>
+      <div class="userEmail" id="userEmail" style="font-size:.8rem;color:var(--muted)">Not signed in</div>
+    </div>
+  </header>
 
-    <p class="note">Note: Purchases create a request for admin review. Points will be deducted manually after approval via the NT panel.</p>
-  </div>
+  <div id="grid" class="grid"></div>
 
-  <div id="toast" style="display:none" class="toast"></div>
+  <p class="note">Purchases create a request for review. Points will be deducted manually after approval.</p>
+
+</div>
+
+<div id="toast" style="display:none" class="toast"></div>
 
 <script>
-  // Hardcoded store items — edit/add as you like
+  // Store item list
   const STORE_ITEMS = [
-  {
-    id: "tg_access_7days",
-    name: "7-Day Telegram Bot Access",
-    desc: "Get full access to the official Telegram bot for 7 days — no ads, no shorteners, direct premium experience.",
-    cost: 70,
-    img: "Telegram-bots-2-1.avif"
-  },
-
-  {
-    id: "password_access_2days",
-    name: "2-Day Password Access",
-    desc: "Unlock the private password-protected section of the website for 48 hours. Premium access, instantly delivered.",
-    cost: 40,
-    img: "website.avif"
-  },
-
-  {
-    id: "yt_subscription_1month",
-    name: "1-Month YouTube Subscription",
-    desc: "Get a 30-day YouTube channel subscription from us. Delivered manually after request approval.",
-    cost: 400,
-    img: "YTP_logo_social_1200x630.png"
-  },
-
-  {
-    id: "direct_download",
-    name: "Direct Book Download (Telegram)",
-    desc: "Skip all interruptions — get instant direct download links for any book via Telegram without delays.",
-    cost: 15,
-    img: "direct-download-featured.jpg"
-  }
-];
+    {
+      id: "tg_access_7days",
+      name: "7-Day Telegram Bot Access",
+      desc: "Full access to the official Telegram bot — no ads, no shorteners.",
+      cost: 70,
+      img: "Telegram-bots-2-1.avif"
+    },
+    {
+      id: "password_access_2days",
+      name: "2-Day Password Access",
+      desc: "Unlock private password-protected section for 48 hours.",
+      cost: 40,
+      img: "website.avif"
+    },
+    {
+      id: "yt_subscription_1month",
+      name: "1-Month YouTube Subscription",
+      desc: "We subscribe to your YouTube account for 30 days.",
+      cost: 400,
+      img: "YTP_logo_social_1200x630.png"
+    },
+    {
+      id: "direct_download",
+      name: "Direct Book Download",
+      desc: "Instant direct download links via Telegram.",
+      cost: 15,
+      img: "direct-download-featured.jpg"
+    }
+  ];
 
 
   const grid = document.getElementById("grid");
@@ -100,15 +202,17 @@
       const card = document.createElement("div");
       card.className = "card";
       card.innerHTML = `
-        <div class="thumb"><img src="${item.img}" alt="${item.name}"/></div>
+        <div class="thumb"><img src="${item.img}" alt="${item.name}" /></div>
         <div class="name">${item.name}</div>
         <div class="desc">${item.desc}</div>
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div class="cost">${item.cost} <span style="color:#ffb3b3;font-weight:600">NT</span></div>
-        </div>
-        <div class="buy">
-          <button class="btn buyBtn" data-id="${item.id}" data-name="${item.name}" data-cost="${item.cost}"><i class="fa-solid fa-cart-plus"></i> Buy</button>
-        </div>
+        <div class="cost">${item.cost} NT</div>
+
+        <button class="btn buyBtn" 
+                data-id="${item.id}" 
+                data-name="${item.name}" 
+                data-cost="${item.cost}">
+          <i class="fa-solid fa-cart-plus"></i> Buy
+        </button>
       `;
       grid.appendChild(card);
     });
@@ -116,22 +220,46 @@
 
   renderItems();
 
-  // Auto-fill user email
+
+  // USER info
   const user = JSON.parse(localStorage.getItem("notoraUser") || "null");
   const token = localStorage.getItem("notoraToken");
   const userEmailEl = document.getElementById("userEmail");
-  if (user && user.email) userEmailEl.textContent = user.email;
-  else userEmailEl.textContent = "Not signed in";
+  const ntPointsEl = document.getElementById("ntPoints");
 
-  // Buy click
+  if (user && user.email) userEmailEl.textContent = user.email;
+
+
+  // LOAD USER POINTS
+  let userPoints = 0;
+
+  async function loadUserPoints() {
+    if (!user || !token) return;
+    try {
+      const res = await fetch(`https://notoraadminbackend-1.onrender.com/api/userstats/${user._id}/achievements`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      const data = await res.json();
+      userPoints = data.points || 0;
+      ntPointsEl.textContent = `NT: ${userPoints}`;
+    } catch (err) {
+      console.error("Point fetch error:", err);
+    }
+  }
+
+  loadUserPoints();
+
+
+  // BUY BUTTON HANDLER
   document.addEventListener("click", async (e) => {
     if (!e.target.closest(".buyBtn")) return;
-    const btn = e.target.closest(".buyBtn");
-        const cost = Number(btn.dataset.cost);
 
-    // ❗ Check NT points before allowing purchase
+    const btn = e.target.closest(".buyBtn");
+    const cost = Number(btn.dataset.cost);
+
+    // Check NT points
     if (userPoints < cost) {
-      showToast(`Not enough NT points. You need ${cost} NT`, false);
+      showToast(`Not enough NT points. Need ${cost} NT.`, false);
       return;
     }
 
@@ -139,14 +267,12 @@
 
     const itemId = btn.dataset.id;
     const itemName = btn.dataset.name;
-    const cost = Number(btn.dataset.cost);
 
     btn.disabled = true;
     btn.textContent = "Sending...";
 
     try {
       const res = await fetch("https://notoraadminbackend-1.onrender.com/api/store/request", {
-
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -156,49 +282,34 @@
           itemId,
           itemName,
           cost,
-          note: `Requested from store page`
+          note: "Requested from store page"
         })
       });
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Request failed");
-      showToast("Request sent. Admin will review it.", true);
+
+      showToast("Request sent successfully!", true);
+
     } catch (err) {
       console.error(err);
       showToast(err.message || "Error sending request");
+
     } finally {
       btn.disabled = false;
       btn.innerHTML = `<i class="fa-solid fa-cart-plus"></i> Buy`;
     }
   });
 
+
   function showToast(msg, ok) {
     toast.style.display = "block";
     toast.textContent = msg;
-    toast.style.borderColor = ok ? "rgba(0,200,0,0.12)" : "rgba(229,9,20,0.12)";
-    setTimeout(()=> toast.style.display = "none", 4000);
+    toast.style.borderColor = ok ? "rgba(0,200,0,0.10)" : "rgba(229,9,20,0.20)";
+    setTimeout(() => toast.style.display = "none", 4000);
   }
-
-
-
-  
-  let userPoints = 0;
-
-// Fetch user points from achievements (safe API)
-async function loadUserPoints() {
-  if (!user || !token) return;
-  try {
-    const res = await fetch(`https://notoraadminbackend-1.onrender.com/api/userstats/${user._id}/achievements`, {
-      headers: { "Authorization": `Bearer ${token}` }
-    });
-    const data = await res.json();
-    userPoints = data.points || 0;
-  } catch (err) {
-    console.error("Point fetch error:", err);
-  }
-}
-
-loadUserPoints();
 
 </script>
 </body>
 </html>
+
