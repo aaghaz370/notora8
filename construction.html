@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Under Construction</title>
+
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        background: #000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: "Montserrat", sans-serif;
+        color: #fff;
+        overflow: hidden;
+    }
+
+    .container {
+        text-align: center;
+        padding: 40px;
+        border: 2px solid red;
+        border-radius: 20px;
+        box-shadow: 0 0 20px red;
+        transition: 0.3s;
+        cursor: pointer;
+    }
+
+    .container:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 35px red;
+    }
+
+    h1 {
+        font-size: 45px;
+        color: red;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 15px;
+        animation: glow 1.5s infinite alternate;
+    }
+
+    @keyframes glow {
+        0% { text-shadow: 0 0 10px red; }
+        100% { text-shadow: 0 0 25px red; }
+    }
+
+    .msg {
+        font-size: 18px;
+        opacity: 0.8;
+        margin-bottom: 20px;
+    }
+
+    .gear {
+        font-size: 55px;
+        color: red;
+        animation: rotate 3s linear infinite;
+        display: inline-block;
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .btn {
+        padding: 12px 25px;
+        border: 2px solid red;
+        color: red;
+        font-size: 16px;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: 0.3s;
+    }
+
+    .btn:hover {
+        background: red;
+        color: #000;
+        box-shadow: 0 0 15px red;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container" onclick="pulse()">
+    <div class="gear">⚙</div>
+    <h1>Page Under Construction</h1>
+    <p class="msg">Work in progress… please check back later!</p>
+    <a href="#" class="btn">Go Back</a>
+</div>
+
+<script>
+    function pulse() {
+        document.querySelector(".container").style.boxShadow =
+            "0 0 45px red";
+
+        setTimeout(() => {
+            document.querySelector(".container").style.boxShadow =
+            "0 0 25px red";
+        }, 300);
+    }
+</script>
+
+</body>
+</html>
