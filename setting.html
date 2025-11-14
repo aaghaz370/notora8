@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Settings — Notora</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://kit.fontawesome.com/1c020da525.js" crossorigin="anonymous"></script>
+
+<style>
+:root{
+  --bg:#070707;
+  --card:#111;
+  --accent:#e50914;
+  --accent2:#ff3c3c;
+  --muted:#bdbdbd;
+}
+
+body{
+  margin:0;
+  font-family:"Poppins",sans-serif;
+  background:linear-gradient(180deg,#080808,#0b0b0b);
+  color:#fff;
+  padding:20px;
+}
+
+.wrap{
+  max-width:700px;
+  margin:0 auto;
+}
+
+/* Back Arrow */
+.back{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  width:max-content;
+  cursor:pointer;
+  color:var(--muted);
+  font-weight:600;
+  margin-bottom:20px;
+}
+.back i{
+  font-size:1.4rem;
+  color:var(--accent);
+}
+
+/* Title */
+h1{
+  margin:0 0 25px 0;
+  font-size:1.8rem;
+  color:var(--accent);
+}
+
+/* Cards */
+.card{
+  background:var(--card);
+  border-radius:16px;
+  padding:18px;
+  margin-bottom:16px;
+  border:1px solid rgba(255,255,255,0.05);
+  box-shadow:0 8px 30px rgba(0,0,0,0.6);
+}
+
+.card-title{
+  font-size:1.1rem;
+  font-weight:700;
+  margin-bottom:10px;
+  color:#fff;
+}
+
+.option{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 0;
+  color:var(--muted);
+  font-size:.96rem;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+.option:last-child{
+  border-bottom:none;
+}
+
+/* Switch */
+.switch{
+  position:relative;
+  width:46px;
+  height:24px;
+  background:#333;
+  border-radius:20px;
+  cursor:pointer;
+}
+.switch::after{
+  content:"";
+  position:absolute;
+  width:20px;
+  height:20px;
+  background:white;
+  border-radius:50%;
+  top:2px;
+  left:2px;
+  transition:.25s;
+}
+.switch.active{
+  background:var(--accent);
+}
+.switch.active::after{
+  left:24px;
+}
+
+/* Select Box */
+select{
+  background:#0d0d0d;
+  border:1px solid rgba(255,255,255,0.08);
+  color:#fff;
+  padding:8px 10px;
+  border-radius:8px;
+  font-size:.95rem;
+}
+
+/* Clear Button */
+.btn{
+  width:100%;
+  margin-top:8px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  font-weight:700;
+  color:white;
+  cursor:pointer;
+}
+
+/* Link */
+.link{
+  color:var(--accent);
+  font-weight:700;
+  cursor:pointer;
+}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Back Arrow -->
+  <div class="back" onclick="window.history.back()">
+    <i class="fa-solid fa-arrow-left"></i> Back
+  </div>
+
+  <h1>Settings</h1>
+
+  <!-- FULL SCREEN MODE -->
+  <div class="card">
+    <div class="card-title">Display</div>
+
+    <div class="option">
+      <span>Full Screen Mode</span>
+      <div id="fsToggle" class="switch"></div>
+    </div>
+  </div>
+
+  <!-- LANGUAGE -->
+  <div class="card">
+    <div class="card-title">Language</div>
+
+    <div class="option" style="border-bottom:none">
+      <span>Choose Language</span>
+      <select id="langSelect">
+        <option value="en">English</option>
+        <option value="hi">Hindi</option>
+        <option value="ta">Tamil</option>
+        <option value="te">Telugu</option>
+        <option value="ur">Urdu</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- RESET CACHE -->
+  <div class="card">
+    <div class="card-title">Storage</div>
+
+    <button class="btn" onclick="resetCache()">Reset App Cache</button>
+  </div>
+
+  <!-- HELP -->
+  <div class="card">
+    <div class="card-title">Support</div>
+
+    <div class="option" style="border-bottom:none">
+      <span>Help & Support</span>
+      <span class="link" onclick="window.location.href='help.html'">Open</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+
+/* ---------- FULL SCREEN MODE ---------- */
+const fsToggle = document.getElementById("fsToggle");
+
+// Load previous setting
+if(localStorage.getItem("notora_fullscreen") === "on"){
+  fsToggle.classList.add("active");
+  openFullscreen();
+}
+
+fsToggle.onclick = () => {
+  fsToggle.classList.toggle("active");
+  if(fsToggle.classList.contains("active")){
+    openFullscreen();
+    localStorage.setItem("notora_fullscreen","on");
+  } else {
+    closeFullscreen();
+    localStorage.setItem("notora_fullscreen","off");
+  }
+};
+
+function openFullscreen(){
+  const el = document.documentElement;
+  if(el.requestFullscreen) el.requestFullscreen();
+}
+
+function closeFullscreen(){
+  if(document.exitFullscreen) document.exitFullscreen();
+}
+
+/* ---------- LANGUAGE CHANGE ---------- */
+const langSelect = document.getElementById("langSelect");
+
+// Load saved lang
+if(localStorage.getItem("notora_lang")){
+  langSelect.value = localStorage.getItem("notora_lang");
+}
+
+langSelect.onchange = () => {
+  const lang = langSelect.value;
+  localStorage.setItem("notora_lang", lang);
+  alert("Language changed — reload to apply.");
+};
+
+/* ---------- RESET CACHE ---------- */
+function resetCache(){
+  localStorage.clear();
+  sessionStorage.clear();
+  alert("App cache cleared!");
+}
+
+</script>
+
+</body>
+</html>
