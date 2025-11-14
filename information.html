@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Notora — Info & Rules</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://kit.fontawesome.com/1c020da525.js" crossorigin="anonymous"></script>
+
+<style>
+  :root{
+    --bg:#070707;
+    --card:#121212;
+    --muted:#bdbdbd;
+    --accent:#e50914;
+    --accent-2:#ff3c3c;
+    --glass: rgba(255,255,255,0.03);
+    --radius:16px;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:"Poppins",sans-serif;
+    background:#080808;
+    color:#fff;
+    padding:24px;
+  }
+
+  .container{
+    max-width:1000px;
+    margin:auto;
+    padding-bottom:40px;
+  }
+
+  .title{
+    font-size:2.3rem;
+    font-weight:800;
+    letter-spacing:-.5px;
+    color:var(--accent);
+    text-align:center;
+    text-shadow:0 0 18px rgba(229,9,20,0.25);
+    margin-bottom:25px;
+  }
+
+  /* Universal section wrappers */
+  .section{
+    margin:40px 0;
+    padding:24px;
+    border-radius:var(--radius);
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    box-shadow: 0 10px 40px rgba(0,0,0,0.55);
+    border:1px solid rgba(255,255,255,0.04);
+  }
+
+  .section h2{
+    font-size:1.8rem;
+    font-weight:800;
+    margin-bottom:15px;
+    color:var(--accent);
+    text-shadow:0 0 12px rgba(229,9,20,.3);
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+
+  /* ===== 1. INFORMATION STYLE ===== */
+  .info-box{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .info-item{
+    padding:14px;
+    border-left:4px solid var(--accent);
+    background:rgba(255,255,255,0.02);
+    border-radius:10px;
+  }
+  .info-item b{
+    color:var(--accent-2);
+  }
+
+  /* ===== 2. RULES STYLE ===== */
+  .rules-list{
+    counter-reset: ruleCounter;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .rule{
+    counter-increment: ruleCounter;
+    padding:14px 16px;
+    border-radius:12px;
+    background:rgba(255,255,255,0.03);
+    position:relative;
+    padding-left:60px;
+  }
+  .rule:before{
+    content: counter(ruleCounter);
+    position:absolute;
+    left:16px;
+    top:50%;
+    transform:translateY(-50%);
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+  }
+
+  /* ===== 3. FAQ STYLE ===== */
+  .faq-item{
+    border:1px solid rgba(255,255,255,0.05);
+    background:rgba(255,255,255,0.02);
+    padding:16px;
+    margin-bottom:10px;
+    border-radius:14px;
+    cursor:pointer;
+    transition:.25s;
+  }
+
+  .faq-q{
+    font-weight:700;
+    display:flex;
+    justify-content:space-between;
+    font-size:1rem;
+    color:var(--accent-2);
+  }
+
+  .faq-a{
+    display:none;
+    margin-top:10px;
+    font-size:.92rem;
+    color:var(--muted);
+  }
+
+  .faq-item.active{
+    background:rgba(229,9,20,0.10);
+  }
+  .faq-item.active .faq-a{
+    display:block;
+  }
+
+  /* ===== 4. LEGAL ===== */
+  .legal-box{
+    padding:16px;
+    background:rgba(255,255,255,0.02);
+    border-radius:14px;
+    line-height:1.5rem;
+  }
+  .legal-box b{
+    color:var(--accent);
+  }
+
+  /* ===== 5. NOTICE ===== */
+  .notice{
+    background:rgba(255,255,255,0.02);
+    border-radius:14px;
+    padding:18px;
+    border-left:4px solid var(--accent);
+    font-size:.95rem;
+    color:var(--muted);
+    line-height:1.45rem;
+  }
+
+  footer{
+    text-align:center;
+    color:var(--muted);
+    margin-top:40px;
+    font-size:.85rem;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="title">Notora — Information & Rules</div>
+
+  <!-- ================== INFORMATION ================== -->
+  <div class="section">
+    <h2><i class="fa-solid fa-circle-info"></i> 1. INFORMATION</h2>
+    <div class="info-box">
+
+      <div class="info-item">
+        <b>Notora</b> ek community-powered library platform hai jahan users apne paas mojood books ko share kar sakte hain.
+      </div>
+
+      <div class="info-item">
+        Website ka main focus hai: <b>learning, exploring aur free knowledge access</b>. Koi bhi paid service nahi hai.
+      </div>
+
+      <div class="info-item">
+        Recommended books algorithm: trending searches, most-read books aur community activity ke base par kaam karta hai.
+      </div>
+
+      <div class="info-item">
+        Har user ka data (email/password) hashed form me secure stored hota hai. Password plain-text me kabhi save nahi hota.
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================== RULES ================== -->
+  <div class="section">
+    <h2><i class="fa-solid fa-scale-balanced"></i> 2. RULES</h2>
+    <div class="rules-list">
+
+      <div class="rule">Kisi bhi user ko gali dena, beizzat karna ya disturb karna strictly prohibited hai.</div>
+
+      <div class="rule">Har user apne account aur uploads ka zimmedar khud hoga.</div>
+
+      <div class="rule">Spam, fake books, malware links ya misleading files upload mat karein.</div>
+
+      <div class="rule">Repeated bad behaviour se account restrict ya permanently ban ho sakta hai.</div>
+
+      <div class="rule">Comments me respectful language rakhna mandatory hai.</div>
+
+    </div>
+  </div>
+
+  <!-- ================== FAQ ================== -->
+  <div class="section">
+    <h2><i class="fa-solid fa-question-circle"></i> 3. FAQs</h2>
+
+    <div class="faq-item">
+      <div class="faq-q">Notora free kyu hai? <i class="fa-solid fa-chevron-down"></i></div>
+      <div class="faq-a">Ye community-driven platform hai jisme users hi content contribute karte hain. Koi subscription nahi hai.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Kya ye legal hai? <i class="fa-solid fa-chevron-down"></i></div>
+      <div class="faq-a">Haan. Users sirf wahi books upload karte hain jo unke paas already mojood hoti hain. Notora kisi bhi copyrighted book ka owner nahi.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Forgot Password system kab aayega? <i class="fa-solid fa-chevron-down"></i></div>
+      <div class="faq-a">Feature develop ho raha hai. Tab tak aap password ko kahin note karke rakhein.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Books ka verification kaise hota hai? <i class="fa-solid fa-chevron-down"></i></div>
+      <div class="faq-a">Community flags, reports aur moderators ke through suspicious books ko review kiya jata hai.</div>
+    </div>
+
+  </div>
+
+  <!-- ================== LEGAL ================== -->
+  <div class="section">
+    <h2><i class="fa-solid fa-gavel"></i> 4. LEGAL</h2>
+    <div class="legal-box">
+
+      <b>Notora</b> kisi bhi book ka owner ya copyright holder nahi hai.  
+      Website sirf users dwara uploaded books ko host karti hai.  
+
+      Hum copyright violation ka support nahi karte.  
+      Agar koi user kisi copyrighted content ko upload kare, uska zimma usi user ka hoga.
+
+      DMCA ya removal request par content 24–48 hours me remove kiya jata hai.
+
+    </div>
+  </div>
+
+  <!-- ================== NOTICE ================== -->
+  <div class="section">
+    <h2><i class="fa-solid fa-bell"></i> 5. NOTICE</h2>
+
+    <div class="notice">
+      Yahan wo saare notices aayenge jo tum manually add karoge.  
+      Example: “System maintenance 25 Nov ko hoga”, “New feature coming soon”, etc.  
+      ← Ye section editable rakha gaya hai.
+    </div>
+
+  </div>
+
+  <footer>© 2025 — Notora Community Library</footer>
+
+</div>
+
+<script>
+  // Accordion FAQ
+  document.querySelectorAll(".faq-item").forEach(item=>{
+    item.addEventListener("click",()=>{
+      item.classList.toggle("active");
+    });
+  });
+</script>
+
+</body>
+</html>
